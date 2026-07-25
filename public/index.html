@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>نظام إدارة مدرسة النور</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Cairo', sans-serif; }
+    .sidebar { transition: all 0.3s; }
+    .nav-item:hover { background: rgba(255,255,255,0.1); }
+    .card { transition: transform 0.2s; }
+    .card:hover { transform: translateY(-5px); }
+  </style>
+</head>
+<body class="bg-gray-100">
+  <div class="flex h-screen">
+    
+    <!-- Sidebar -->
+    <div class="sidebar w-64 bg-gradient-to-b from-blue-800 to-blue-900 text-white">
+      <div class="p-6 border-b border-blue-700">
+        <h1 class="text-2xl font-bold">🏫 مدرسة النور</h1>
+        <p class="text-blue-200 text-sm mt-1">نظام الإدارة المتكامل</p>
+      </div>
+      
+      <nav class="mt-6">
+        <a href="#" onclick="showPage('dashboard')" class="nav-item flex items-center px-6 py-3 text-blue-100 hover:text-white">
+          <span class="ml-3">📊</span> لوحة التحكم
+        </a>
+        <a href="#" onclick="showPage('students')" class="nav-item flex items-center px-6 py-3 text-blue-100 hover:text-white">
+          <span class="ml-3">👥</span> الطلاب
+        </a>
+        <a href="#" onclick="showPage('attendance')" class="nav-item flex items-center px-6 py-3 text-blue-100 hover:text-white">
+          <span class="ml-3">📅</span> الحضور
+        </a>
+        <a href="#" onclick="showPage('grades')" class="nav-item flex items-center px-6 py-3 text-blue-100 hover:text-white">
+          <span class="ml-3">📚</span> الدرجات
+        </a>
+        <a href="#" onclick="showPage('fees')" class="nav-item flex items-center px-6 py-3 text-blue-100 hover:text-white">
+          <span class="ml-3">💰</span> الرسوم
+        </a>
+        <a href="#" onclick="showPage('certificates')" class="nav-item flex items-center px-6 py-3 text-blue-100 hover:text-white">
+          <span class="ml-3">🎓</span> الشهادات
+        </a>
+      </nav>
+      
+      <div class="absolute bottom-0 w-64 p-4 border-t border-blue-700">
+        <div class="flex items-center">
+          <div class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
+            <span>👤</span>
+          </div>
+          <div class="mr-3">
+            <p class="text-sm font-semibold">المدير العام</p>
+            <p class="text-xs text-blue-200">admin@school.com</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div class="flex-1 overflow-auto">
+      <!-- Top Bar -->
+      <div class="bg-white shadow-sm px-6 py-4 flex justify-between items-center">
+        <h2 id="page-title" class="text-2xl font-bold text-gray-800">لوحة التحكم</h2>
+        <div class="flex items-center gap-4">
+          <span class="text-sm text-gray-600">📅 <span id="current-date"></span></span>
+          <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+            🔔 الإشعارات
+          </button>
+        </div>
+      </div>
+
+      <!-- Dashboard Page -->
+      <div id="dashboard" class="page p-6">
+        <!-- Stats Cards -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+          <div class="card bg-white rounded-xl shadow-md p-6 border-r-4 border-blue-500">
+            <div class="flex justify-between items-center">
+              <div>
+                <p class="text-gray-500 text-sm">إجمالي الطلاب</p>
+                <p class="text-3xl font-bold text-gray-800 mt-2" id="total-students">0</p>
+                <p class="text-green-600 text-sm mt-1">↑ 12% هذا الشهر</p>
+              </div>
+              <div class="bg-blue-100 p-4 rounded-full">
+                <span class="text-3xl">👥</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="card bg-white rounded-xl shadow-md p-6 border-r-4 border-green-500">
+            <div class="flex justify-between items-center">
+              <div>
+                <p class="text-gray-500 text-sm">الحضور اليوم</p>
+                <p class="text-3xl font-bold text-gray-800 mt-2" id="attendance-today">0</p>
+                <p class="text-green-600 text-sm mt-1">↑ 5% عن الأمس</p>
+              </div>
+              <div class="bg-green-100 p-4 rounded-full">
+                <span class="text-3xl">✅</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="card bg-white rounded-xl shadow-md p-6 border-r-4 border-yellow-500">
+            <div class="flex justify-between items-center">
+              <div>
+                <p class="text-gray-500 text-sm">الإيرادات الشهرية</p>
+                <p class="text-3xl font-bold text-gray-800 mt-2" id="monthly-revenue">0</p>
+                <p class="text-green-600 text-sm mt-1">جنيه مصري</p>
+              </div>
+              <div class="bg-yellow-100 p-4 rounded-full">
+                <span class="text-3xl">💰</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="card bg-white rounded-xl shadow-md p-6 border-r-4 border-purple-500">
+            <div class="flex justify-between items-center">
+              <div>
+                <p class="text-gray-500 text-sm">معدل النجاح</p>
+                <p class="text-3xl font-bold text-gray-800 mt-2">92%</p>
+                <p class="text-green-600 text-sm mt-1">↑ 3% هذا الترم</p>
+              </div>
+              <div class="bg-purple-100 p-4 rounded-full">
+                <span class="text-3xl">🎯</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Charts -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+          <div class="bg-white rounded-xl shadow-md p-6">
+            <h3 class="text-lg font-bold text-gray-800 mb-4">📊 إحصائيات الحضور</h3>
+            <canvas id="attendanceChart"></canvas>
+          </div>
+
+          <div class="bg-white rounded-xl shadow-md p-6">
+            <h3 class="text-lg font-bold text-gray-800 mb-4">💵 الإيرادات الشهرية</h3>
+            <canvas id="revenueChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Recent Activities -->
+        <div class="bg-white rounded-xl shadow-md p-6">
+          <h3 class="text-lg font-bold text-gray-800 mb-4">📝 النشاطات الأخيرة</h3>
+          <div class="space-y-3">
+            <div class="flex items-center p-3 bg-blue-50 rounded-lg">
+              <div class="bg-blue-500 text-white w-10 h-10 rounded-full flex items-center justify-center">✅</div>
+              <div class="mr-4 flex-1">
+                <p class="font-semibold">تم تسجيل حضور 25 طالب</p>
+                <p class="text-sm text-gray-600">منذ 5 دقائق</p>
+              </div>
+            </div>
+            <div class="flex items-center p-3 bg-green-50 rounded-lg">
+              <div class="bg-green-500 text-white w-10 h-10 rounded-full flex items-center justify-center">💰</div>
+              <div class="mr-4 flex-1">
+                <p class="font-semibold">دفعة جديدة: 5000 جنيه - أحمد محمد</p>
+                <p class="text-sm text-gray-600">منذ 30 دقيقة</p>
+              </div>
+            </div>
+            <div class="flex items-center p-3 bg-yellow-50 rounded-lg">
+              <div class="bg-yellow-500 text-white w-10 h-10 rounded-full flex items-center justify-center">📚</div>
+              <div class="mr-4 flex-1">
+                <p class="font-semibold">تم إضافة درجات الرياضيات للصف الأول</p>
+                <p class="text-sm text-gray-600">منذ ساعة</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Students Page -->
+      <div id="students" class="page p-6 hidden">
+        <div class="bg-white rounded-xl shadow-md p-6">
+          <div class="flex justify-between items-center mb-6">
+            <h3 class="text-xl font-bold">👥 إدارة الطلاب</h3>
+            <button onclick="addStudent()" class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+              + إضافة طالب
+            </button>
+          </div>
+          
+          <div class="overflow-x-auto">
+            <table class="w-full">
+              <thead class="bg-gray-50 border-b">
+                <tr>
+                  <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">الرقم</th>
+                  <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">الاسم</th>
+                  <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">الصف</th>
+                  <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">الشعبة</th>
+                  <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">الحالة</th>
+                  <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">الإجراءات</th>
+                </tr>
+              </thead>
+              <tbody id="students-table" class="divide-y divide-gray-200">
+                <!-- سيتم ملؤه بالجافاسكربت -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Attendance Page -->
+      <div id="attendance" class="page p-6 hidden">
+        <div class="bg-white rounded-xl shadow-md p-6">
+          <h3 class="text-xl font-bold mb-6">📅 سجل الحضور والغياب</h3>
+          <div id="attendance-list" class="space-y-3">
+            <!-- سيتم ملؤه بالجافاسكربت -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Grades Page -->
+      <div id="grades" class="page p-6 hidden">
+        <div class="bg-white rounded-xl shadow-md p-6">
+          <h3 class="text-xl font-bold mb-6">📚 درجات الطلاب</h3>
+          <div class="overflow-x-auto">
+            <table class="w-full">
+              <thead class="bg-gray-50 border-b">
+                <tr>
+                  <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">الطالب</th>
+                  <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">المادة</th>
+                  <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">الدرجة</th>
+                  <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">النسبة</th>
+                  <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">التقدير</th>
+                </tr>
+              </thead>
+              <tbody id="grades-table" class="divide-y divide-gray-200">
+                <!-- سيتم ملؤه بالجافاسكربت -->
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
+      <!-- Fees Page -->
+      <div id="fees" class="page p-6 hidden">
+        <div class="bg-white rounded-xl shadow-md p-6">
+          <h3 class="text-xl font-bold mb-6">💰 الرسوم والمدفوعات</h3>
+          <div id="fees-list" class="space-y-3">
+            <!-- سيتم ملؤه بالجافاسكربت -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Certificates Page -->
+      <div id="certificates" class="page p-6 hidden">
+        <div class="bg-white rounded-xl shadow-md p-6">
+          <h3 class="text-xl font-bold mb-6">🎓 شهادات الطلاب</h3>
+          <div id="certificates-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <!-- سيتم ملؤه بالجافاسكربت -->
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    // عرض التاريخ الحالي
+    document.getElementById('current-date').textContent = new Date().toLocaleDateString('ar-EG', {
+      weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+    });
+
+    // التبديل بين الصفحات
+    function showPage(pageName) {
+      document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
+      document.getElementById(pageName).classList.remove('hidden');
+      
+      const titles = {
+        'dashboard': 'لوحة التحكم',
+        'students': 'إدارة الطلاب',
+        'attendance': 'الحضور والغياب',
+        'grades': 'درجات الطلاب',
+        'fees': 'الرسوم والمدفوعات',
+        'certificates': 'شهادات الطلاب'
+      };
+      document.getElementById('page-title').textContent = titles[pageName];
+      
+      // تحميل البيانات عند التنقل
+      if (pageName === 'students') loadStudents();
+      if (pageName === 'attendance') loadAttendance();
+      if (pageName === 'grades') loadGrades();
+      if (pageName === 'fees') loadFees();
+      if (pageName === 'certificates') loadCertificates();
+    }
+
+    // تحميل البيانات من الـ API
+    async function loadStudents() {
+      const res = await fetch('/api/students');
+      const data = await res.json();
+      const tbody = document.getElementById('students-table');
+      tbody.innerHTML = data.data.map(s => `
+        <tr class="hover:bg-gray-50">
+          <td class="px-6 py-4">${s.id}</td>
+          <td class="px-6 py-4 font-semibold">${s.name}</td>
+          <td class="px-6 py-4">${s.grade}</td>
+          <td class="px-6 py-4">${s.section}</td>
+          <td class="px-6 py-4"><span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">${s.status}</span></td>
+          <td class="px-6 py-4">
+            <a href="/certificate/${s.id}" target="_blank" class="text-blue-600 hover:text-blue-900 ml-2">🎓</a>
+            <button class="text-red-600 hover:text-red-900">🗑️</button>
+          </td>
+        </tr>
+      `).join('');
+      document.getElementById('total-students').textContent = data.count;
+    }
+
+    async function loadAttendance() {
+      const res = await fetch('/api/attendance');
+      const data = await res.json();
+      const list = document.getElementById('attendance-list');
+      list.innerHTML = data.data.map(a => `
+        <div class="flex items-center p-4 bg-gray-50 rounded-lg">
+          <div class="w-12 h-12 ${a.status === 'present' ? 'bg-green-500' : a.status === 'absent' ? 'bg-red-500' : 'bg-yellow-500'} text-white rounded-full flex items-center justify-center text-xl">
+            ${a.status === 'present' ? '✅' : a.status === 'absent' ? '❌' : '⏰'}
+          </div>
+          <div class="mr-4 flex-1">
+            <p class="font-semibold">${a.student_name}</p>
+            <p class="text-sm text-gray-600">${a.date}</p>
+          </div>
+          <span class="px-3 py-1 rounded-full text-sm ${a.status === 'present' ? 'bg-green-100 text-green-800' : a.status === 'absent' ? 'bg-red-100 text-red-800' : 'bg-yellow-100 text-yellow-800'}">
+            ${a.status === 'present' ? 'حاضر' : a.status === 'absent' ? 'غائب' : 'متأخر'}
+          </span>
+        </div>
+      `).join('');
+      document.getElementById('attendance-today').textContent = data.data.filter(a => a.status === 'present').length;
+    }
+
+    async function loadGrades() {
+      const res = await fetch('/api/grades');
+      const data = await res.json();
+      const tbody = document.getElementById('grades-table');
+      tbody.innerHTML = data.data.map(g => {
+        const percentage = ((g.score / g.max_score) * 100).toFixed(1);
+        const grade = percentage >= 90 ? 'ممتاز' : percentage >= 80 ? 'جيد جداً' : percentage >= 70 ? 'جيد' : percentage >= 60 ? 'مقبول' : 'ضعيف';
+        const color = percentage >= 90 ? 'green' : percentage >= 70 ? 'blue' : 'yellow';
+        return `
+          <tr class="hover:bg-gray-50">
+            <td class="px-6 py-4 font-semibold">${g.student_name}</td>
+            <td class="px-6 py-4">${g.subject}</td>
+            <td class="px-6 py-4">${g.score} / ${g.max_score}</td>
+            <td class="px-6 py-4">${percentage}%</td>
+            <td class="px-6 py-4"><span class="bg-${color}-100 text-${color}-800 px-3 py-1 rounded-full text-sm">${grade}</span></td>
+          </tr>
+        `;
+      }).join('');
+    }
+
+    async function loadFees() {
+      const res = await fetch('/api/fees');
+      const data = await res.json();
+      const list = document.getElementById('fees-list');
+      let total = 0;
+      list.innerHTML = data.data.map(f => {
+        if (f.status === 'paid') total += f.amount;
+        return `
+          <div class="flex items-center p-4 bg-gray-50 rounded-lg">
+            <div class="w-12 h-12 ${f.status === 'paid' ? 'bg-green-500' : 'bg-red-500'} text-white rounded-full flex items-center justify-center text-xl">
+              ${f.status === 'paid' ? '💵' : '⏳'}
+            </div>
+            <div class="mr-4 flex-1">
+              <p class="font-semibold">${f.student_name}</p>
+              <p class="text-sm text-gray-600">تاريخ الاستحقاق: ${f.due_date}</p>
+            </div>
+            <div class="text-left">
+              <p class="font-bold text-lg">${f.amount} جنيه</p>
+              <span class="px-3 py-1 rounded-full text-xs ${f.status === 'paid' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'}">
+                ${f.status === 'paid' ? 'مدفوع' : 'غير مدفوع'}
+              </span>
+            </div>
+          </div>
+        `;
+      }).join('');
+      document.getElementById('monthly-revenue').textContent = total.toLocaleString();
+    }
+
+    async function loadCertificates() {
+      const res = await fetch('/api/students');
+      const data = await res.json();
+      const list = document.getElementById('certificates-list');
+      list.innerHTML = data.data.map(s => `
+        <a href="/certificate/${s.id}" target="_blank" class="block bg-gradient-to-br from-blue-500 to-purple-600 text-white p-6 rounded-xl hover:shadow-xl transition">
+          <div class="text-4xl mb-2">🎓</div>
+          <h4 class="font-bold text-lg">${s.name}</h4>
+          <p class="text-sm opacity-90">${s.grade} - ${s.section}</p>
+          <button class="mt-4 bg-white text-blue-600 px-4 py-2 rounded-lg text-sm font-semibold w-full">
+            عرض الشهادة
+          </button>
+        </a>
+      `).join('');
+    }
+
+    function addStudent() {
+      const name = prompt('اسم الطالب:');
+      const grade = prompt('الصف:');
+      const section = prompt('الشعبة:');
+      if (name && grade && section) {
+        fetch('/api/students', {
+          method: 'POST',
+          headers: {'Content-Type': 'application/json'},
+          body: JSON.stringify({name, grade, section})
+        }).then(() => {
+          alert('✅ تم إضافة الطالب بنجاح');
+          loadStudents();
+        });
+      }
+    }
+
+    // الرسوم البيانية
+    window.addEventListener('load', () => {
+      // رسم بياني للحضور
+      new Chart(document.getElementById('attendanceChart'), {
+        type: 'doughnut',
+        data: {
+          labels: ['حاضر', 'غائب', 'متأخر'],
+          datasets: [{
+            data: [75, 15, 10],
+            backgroundColor: ['#10b981', '#ef4444', '#f59e0b']
+          }]
+        },
+        options: { responsive: true }
+      });
+
+      // رسم بياني للإيرادات
+      new Chart(document.getElementById('revenueChart'), {
+        type: 'bar',
+        data: {
+          labels: ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو'],
+          datasets: [{
+            label: 'الإيرادات (جنيه)',
+            data: [45000, 52000, 48000, 61000, 55000, 67000],
+            backgroundColor: '#3b82f6'
+          }]
+        },
+        options: { responsive: true }
+      });
+
+      // تحميل البيانات الأولية
+      loadStudents();
+      loadAttendance();
+      loadFees();
+    });
+  </script>
+</body>
+</html>
