@@ -96,6 +96,29 @@ app.get('/certificate/:id', async (req, res) => {
   }
 });
 
+// التحقق من تسجيل الدخول
+function checkAuth(req, res, next) {
+  // السماح بالوصول لصفحة تسجيل الدخول والـ APIs العامة
+  if (req.path === '/login.html' || req.path === '/api/login') {
+    return next();
+  }
+  
+  // في النسخة التجريبية، نتخطى التحقق (لاحقاً سنتحقق من Token)
+  next();
+}
+
+app.use(checkAuth);
+
+// إعادة توجيه الصفحة الرئيسية لصفحة تسجيل الدخول إذا لم يكن مسجلاً
+app.get('/', (req, res) => {
+  // في النسخة التجريبية، نعرض الواجهة مباشرة
+  res.sendFile(__dirname + '/public/index.html');
+});
+
+// صفحة تسجيل الدخول
+app.get('/login', (req, res) => {
+  res.sendFile(__dirname + '/public/login.html');
+});
 // تشغيل الخادم
 app.listen(PORT, () => {
   console.log(`🚀 النظام المتكامل يعمل على المنفذ ${PORT}`);
