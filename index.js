@@ -120,6 +120,56 @@ app.get('/login', (req, res) => {
   res.sendFile(__dirname + '/public/login.html');
 });
 // تشغيل الخادم
+// ======== APIs لبيانات المدرسة ========
+
+// جلب معلومات المدرسة
+app.get('/api/school', (req, res) => {
+  db.get("SELECT * FROM school_info", (err, row) => {
+    res.json({ success: true, data: row });
+  });
+});
+
+// جلب الفصول الدراسية
+app.get('/api/terms', (req, res) => {
+  db.all("SELECT * FROM terms", (err, rows) => {
+    res.json({ success: true, data: rows });
+  });
+});
+
+// جلب الصفوف
+app.get('/api/grades', (req, res) => {
+  db.all("SELECT * FROM grades", (err, rows) => {
+    res.json({ success: true, data: rows });
+  });
+});
+
+// جلب الشعب
+app.get('/api/sections', (req, res) => {
+  db.all("SELECT s.*, g.name as grade_name FROM sections s JOIN grades g ON s.grade_id = g.id", (err, rows) => {
+    res.json({ success: true, data: rows });
+  });
+});
+
+// جلب المواد الدراسية
+app.get('/api/subjects', (req, res) => {
+  db.all("SELECT * FROM subjects", (err, rows) => {
+    res.json({ success: true, data: rows });
+  });
+});
+
+// جلب المعلمين
+app.get('/api/teachers', (req, res) => {
+  db.all("SELECT t.*, s.name as subject_name FROM teachers t LEFT JOIN subjects s ON t.subject_id = s.id", (err, rows) => {
+    res.json({ success: true, data: rows });
+  });
+});
+
+// جلب القاعات والمعامل
+app.get('/api/rooms', (req, res) => {
+  db.all("SELECT * FROM rooms", (err, rows) => {
+    res.json({ success: true, data: rows });
+  });
+});
 app.listen(PORT, () => {
   console.log(`🚀 النظام المتكامل يعمل على المنفذ ${PORT}`);
   console.log(`💾 قاعدة البيانات: school.db`);
