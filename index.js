@@ -5,7 +5,7 @@ const db = require('./database');
 const { getStudentCertificate, generateCertificateHTML } = require('./certificate');
 
 const app = express();
-const PORT = process.env.PORT || 3003;
+const PORT = process.env.PORT || 3004;
 
 // ======== إعدادات النظام ========
 app.use(cors());
