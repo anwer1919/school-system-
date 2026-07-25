@@ -10,13 +10,11 @@ function generateStudentsReport(res) {
   
   doc.pipe(res);
   
-  // العنوان
   doc.fontSize(20).text('تقرير الطلاب', { align: 'center' });
   doc.moveDown();
   doc.fontSize(12).text(`تاريخ التقرير: ${new Date().toLocaleDateString('ar-EG')}`, { align: 'center' });
   doc.moveDown(2);
   
-  // جلب البيانات
   db.all("SELECT * FROM students", (err, rows) => {
     if (err) {
       doc.text('حدث خطأ في جلب البيانات');
@@ -24,7 +22,6 @@ function generateStudentsReport(res) {
       return;
     }
     
-    // رؤوس الجدول
     doc.fontSize(12).font('Helvetica-Bold');
     doc.text('الرقم', 50, doc.y, { continued: true });
     doc.text('الاسم', 150, doc.y, { continued: true });
@@ -33,11 +30,9 @@ function generateStudentsReport(res) {
     doc.text('الحالة', 500, doc.y);
     doc.moveDown();
     
-    // خط فاصل
     doc.moveTo(50, doc.y).lineTo(550, doc.y).stroke();
     doc.moveDown();
     
-    // البيانات
     doc.font('Helvetica');
     rows.forEach(student => {
       doc.text(student.id.toString(), 50, doc.y, { continued: true });
