@@ -11,32 +11,44 @@
     body { font-family: 'Cairo', sans-serif; }
     .sidebar { transition: all 0.3s; }
     .nav-item:hover { background: rgba(255,255,255,0.1); }
+    .nav-item.active { background: rgba(255,255,255,0.2); border-right: 4px solid white; }
     .card { transition: transform 0.2s; }
     .card:hover { transform: translateY(-5px); }
+    .fade-in { animation: fadeIn 0.5s; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
   </style>
 </head>
 <body class="bg-gray-100">
   <div class="flex h-screen">
     
     <!-- Sidebar -->
-    <div class="sidebar w-64 bg-gradient-to-b from-blue-800 to-blue-900 text-white">
+    <div class="sidebar w-64 bg-gradient-to-b from-blue-800 to-blue-900 text-white flex flex-col">
       <div class="p-6 border-b border-blue-700">
         <h1 class="text-2xl font-bold">🏫 مدرسة النور</h1>
         <p class="text-blue-200 text-sm mt-1">نظام الإدارة المتكامل</p>
       </div>
       
-      <nav class="mt-6">
-        <a href="#" onclick="showPage('dashboard')" class="nav-item flex items-center px-6 py-3 text-blue-100 hover:text-white">
+      <nav class="mt-6 flex-1 overflow-y-auto">
+        <a href="#" onclick="showPage('dashboard')" class="nav-item active flex items-center px-6 py-3 text-blue-100 hover:text-white">
           <span class="ml-3">📊</span> لوحة التحكم
         </a>
         <a href="#" onclick="showPage('students')" class="nav-item flex items-center px-6 py-3 text-blue-100 hover:text-white">
           <span class="ml-3">👥</span> الطلاب
         </a>
+        <a href="#" onclick="showPage('teachers')" class="nav-item flex items-center px-6 py-3 text-blue-100 hover:text-white">
+          <span class="ml-3">👨‍🏫</span> المعلمون
+        </a>
+        <a href="#" onclick="showPage('subjects')" class="nav-item flex items-center px-6 py-3 text-blue-100 hover:text-white">
+          <span class="ml-3">📚</span> المواد الدراسية
+        </a>
         <a href="#" onclick="showPage('attendance')" class="nav-item flex items-center px-6 py-3 text-blue-100 hover:text-white">
           <span class="ml-3">📅</span> الحضور
         </a>
         <a href="#" onclick="showPage('grades')" class="nav-item flex items-center px-6 py-3 text-blue-100 hover:text-white">
-          <span class="ml-3">📚</span> الدرجات
+          <span class="ml-3">🎯</span> الدرجات
         </a>
         <a href="#" onclick="showPage('fees')" class="nav-item flex items-center px-6 py-3 text-blue-100 hover:text-white">
           <span class="ml-3">💰</span> الرسوم
@@ -44,36 +56,46 @@
         <a href="#" onclick="showPage('certificates')" class="nav-item flex items-center px-6 py-3 text-blue-100 hover:text-white">
           <span class="ml-3">🎓</span> الشهادات
         </a>
+        <a href="#" onclick="showPage('school')" class="nav-item flex items-center px-6 py-3 text-blue-100 hover:text-white">
+          <span class="ml-3">🏢</span> بيانات المدرسة
+        </a>
+        <a href="#" onclick="showPage('reports')" class="nav-item flex items-center px-6 py-3 text-blue-100 hover:text-white">
+          <span class="ml-3">📄</span> التقارير
+        </a>
       </nav>
       
-      <div class="absolute bottom-0 w-64 p-4 border-t border-blue-700">
-        <div class="flex items-center">
+      <div class="p-4 border-t border-blue-700">
+        <div class="flex items-center mb-3">
           <div class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
             <span>👤</span>
           </div>
-          <div class="mr-3">
-            <p class="text-sm font-semibold">المدير العام</p>
-            <p class="text-xs text-blue-200">admin@school.com</p>
+          <div class="mr-3 flex-1">
+            <p class="text-sm font-semibold" id="user-name">المدير العام</p>
+            <p class="text-xs text-blue-200" id="user-email">admin@school.com</p>
           </div>
         </div>
+        <button onclick="logout()" class="w-full bg-red-500 hover:bg-red-600 text-white py-2 rounded-lg text-sm">
+          🚪 تسجيل الخروج
+        </button>
       </div>
     </div>
 
     <!-- Main Content -->
     <div class="flex-1 overflow-auto">
       <!-- Top Bar -->
-      <div class="bg-white shadow-sm px-6 py-4 flex justify-between items-center">
+      <div class="bg-white shadow-sm px-6 py-4 flex justify-between items-center sticky top-0 z-10">
         <h2 id="page-title" class="text-2xl font-bold text-gray-800">لوحة التحكم</h2>
         <div class="flex items-center gap-4">
           <span class="text-sm text-gray-600">📅 <span id="current-date"></span></span>
-          <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700">
+          <button class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 relative">
             🔔 الإشعارات
+            <span class="absolute -top-1 -right-1 bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center">3</span>
           </button>
         </div>
       </div>
 
-      <!-- Dashboard Page -->
-      <div id="dashboard" class="page p-6">
+      <!-- ============ Dashboard Page ============ -->
+      <div id="dashboard" class="page p-6 fade-in">
         <!-- Stats Cards -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <div class="card bg-white rounded-xl shadow-md p-6 border-r-4 border-blue-500">
@@ -118,12 +140,12 @@
           <div class="card bg-white rounded-xl shadow-md p-6 border-r-4 border-purple-500">
             <div class="flex justify-between items-center">
               <div>
-                <p class="text-gray-500 text-sm">معدل النجاح</p>
-                <p class="text-3xl font-bold text-gray-800 mt-2">92%</p>
-                <p class="text-green-600 text-sm mt-1">↑ 3% هذا الترم</p>
+                <p class="text-gray-500 text-sm">عدد المعلمين</p>
+                <p class="text-3xl font-bold text-gray-800 mt-2" id="total-teachers">0</p>
+                <p class="text-green-600 text-sm mt-1">↑ 2 هذا الترم</p>
               </div>
               <div class="bg-purple-100 p-4 rounded-full">
-                <span class="text-3xl">🎯</span>
+                <span class="text-3xl">👨‍🏫</span>
               </div>
             </div>
           </div>
@@ -139,6 +161,22 @@
           <div class="bg-white rounded-xl shadow-md p-6">
             <h3 class="text-lg font-bold text-gray-800 mb-4">💵 الإيرادات الشهرية</h3>
             <canvas id="revenueChart"></canvas>
+          </div>
+        </div>
+
+        <!-- Reports Section -->
+        <div class="bg-white rounded-xl shadow-md p-6 mb-8">
+          <h3 class="text-lg font-bold text-gray-800 mb-4">📄 التقارير السريعة</h3>
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <a href="/api/reports/students" target="_blank" class="bg-gradient-to-r from-blue-500 to-blue-600 text-white px-6 py-4 rounded-lg hover:shadow-lg text-center font-semibold flex items-center justify-center gap-2">
+              📄 تقرير الطلاب
+            </a>
+            <a href="/api/reports/attendance" target="_blank" class="bg-gradient-to-r from-green-500 to-green-600 text-white px-6 py-4 rounded-lg hover:shadow-lg text-center font-semibold flex items-center justify-center gap-2">
+              📄 تقرير الحضور
+            </a>
+            <a href="/api/reports/fees" target="_blank" class="bg-gradient-to-r from-yellow-500 to-yellow-600 text-white px-6 py-4 rounded-lg hover:shadow-lg text-center font-semibold flex items-center justify-center gap-2">
+              📄 تقرير المالية
+            </a>
           </div>
         </div>
 
@@ -171,8 +209,8 @@
         </div>
       </div>
 
-      <!-- Students Page -->
-      <div id="students" class="page p-6 hidden">
+      <!-- ============ Students Page ============ -->
+      <div id="students" class="page p-6 hidden fade-in">
         <div class="bg-white rounded-xl shadow-md p-6">
           <div class="flex justify-between items-center mb-6">
             <h3 class="text-xl font-bold">👥 إدارة الطلاب</h3>
@@ -193,28 +231,51 @@
                   <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">الإجراءات</th>
                 </tr>
               </thead>
-              <tbody id="students-table" class="divide-y divide-gray-200">
-                <!-- سيتم ملؤه بالجافاسكربت -->
-              </tbody>
+              <tbody id="students-table" class="divide-y divide-gray-200"></tbody>
             </table>
           </div>
         </div>
       </div>
 
-      <!-- Attendance Page -->
-      <div id="attendance" class="page p-6 hidden">
+      <!-- ============ Teachers Page ============ -->
+      <div id="teachers" class="page p-6 hidden fade-in">
         <div class="bg-white rounded-xl shadow-md p-6">
-          <h3 class="text-xl font-bold mb-6">📅 سجل الحضور والغياب</h3>
-          <div id="attendance-list" class="space-y-3">
-            <!-- سيتم ملؤه بالجافاسكربت -->
+          <h3 class="text-xl font-bold mb-6">👨‍🏫 المعلمون</h3>
+          <div id="teachers-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+        </div>
+      </div>
+
+      <!-- ============ Subjects Page ============ -->
+      <div id="subjects" class="page p-6 hidden fade-in">
+        <div class="bg-white rounded-xl shadow-md p-6">
+          <h3 class="text-xl font-bold mb-6">📚 المواد الدراسية</h3>
+          <div class="overflow-x-auto">
+            <table class="w-full">
+              <thead class="bg-gray-50 border-b">
+                <tr>
+                  <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">الكود</th>
+                  <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">اسم المادة</th>
+                  <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">الصف</th>
+                </tr>
+              </thead>
+              <tbody id="subjects-table" class="divide-y divide-gray-200"></tbody>
+            </table>
           </div>
         </div>
       </div>
 
-      <!-- Grades Page -->
-      <div id="grades" class="page p-6 hidden">
+      <!-- ============ Attendance Page ============ -->
+      <div id="attendance" class="page p-6 hidden fade-in">
         <div class="bg-white rounded-xl shadow-md p-6">
-          <h3 class="text-xl font-bold mb-6">📚 درجات الطلاب</h3>
+          <h3 class="text-xl font-bold mb-6">📅 سجل الحضور والغياب</h3>
+          <div id="attendance-list" class="space-y-3"></div>
+        </div>
+      </div>
+
+      <!-- ============ Grades Page ============ -->
+      <div id="grades" class="page p-6 hidden fade-in">
+        <div class="bg-white rounded-xl shadow-md p-6">
+          <h3 class="text-xl font-bold mb-6">🎯 درجات الطلاب</h3>
           <div class="overflow-x-auto">
             <table class="w-full">
               <thead class="bg-gray-50 border-b">
@@ -226,30 +287,92 @@
                   <th class="px-6 py-3 text-right text-xs font-medium text-gray-500 uppercase">التقدير</th>
                 </tr>
               </thead>
-              <tbody id="grades-table" class="divide-y divide-gray-200">
-                <!-- سيتم ملؤه بالجافاسكربت -->
-              </tbody>
+              <tbody id="grades-table" class="divide-y divide-gray-200"></tbody>
             </table>
           </div>
         </div>
       </div>
 
-      <!-- Fees Page -->
-      <div id="fees" class="page p-6 hidden">
+      <!-- ============ Fees Page ============ -->
+      <div id="fees" class="page p-6 hidden fade-in">
         <div class="bg-white rounded-xl shadow-md p-6">
           <h3 class="text-xl font-bold mb-6">💰 الرسوم والمدفوعات</h3>
-          <div id="fees-list" class="space-y-3">
-            <!-- سيتم ملؤه بالجافاسكربت -->
+          <div id="fees-list" class="space-y-3"></div>
+        </div>
+      </div>
+
+      <!-- ============ Certificates Page ============ -->
+      <div id="certificates" class="page p-6 hidden fade-in">
+        <div class="bg-white rounded-xl shadow-md p-6">
+          <h3 class="text-xl font-bold mb-6">🎓 شهادات الطلاب</h3>
+          <div id="certificates-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+        </div>
+      </div>
+
+      <!-- ============ School Info Page ============ -->
+      <div id="school" class="page p-6 hidden fade-in">
+        <div class="bg-white rounded-xl shadow-md p-6">
+          <h3 class="text-xl font-bold mb-6">🏢 بيانات المدرسة</h3>
+          <div id="school-info" class="space-y-6"></div>
+          
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-8">
+            <div class="bg-blue-50 p-6 rounded-xl">
+              <h4 class="font-bold text-lg mb-4 text-blue-900">📚 الفصول الدراسية</h4>
+              <div id="terms-list" class="space-y-2"></div>
+            </div>
+            <div class="bg-green-50 p-6 rounded-xl">
+              <h4 class="font-bold text-lg mb-4 text-green-900">🏫 الصفوف والشعب</h4>
+              <div id="sections-list" class="space-y-2"></div>
+            </div>
+            <div class="bg-purple-50 p-6 rounded-xl">
+              <h4 class="font-bold text-lg mb-4 text-purple-900">🏛️ القاعات والمعامل</h4>
+              <div id="rooms-list" class="space-y-2"></div>
+            </div>
           </div>
         </div>
       </div>
 
-      <!-- Certificates Page -->
-      <div id="certificates" class="page p-6 hidden">
+      <!-- ============ Reports Page ============ -->
+      <div id="reports" class="page p-6 hidden fade-in">
         <div class="bg-white rounded-xl shadow-md p-6">
-          <h3 class="text-xl font-bold mb-6">🎓 شهادات الطلاب</h3>
-          <div id="certificates-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <!-- سيتم ملؤه بالجافاسكربت -->
+          <h3 class="text-xl font-bold mb-6">📄 التقارير والإحصائيات</h3>
+          
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="bg-gradient-to-br from-blue-500 to-blue-600 text-white p-6 rounded-xl">
+              <div class="text-4xl mb-3">👥</div>
+              <h4 class="text-xl font-bold mb-2">تقرير الطلاب</h4>
+              <p class="text-blue-100 mb-4">قائمة كاملة بجميع الطلاب المسجلين مع بياناتهم</p>
+              <a href="/api/reports/students" target="_blank" class="inline-block bg-white text-blue-600 px-4 py-2 rounded-lg font-semibold hover:bg-blue-50">
+                📥 تحميل PDF
+              </a>
+            </div>
+
+            <div class="bg-gradient-to-br from-green-500 to-green-600 text-white p-6 rounded-xl">
+              <div class="text-4xl mb-3">📅</div>
+              <h4 class="text-xl font-bold mb-2">تقرير الحضور</h4>
+              <p class="text-green-100 mb-4">سجل الحضور والغياب لجميع الطلاب</p>
+              <a href="/api/reports/attendance" target="_blank" class="inline-block bg-white text-green-600 px-4 py-2 rounded-lg font-semibold hover:bg-green-50">
+                📥 تحميل PDF
+              </a>
+            </div>
+
+            <div class="bg-gradient-to-br from-yellow-500 to-yellow-600 text-white p-6 rounded-xl">
+              <div class="text-4xl mb-3">💰</div>
+              <h4 class="text-xl font-bold mb-2">التقرير المالي</h4>
+              <p class="text-yellow-100 mb-4">الإيرادات والمدفوعات والرسوم المستحقة</p>
+              <a href="/api/reports/fees" target="_blank" class="inline-block bg-white text-yellow-600 px-4 py-2 rounded-lg font-semibold hover:bg-yellow-50">
+                📥 تحميل PDF
+              </a>
+            </div>
+
+            <div class="bg-gradient-to-br from-purple-500 to-purple-600 text-white p-6 rounded-xl">
+              <div class="text-4xl mb-3">🎯</div>
+              <h4 class="text-xl font-bold mb-2">تقرير الدرجات</h4>
+              <p class="text-purple-100 mb-4">درجات جميع الطلاب في جميع المواد</p>
+              <a href="/api/reports/grades" target="_blank" class="inline-block bg-white text-purple-600 px-4 py-2 rounded-lg font-semibold hover:bg-purple-50">
+                📥 تحميل PDF
+              </a>
+            </div>
           </div>
         </div>
       </div>
@@ -263,30 +386,56 @@
       weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
     });
 
+    // تحميل بيانات المستخدم
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    if (user.name) {
+      document.getElementById('user-name').textContent = user.name;
+      document.getElementById('user-email').textContent = user.role === 'admin' ? 'admin@school.com' : user.email || '';
+    }
+
+    // تسجيل الخروج
+    function logout() {
+      if (confirm('هل تريد تسجيل الخروج؟')) {
+        localStorage.removeItem('user');
+        window.location.href = '/login';
+      }
+    }
+
     // التبديل بين الصفحات
     function showPage(pageName) {
       document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
       document.getElementById(pageName).classList.remove('hidden');
+      document.getElementById(pageName).classList.add('fade-in');
+      
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      event.target.closest('.nav-item').classList.add('active');
       
       const titles = {
         'dashboard': 'لوحة التحكم',
         'students': 'إدارة الطلاب',
+        'teachers': 'المعلمون',
+        'subjects': 'المواد الدراسية',
         'attendance': 'الحضور والغياب',
         'grades': 'درجات الطلاب',
         'fees': 'الرسوم والمدفوعات',
-        'certificates': 'شهادات الطلاب'
+        'certificates': 'شهادات الطلاب',
+        'school': 'بيانات المدرسة',
+        'reports': 'التقارير'
       };
       document.getElementById('page-title').textContent = titles[pageName];
       
-      // تحميل البيانات عند التنقل
       if (pageName === 'students') loadStudents();
+      if (pageName === 'teachers') loadTeachers();
+      if (pageName === 'subjects') loadSubjects();
       if (pageName === 'attendance') loadAttendance();
       if (pageName === 'grades') loadGrades();
       if (pageName === 'fees') loadFees();
       if (pageName === 'certificates') loadCertificates();
+      if (pageName === 'school') loadSchoolInfo();
     }
 
-    // تحميل البيانات من الـ API
+    // ======== تحميل البيانات ========
+
     async function loadStudents() {
       const res = await fetch('/api/students');
       const data = await res.json();
@@ -300,11 +449,47 @@
           <td class="px-6 py-4"><span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">${s.status}</span></td>
           <td class="px-6 py-4">
             <a href="/certificate/${s.id}" target="_blank" class="text-blue-600 hover:text-blue-900 ml-2">🎓</a>
-            <button class="text-red-600 hover:text-red-900">🗑️</button>
           </td>
         </tr>
       `).join('');
       document.getElementById('total-students').textContent = data.count;
+    }
+
+    async function loadTeachers() {
+      const res = await fetch('/api/teachers');
+      const data = await res.json();
+      const list = document.getElementById('teachers-list');
+      list.innerHTML = data.data.map(t => `
+        <div class="bg-gradient-to-br from-blue-50 to-purple-50 p-6 rounded-xl border border-blue-100">
+          <div class="flex items-center mb-4">
+            <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 text-white rounded-full flex items-center justify-center text-2xl">
+              👨‍🏫
+            </div>
+            <div class="mr-4">
+              <h4 class="font-bold text-lg">${t.name}</h4>
+              <p class="text-sm text-gray-600">${t.subject_name || 'مادة عامة'}</p>
+            </div>
+          </div>
+          <div class="space-y-2 text-sm">
+            <p class="text-gray-700">📧 ${t.email}</p>
+            <p class="text-gray-700">📱 ${t.phone}</p>
+          </div>
+        </div>
+      `).join('');
+      document.getElementById('total-teachers').textContent = data.data.length;
+    }
+
+    async function loadSubjects() {
+      const res = await fetch('/api/subjects');
+      const data = await res.json();
+      const tbody = document.getElementById('subjects-table');
+      tbody.innerHTML = data.data.map(s => `
+        <tr class="hover:bg-gray-50">
+          <td class="px-6 py-4 font-mono text-blue-600">${s.code}</td>
+          <td class="px-6 py-4 font-semibold">${s.name}</td>
+          <td class="px-6 py-4">الصف ${s.grade_id}</td>
+        </tr>
+      `).join('');
     }
 
     async function loadAttendance() {
@@ -392,6 +577,71 @@
       `).join('');
     }
 
+    async function loadSchoolInfo() {
+      // بيانات المدرسة
+      const schoolRes = await fetch('/api/school');
+      const school = (await schoolRes.json()).data;
+      document.getElementById('school-info').innerHTML = `
+        <div class="bg-gradient-to-br from-blue-50 to-purple-50 p-6 rounded-xl border border-blue-100">
+          <div class="flex items-center mb-4">
+            <div class="text-6xl ml-4">${school.logo || '🏫'}</div>
+            <div>
+              <h3 class="text-2xl font-bold text-blue-900">${school.name}</h3>
+              <p class="text-gray-600">العام الدراسي: ${school.academic_year}</p>
+            </div>
+          </div>
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4">
+            <div class="bg-white p-3 rounded-lg">
+              <p class="text-sm text-gray-500">📍 العنوان</p>
+              <p class="font-semibold">${school.address}</p>
+            </div>
+            <div class="bg-white p-3 rounded-lg">
+              <p class="text-sm text-gray-500">📞 الهاتف</p>
+              <p class="font-semibold">${school.phone}</p>
+            </div>
+            <div class="bg-white p-3 rounded-lg">
+              <p class="text-sm text-gray-500">📧 البريد الإلكتروني</p>
+              <p class="font-semibold">${school.email}</p>
+            </div>
+            <div class="bg-white p-3 rounded-lg">
+              <p class="text-sm text-gray-500">🏢 الفروع</p>
+              <p class="font-semibold">${school.branches}</p>
+            </div>
+          </div>
+        </div>
+      `;
+
+      // الفصول الدراسية
+      const termsRes = await fetch('/api/terms');
+      const terms = (await termsRes.json()).data;
+      document.getElementById('terms-list').innerHTML = terms.map(t => `
+        <div class="bg-white p-3 rounded-lg">
+          <p class="font-semibold">${t.name}</p>
+          <p class="text-xs text-gray-600">${t.start_date} → ${t.end_date}</p>
+        </div>
+      `).join('');
+
+      // الصفوف والشعب
+      const sectionsRes = await fetch('/api/sections');
+      const sections = (await sectionsRes.json()).data;
+      document.getElementById('sections-list').innerHTML = sections.map(s => `
+        <div class="bg-white p-3 rounded-lg flex justify-between">
+          <span class="font-semibold">${s.grade_name} - ${s.name}</span>
+          <span class="text-xs text-gray-600">السعة: ${s.capacity}</span>
+        </div>
+      `).join('');
+
+      // القاعات والمعامل
+      const roomsRes = await fetch('/api/rooms');
+      const rooms = (await roomsRes.json()).data;
+      document.getElementById('rooms-list').innerHTML = rooms.map(r => `
+        <div class="bg-white p-3 rounded-lg flex justify-between">
+          <span class="font-semibold">${r.name}</span>
+          <span class="text-xs text-gray-600">${r.type === 'lab' ? '🔬 معمل' : r.type === 'library' ? '📚 مكتبة' : '🏫 قاعة'} (${r.capacity})</span>
+        </div>
+      `).join('');
+    }
+
     function addStudent() {
       const name = prompt('اسم الطالب:');
       const grade = prompt('الصف:');
@@ -408,9 +658,8 @@
       }
     }
 
-    // الرسوم البيانية
+    // ======== الرسوم البيانية ========
     window.addEventListener('load', () => {
-      // رسم بياني للحضور
       new Chart(document.getElementById('attendanceChart'), {
         type: 'doughnut',
         data: {
@@ -423,7 +672,6 @@
         options: { responsive: true }
       });
 
-      // رسم بياني للإيرادات
       new Chart(document.getElementById('revenueChart'), {
         type: 'bar',
         data: {
@@ -437,7 +685,6 @@
         options: { responsive: true }
       });
 
-      // تحميل البيانات الأولية
       loadStudents();
       loadAttendance();
       loadFees();
