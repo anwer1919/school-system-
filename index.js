@@ -127,6 +127,19 @@ app.post('/api/attendance', (req, res) => {
 });
 
 // تشغيل الخادم
+const { getStudentCertificate, generateCertificateHTML } = require('./certificate');
+
+// عرض شهادة طالب
+app.get('/certificate/:id', async (req, res) => {
+  try {
+    const studentId = req.params.id;
+    const data = await getStudentCertificate(studentId);
+    const html = generateCertificateHTML(data);
+    res.send(html);
+  } catch (error) {
+    res.status(404).send(`<h2 style="text-align:center;">❌ ${error}</h2>`);
+  }
+});
 app.listen(PORT, () => {
   console.log(`🚀 النظام المتكامل يعمل على المنفذ ${PORT}`);
   console.log(`💾 قاعدة البيانات: school.db (محلية وآمنة)`);
