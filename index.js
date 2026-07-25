@@ -171,6 +171,17 @@ app.get('/api/rooms', (req, res) => {
     res.json({ success: true, data: rows });
   });
 });
+// ======== APIs للتقارير ========
+
+// تقرير الطلاب PDF
+app.get('/api/reports/students', (req, res) => {
+  generateStudentsReport(res);
+});
+
+// تقرير الحضور PDF
+app.get('/api/reports/attendance', (req, res) => {
+  generateAttendanceReport(res);
+});
 app.listen(PORT, () => {
   console.log(`🚀 النظام المتكامل يعمل على المنفذ ${PORT}`);
   console.log(`💾 قاعدة البيانات: school.db`);
