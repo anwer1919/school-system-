@@ -3,6 +3,7 @@ const cors = require('cors');
 const bcrypt = require('bcryptjs');
 const db = require('./database');
 const { getStudentCertificate, generateCertificateHTML } = require('./certificate');
+const { generateStudentsReport, generateAttendanceReport } = require('./reports');
 
 const app = express();
 const PORT = process.env.PORT || 3004;
