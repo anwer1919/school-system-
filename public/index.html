@@ -736,6 +736,29 @@
       loadAttendance();
       loadFees();
     });
+    async function loadParents(){const r=await fetch('/api/parents');const d=await r.json();document.getElementById('parents-table').innerHTML=d.data.map(p=>`<tr class="hover:bg-gray-50"><td class="px-4 py-3 font-semibold">${p.name}</td><td class="px-4 py-3">${p.phone}</td><td class="px-4 py-3">${p.email}</td><td class="px-4 py-3">${p.job||'-'}</td></tr>`).join('');}
+
+async function loadEmployees(){const r=await fetch('/api/employees');const d=await r.json();document.getElementById('employees-table').innerHTML=d.data.map(e=>`<tr class="hover:bg-gray-50"><td class="px-4 py-3 font-semibold">${e.name}</td><td class="px-4 py-3"><span class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">${e.role}</span></td><td class="px-4 py-3">${e.phone}</td><td class="px-4 py-3">${e.salary} جنيه</td></tr>`).join('');}
+
+async function loadSchedules(){const r=await fetch('/api/schedules');const d=await r.json();document.getElementById('schedules-table').innerHTML=d.data.map(s=>`<tr class="hover:bg-gray-50"><td class="px-4 py-3 font-semibold">${s.day}</td><td class="px-4 py-3">الحصة ${s.period}</td><td class="px-4 py-3">${s.subject}</td><td class="px-4 py-3">${s.teacher}</td><td class="px-4 py-3">${s.room}</td></tr>`).join('');}
+
+async function loadExams(){const r=await fetch('/api/exams');const d=await r.json();document.getElementById('exams-table').innerHTML=d.data.map(e=>`<tr class="hover:bg-gray-50"><td class="px-4 py-3 font-semibold">${e.name}</td><td class="px-4 py-3">${e.subject}</td><td class="px-4 py-3">${e.grade}</td><td class="px-4 py-3">${e.date}</td><td class="px-4 py-3"><span class="px-2 py-1 rounded-full text-xs ${e.status==='مكتمل'?'bg-green-100 text-green-800':'bg-yellow-100 text-yellow-800'}">${e.status}</span></td></tr>`).join('');}
+
+async function loadClinic(){const r=await fetch('/api/clinic');const d=await r.json();document.getElementById('clinic-list').innerHTML=d.data.map(c=>`<div class="flex items-center p-4 bg-red-50 rounded-lg"><div class="w-12 h-12 bg-red-500 text-white rounded-full flex items-center justify-center text-xl">🏥</div><div class="mr-4 flex-1"><p class="font-semibold">${c.student_name}</p><p class="text-sm text-gray-600">${c.date} - ${c.complaint}</p><p class="text-sm text-green-700">العلاج: ${c.treatment}</p></div></div>`).join('');}
+
+async function loadTransport(){const r=await fetch('/api/transport');const d=await r.json();document.getElementById('transport-list').innerHTML=d.data.map(t=>`<div class="bg-yellow-50 p-6 rounded-xl border border-yellow-200"><h4 class="font-bold text-lg">🚌 ${t.bus_name}</h4><p class="text-sm text-gray-700 mt-2">المسار: ${t.route}</p><p class="text-sm text-gray-700">السائق: ${t.driver}</p><p class="text-sm text-gray-700">السعة: ${t.students_count}/${t.capacity}</p></div>`).join('');}
+
+async function loadLibrary(){const r=await fetch('/api/library');const d=await r.json();document.getElementById('library-table').innerHTML=d.data.map(b=>`<tr class="hover:bg-gray-50"><td class="px-4 py-3 font-semibold">${b.book_title}</td><td class="px-4 py-3">${b.author}</td><td class="px-4 py-3"><span class="px-2 py-1 rounded-full text-xs ${b.status==='متاح'?'bg-green-100 text-green-800':'bg-red-100 text-red-800'}">${b.status}</span></td><td class="px-4 py-3">${b.borrower||'-'}</td></tr>`).join('');}
+
+async function loadInventory(){const r=await fetch('/api/inventory');const d=await r.json();document.getElementById('inventory-table').innerHTML=d.data.map(i=>`<tr class="hover:bg-gray-50"><td class="px-4 py-3 font-semibold">${i.item_name}</td><td class="px-4 py-3">${i.category}</td><td class="px-4 py-3">${i.quantity}</td><td class="px-4 py-3">${i.location}</td></tr>`).join('');}
+
+async function loadCalendar(){const r=await fetch('/api/calendar_events');const d=await r.json();document.getElementById('calendar-list').innerHTML=d.data.map(e=>`<div class="flex items-center p-4 bg-blue-50 rounded-lg"><div class="w-12 h-12 bg-blue-500 text-white rounded-full flex items-center justify-center text-xl">📅</div><div class="mr-4 flex-1"><p class="font-semibold">${e.title}</p><p class="text-sm text-gray-600">${e.date} - ${e.type}</p><p class="text-sm text-gray-500">${e.description}</p></div></div>`).join('');}
+
+async function loadAudit(){const r=await fetch('/api/audit_log');const d=await r.json();document.getElementById('audit-table').innerHTML=d.data.map(a=>`<tr class="hover:bg-gray-50"><td class="px-4 py-3">${a.user_name}</td><td class="px-4 py-3"><span class="bg-purple-100 text-purple-800 px-2 py-1 rounded-full text-xs">${a.action}</span></td><td class="px-4 py-3">${a.details}</td><td class="px-4 py-3 text-sm text-gray-500">${a.date}</td></tr>`).join('');}
+
+async function loadNotifications(){const r=await fetch('/api/notifications');const d=await r.json();document.getElementById('notifications-list').innerHTML=d.data.map(n=>`<div class="flex items-center p-4 bg-green-50 rounded-lg"><div class="w-12 h-12 bg-green-500 text-white rounded-full flex items-center justify-center text-xl">📱</div><div class="mr-4 flex-1"><p class="font-semibold">${n.type} → ${n.recipient}</p><p class="text-sm text-gray-600">${n.message}</p><p class="text-xs text-gray-400">${n.date}</p></div><span class="px-2 py-1 rounded-full text-xs bg-green-100 text-green-800">${n.status}</span></div>`).join('');}
+
+async function loadSettings(){const r=await fetch('/api/settings');const d=await r.json();document.getElementById('settings-list').innerHTML=d.data.map(s=>`<div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg"><div><p class="font-semibold">${s.key}</p></div><p class="text-blue-600 font-mono">${s.value}</p></div>`).join('');}
   </script>
 </body>
 </html>
