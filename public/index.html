@@ -316,6 +316,299 @@
             <a href="/api/reports/grades" target="_blank" class="bg-gradient-to-br from-purple-500 to-purple-600 text-white p-6 rounded-xl hover:shadow-xl"><div class="text-4xl mb-2">🎯</div><h4 class="font-bold text-lg">كشوف الدرجات</h4></a>
             <a href="/api/reports/teachers" target="_blank" class="bg-gradient-to-br from-pink-500 to-pink-600 text-white p-6 rounded-xl hover:shadow-xl"><div class="text-4xl mb-2">👨‍🏫</div><h4 class="font-bold text-lg">تقرير المعلمين</h4></a>
             <a href="/api/reports/financial" target="_blank" class="bg-gradient-to-br from-indigo-500 to-indigo-600 text-white p-6 rounded-xl hover:shadow-xl"><div class="text-4xl mb-2">💵</div><h4 class="font-bold text-lg">التقرير الشامل</h4></a>
+           <script>
+    // ======== إعدادات عامة ========
+    document.getElementById('current-date').textContent = new Date().toLocaleDateString('ar-EG', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    const user = JSON.parse(localStorage.getItem('user') || '{}');
+    if (user.name) document.getElementById('user-name').textContent = user.name;
+
+    function logout() {
+      if (confirm('هل تريد تسجيل الخروج؟')) {
+        localStorage.removeItem('user');
+        window.location.href = '/login';
+      }
+    }
+
+    function showToast(msg, type = 'success') {
+      const t = document.getElementById('toast');
+      t.textContent = msg;
+      t.style.background = type === 'success' ? '#10b981' : '#ef4444';
+      t.classList.add('show');
+      setTimeout(() => t.classList.remove('show'), 3000);
+    }
+
+    // ======== Modal System ========
+    const formConfigs = {
+      students: { title: 'إضافة/تعديل طالب', fields: [
+        { name: 'name', label: 'الاسم', type: 'text', required: true },
+        { name: 'grade', label: 'الصف', type: 'text', required: true },
+        { name: 'section', label: 'الشعبة', type: 'text', required: true },
+        { name: 'status', label: 'الحالة', type: 'select', options: ['نشط','متوقف','متخرج'], required: true },
+        { name: 'seat_number', label: 'رقم الجلوس', type: 'text' },
+        { name: 'birth_date', label: 'تاريخ الميلاد', type: 'date' },
+        { name: 'gender', label: 'النوع', type: 'select', options: ['ذكر','أنثى'] }
+      ]},
+      teachers: { title: 'إضافة/تعديل معلم', fields: [
+        { name: 'name', label: 'الاسم', type: 'text', required: true },
+        { name: 'email', label: 'البريد', type: 'email', required: true },
+        { name: 'phone', label: 'الهاتف', type: 'text', required: true },
+        { name: 'subject_id', label: 'رقم المادة', type: 'number' },
+        { name: 'salary', label: 'الراتب', type: 'number' }
+      ]},
+      employees: { title: 'إضافة/تعديل موظف', fields: [
+        { name: 'name', label: 'الاسم', type: 'text', required: true },
+        { name: 'email', label: 'البريد', type: 'email' },
+        { name: 'phone', label: 'الهاتف', type: 'text', required: true },
+        { name: 'role', label: 'الوظيفة', type: 'text', required: true },
+        { name: 'salary', label: 'الراتب', type: 'number' }
+      ]},
+      parents: { title: 'إضافة/تعديل ولي أمر', fields: [
+        { name: 'name', label: 'الاسم', type: 'text', required: true },
+        { name: 'email', label: 'البريد', type: 'email' },
+        { name: 'phone', label: 'الهاتف', type: 'text', required: true },
+        { name: 'address', label: 'العنوان', type: 'text' },
+        { name: 'job', label: 'الوظيفة', type: 'text' }
+      ]},
+      subjects: { title: 'إضافة/تعديل مادة', fields: [
+        { name: 'name', label: 'اسم المادة', type: 'text', required: true },
+        { name: 'code', label: 'الكود', type: 'text', required: true },
+        { name: 'grade_id', label: 'رقم الصف', type: 'number' }
+      ]},
+      exams: { title: 'إضافة/تعديل امتحان', fields: [
+        { name: 'name', label: 'اسم الامتحان', type: 'text', required: true },
+        { name: 'subject', label: 'المادة', type: 'text', required: true },
+        { name: 'grade', label: 'الصف', type: 'text' },
+        { name: 'date', label: 'التاريخ', type: 'date', required: true },
+        { name: 'max_score', label: 'الدرجة الكاملة', type: 'number' },
+        { name: 'status', label: 'الحالة', type: 'select', options: ['قادم','مكتمل','ملغي'] }
+      ]},
+      fees: { title: 'إضافة/تعديل رسم', fields: [
+        { name: 'student_name', label: 'اسم الطالب', type: 'text', required: true },
+        { name: 'amount', label: 'المبلغ', type: 'number', required: true },
+        { name: 'type', label: 'النوع', type: 'text' },
+        { name: 'due_date', label: 'تاريخ الاستحقاق', type: 'date' },
+        { name: 'status', label: 'الحالة', type: 'select', options: ['unpaid','paid','partial'] }
+      ]},
+      attendance: { title: 'تسجيل حضور', fields: [
+        { name: 'student_name', label: 'اسم الطالب', type: 'text', required: true },
+        { name: 'date', label: 'التاريخ', type: 'date', required: true },
+        { name: 'status', label: 'الحالة', type: 'select', options: ['present','absent','late'], required: true }
+      ]},
+      grades: { title: 'رصد درجة', fields: [
+        { name: 'student_name', label: 'اسم الطالب', type: 'text', required: true },
+        { name: 'subject', label: 'المادة', type: 'text', required: true },
+        { name: 'score', label: 'الدرجة', type: 'number', required: true },
+        { name: 'max_score', label: 'من', type: 'number', required: true },
+        { name: 'exam_type', label: 'نوع الامتحان', type: 'text' }
+      ]},
+      schedules: { title: 'إضافة حصة', fields: [
+        { name: 'day', label: 'اليوم', type: 'select', options: ['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس'], required: true },
+        { name: 'period', label: 'رقم الحصة', type: 'number', required: true },
+        { name: 'subject', label: 'المادة', type: 'text', required: true },
+        { name: 'teacher', label: 'المعلم', type: 'text' },
+        { name: 'section', label: 'الشعبة', type: 'text' },
+        { name: 'room', label: 'القاعة', type: 'text' }
+      ]},
+      revenue: { title: 'إضافة إيراد', fields: [
+        { name: 'source', label: 'المصدر', type: 'text', required: true },
+        { name: 'amount', label: 'المبلغ', type: 'number', required: true },
+        { name: 'date', label: 'التاريخ', type: 'date', required: true },
+        { name: 'notes', label: 'ملاحظات', type: 'text' }
+      ]},
+      expenses: { title: 'إضافة مصروف', fields: [
+        { name: 'category', label: 'البند', type: 'text', required: true },
+        { name: 'amount', label: 'المبلغ', type: 'number', required: true },
+        { name: 'date', label: 'التاريخ', type: 'date', required: true },
+        { name: 'notes', label: 'ملاحظات', type: 'text' }
+      ]},
+      clinic: { title: 'سجل طبي', fields: [
+        { name: 'student_name', label: 'اسم الطالب', type: 'text', required: true },
+        { name: 'date', label: 'التاريخ', type: 'date', required: true },
+        { name: 'complaint', label: 'الشكوى', type: 'text', required: true },
+        { name: 'treatment', label: 'العلاج', type: 'text' }
+      ]},
+      transport: { title: 'إضافة باص', fields: [
+        { name: 'bus_name', label: 'اسم الباص', type: 'text', required: true },
+        { name: 'route', label: 'المسار', type: 'text', required: true },
+        { name: 'driver', label: 'السائق', type: 'text' },
+        { name: 'capacity', label: 'السعة', type: 'number' },
+        { name: 'students_count', label: 'عدد الطلاب', type: 'number' }
+      ]},
+      library: { title: 'إضافة كتاب', fields: [
+        { name: 'book_title', label: 'عنوان الكتاب', type: 'text', required: true },
+        { name: 'author', label: 'المؤلف', type: 'text' },
+        { name: 'isbn', label: 'ISBN', type: 'text' },
+        { name: 'status', label: 'الحالة', type: 'select', options: ['متاح','مُعار','تالف'] },
+        { name: 'borrower', label: 'المُعار لـ', type: 'text' },
+        { name: 'due_date', label: 'تاريخ الإرجاع', type: 'date' }
+      ]},
+      inventory: { title: 'إضافة صنف', fields: [
+        { name: 'item_name', label: 'اسم الصنف', type: 'text', required: true },
+        { name: 'category', label: 'الفئة', type: 'text', required: true },
+        { name: 'quantity', label: 'الكمية', type: 'number', required: true },
+        { name: 'location', label: 'الموقع', type: 'text' }
+      ]},
+      calendar_events: { title: 'إضافة حدث', fields: [
+        { name: 'title', label: 'العنوان', type: 'text', required: true },
+        { name: 'date', label: 'التاريخ', type: 'date', required: true },
+        { name: 'type', label: 'النوع', type: 'select', options: ['أكاديمي','امتحان','عطلة','فعالية'] },
+        { name: 'description', label: 'الوصف', type: 'text' }
+      ]}
+    };
+
+    let currentEditId = null;
+    let currentTable = null;
+
+    function openAddModal(table) {
+      currentTable = table;
+      currentEditId = null;
+      const config = formConfigs[table];
+      document.getElementById('modal-title').textContent = config.title;
+      renderForm(config.fields, {});
+      document.getElementById('modal').classList.add('show');
+    }
+
+    function openEditModal(table, id, data) {
+      currentTable = table;
+      currentEditId = id;
+      const config = formConfigs[table];
+      document.getElementById('modal-title').textContent = 'تعديل: ' + config.title;
+      renderForm(config.fields, data);
+      document.getElementById('modal').classList.add('show');
+    }
+
+    function renderForm(fields, data) {
+      const form = document.getElementById('modal-form');
+      form.innerHTML = fields.map(f => {
+        const val = data[f.name] || '';
+        if (f.type === 'select') {
+          return `<label class="block text-sm font-semibold text-gray-700 mb-1">${f.label}${f.required?' *':''}</label>
+                  <select name="${f.name}" class="form-input" ${f.required?'required':''}>
+                    <option value="">اختر...</option>
+                    ${f.options.map(o => `<option value="${o}" ${val===o?'selected':''}>${o}</option>`).join('')}
+                  </select>`;
+        }
+        return `<label class="block text-sm font-semibold text-gray-700 mb-1">${f.label}${f.required?' *':''}</label>
+                <input type="${f.type}" name="${f.name}" value="${val}" class="form-input" ${f.required?'required':''}>`;
+      }).join('') + `<div class="flex gap-2 mt-4">
+        <button type="submit" class="flex-1 bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700">💾 حفظ</button>
+        <button type="button" onclick="closeModal()" class="flex-1 bg-gray-300 text-gray-700 py-3 rounded-lg font-semibold hover:bg-gray-400">إلغاء</button>
+      </div>`;
+    }
+
+    function closeModal() {
+      document.getElementById('modal').classList.remove('show');
+    }
+
+    document.getElementById('modal-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const data = {};
+      formData.forEach((v, k) => data[k] = v);
+      
+      try {
+        const url = currentEditId ? `/api/${currentTable}/${currentEditId}` : `/api/${currentTable}`;
+        const method = currentEditId ? 'PUT' : 'POST';
+        const res = await fetch(url, {
+          method,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(data)
+        });
+        const result = await res.json();
+        if (result.success) {
+          showToast(currentEditId ? '✅ تم التعديل بنجاح' : '✅ تمت الإضافة بنجاح');
+          closeModal();
+          const loaders = { students:loadStudents, teachers:loadTeachers, employees:loadEmployees, parents:loadParents, subjects:loadSubjects, schedules:loadSchedules, attendance:loadAttendance, exams:loadExams, grades:loadGrades, fees:loadFees, revenue:loadRevenue, expenses:loadExpenses, clinic:loadClinic, transport:loadTransport, library:loadLibrary, inventory:loadInventory, calendar_events:loadCalendar };
+          if (loaders[currentTable]) loaders[currentTable]();
+        } else {
+          showToast('❌ ' + (result.message || 'حدث خطأ'), 'error');
+        }
+      } catch (err) {
+        showToast('❌ خطأ في الاتصال', 'error');
+      }
+    });
+
+    async function deleteItem(table, id, name) {
+      if (!confirm(`هل أنت متأكد من حذف "${name}"؟`)) return;
+      try {
+        const res = await fetch(`/api/${table}/${id}`, { method: 'DELETE' });
+        const result = await res.json();
+        if (result.success) {
+          showToast('🗑️ تم الحذف بنجاح');
+          const loaders = { students:loadStudents, teachers:loadTeachers, employees:loadEmployees, parents:loadParents, subjects:loadSubjects, schedules:loadSchedules, attendance:loadAttendance, exams:loadExams, grades:loadGrades, fees:loadFees, revenue:loadRevenue, expenses:loadExpenses, clinic:loadClinic, transport:loadTransport, library:loadLibrary, inventory:loadInventory, calendar_events:loadCalendar };
+          if (loaders[table]) loaders[table]();
+        }
+      } catch (err) {
+        showToast('❌ خطأ في الحذف', 'error');
+      }
+    }
+
+    // ======== Page Navigation ========
+    function showPage(pageName) {
+      document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
+      document.getElementById(pageName).classList.remove('hidden');
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      event.target.closest('.nav-item').classList.add('active');
+      const titles = { dashboard:'لوحة التحكم', students:'الطلاب', parents:'أولياء الأمور', teachers:'المعلمون', employees:'الموظفين', subjects:'المواد', schedules:'جدول الحصص', attendance:'الحضور', exams:'الامتحانات', grades:'الدرجات', fees:'الرسوم', revenue:'الإيرادات', expenses:'المصروفات', certificates:'الشهادات', school:'بيانات المدرسة', clinic:'العيادة', transport:'النقل', library:'المكتبة', inventory:'المخازن', calendar:'التقويم', audit:'سجل النشاط', notifications:'الإشعارات', settings:'الإعدادات', reports:'التقارير' };
+      document.getElementById('page-title').textContent = titles[pageName] || '';
+      const loaders = { students:loadStudents, parents:loadParents, teachers:loadTeachers, employees:loadEmployees, subjects:loadSubjects, schedules:loadSchedules, attendance:loadAttendance, exams:loadExams, grades:loadGrades, fees:loadFees, revenue:loadRevenue, expenses:loadExpenses, certificates:loadCertificates, school:loadSchoolInfo, clinic:loadClinic, transport:loadTransport, library:loadLibrary, inventory:loadInventory, calendar:loadCalendar, audit:loadAudit, notifications:loadNotifications, settings:loadSettings };
+      if (loaders[pageName]) loaders[pageName]();
+    }
+
+    // ======== Data Loaders ========
+    async function loadStudents(){const r=await fetch('/api/students');const d=await r.json();document.getElementById('students-table').innerHTML=d.data.map(s=>`<tr class="hover:bg-gray-50"><td class="px-4 py-3">${s.id}</td><td class="px-4 py-3 font-semibold">${s.name}</td><td class="px-4 py-3">${s.grade}</td><td class="px-4 py-3">${s.section}</td><td class="px-4 py-3">${s.seat_number||'-'}</td><td class="px-4 py-3"><span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">${s.status}</span></td><td class="px-4 py-3"><button onclick='openEditModal("students",${s.id},${JSON.stringify(s)})' class="btn-action btn-edit">✏️</button><button onclick="deleteItem('students',${s.id},'${s.name}')" class="btn-action btn-delete">🗑️</button></td></tr>`).join('');document.getElementById('total-students').textContent=d.count;}
+
+    async function loadParents(){const r=await fetch('/api/parents');const d=await r.json();document.getElementById('parents-table').innerHTML=d.data.map(p=>`<tr class="hover:bg-gray-50"><td class="px-4 py-3 font-semibold">${p.name}</td><td class="px-4 py-3">${p.phone}</td><td class="px-4 py-3">${p.email}</td><td class="px-4 py-3">${p.job||'-'}</td><td class="px-4 py-3"><button onclick='openEditModal("parents",${p.id},${JSON.stringify(p)})' class="btn-action btn-edit">✏️</button><button onclick="deleteItem('parents',${p.id},'${p.name}')" class="btn-action btn-delete">🗑️</button></td></tr>`).join('');}
+
+    async function loadTeachers(){const r=await fetch('/api/teachers');const d=await r.json();document.getElementById('teachers-list').innerHTML=d.data.map(t=>`<div class="bg-gradient-to-br from-blue-50 to-purple-50 p-6 rounded-xl border border-blue-100"><div class="flex items-center mb-4"><div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 text-white rounded-full flex items-center justify-center text-2xl">👨‍🏫</div><div class="mr-4 flex-1"><h4 class="font-bold text-lg">${t.name}</h4><p class="text-sm text-gray-600">${t.email}</p></div></div><div class="space-y-2 text-sm"><p>📱 ${t.phone}</p><p>💰 ${t.salary||0} جنيه</p></div><div class="flex gap-2 mt-4"><button onclick='openEditModal("teachers",${t.id},${JSON.stringify(t)})' class="btn-action btn-edit flex-1">✏️ تعديل</button><button onclick="deleteItem('teachers',${t.id},'${t.name}')" class="btn-action btn-delete flex-1">🗑️ حذف</button></div></div>`).join('');document.getElementById('total-teachers').textContent=d.count;}
+
+    async function loadEmployees(){const r=await fetch('/api/employees');const d=await r.json();document.getElementById('employees-table').innerHTML=d.data.map(e=>`<tr class="hover:bg-gray-50"><td class="px-4 py-3 font-semibold">${e.name}</td><td class="px-4 py-3"><span class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">${e.role}</span></td><td class="px-4 py-3">${e.phone}</td><td class="px-4 py-3">${e.salary||0} جنيه</td><td class="px-4 py-3"><button onclick='openEditModal("employees",${e.id},${JSON.stringify(e)})' class="btn-action btn-edit">✏️</button><button onclick="deleteItem('employees',${e.id},'${e.name}')" class="btn-action btn-delete">🗑️</button></td></tr>`).join('');}
+
+    async function loadSubjects(){const r=await fetch('/api/subjects');const d=await r.json();document.getElementById('subjects-table').innerHTML=d.data.map(s=>`<tr class="hover:bg-gray-50"><td class="px-4 py-3 font-mono text-blue-600">${s.code}</td><td class="px-4 py-3 font-semibold">${s.name}</td><td class="px-4 py-3"><button onclick='openEditModal("subjects",${s.id},${JSON.stringify(s)})' class="btn-action btn-edit">✏️</button><button onclick="deleteItem('subjects',${s.id},'${s.name}')" class="btn-action btn-delete">🗑️</button></td></tr>`).join('');}
+
+    async function loadSchedules(){const r=await fetch('/api/schedules');const d=await r.json();document.getElementById('schedules-table').innerHTML=d.data.map(s=>`<tr class="hover:bg-gray-50"><td class="px-4 py-3 font-semibold">${s.day}</td><td class="px-4 py-3">الحصة ${s.period}</td><td class="px-4 py-3">${s.subject}</td><td class="px-4 py-3">${s.teacher||'-'}</td><td class="px-4 py-3">${s.room||'-'}</td><td class="px-4 py-3"><button onclick='openEditModal("schedules",${s.id},${JSON.stringify(s)})' class="btn-action btn-edit">✏️</button><button onclick="deleteItem('schedules',${s.id},'${s.subject}')" class="btn-action btn-delete">🗑️</button></td></tr>`).join('');}
+
+    async function loadAttendance(){const r=await fetch('/api/attendance');const d=await r.json();document.getElementById('attendance-list').innerHTML=d.data.map(a=>{const s=a.status==='present'?'حاضر':a.status==='absent'?'غائب':'متأخر';const c=a.status==='present'?'bg-green-500':a.status==='absent'?'bg-red-500':'bg-yellow-500';return `<div class="flex items-center p-4 bg-gray-50 rounded-lg"><div class="w-12 h-12 ${c} text-white rounded-full flex items-center justify-center text-xl">${a.status==='present'?'✅':a.status==='absent'?'❌':'⏰'}</div><div class="mr-4 flex-1"><p class="font-semibold">${a.student_name}</p><p class="text-sm text-gray-600">${a.date}</p></div><span class="px-3 py-1 rounded-full text-sm ${a.status==='present'?'bg-green-100 text-green-800':a.status==='absent'?'bg-red-100 text-red-800':'bg-yellow-100 text-yellow-800'}">${s}</span><button onclick='openEditModal("attendance",${a.id},${JSON.stringify(a)})' class="btn-action btn-edit mr-2">✏️</button><button onclick="deleteItem('attendance',${a.id},'${a.student_name}')" class="btn-action btn-delete">🗑️</button></div>`;}).join('');document.getElementById('total-attendance').textContent=d.data.filter(a=>a.status==='present').length;}
+
+    async function loadExams(){const r=await fetch('/api/exams');const d=await r.json();document.getElementById('exams-table').innerHTML=d.data.map(e=>`<tr class="hover:bg-gray-50"><td class="px-4 py-3 font-semibold">${e.name}</td><td class="px-4 py-3">${e.subject}</td><td class="px-4 py-3">${e.date}</td><td class="px-4 py-3"><span class="px-2 py-1 rounded-full text-xs ${e.status==='مكتمل'?'bg-green-100 text-green-800':'bg-yellow-100 text-yellow-800'}">${e.status}</span></td><td class="px-4 py-3"><button onclick='openEditModal("exams",${e.id},${JSON.stringify(e)})' class="btn-action btn-edit">✏️</button><button onclick="deleteItem('exams',${e.id},'${e.name}')" class="btn-action btn-delete">🗑️</button></td></tr>`).join('');}
+
+    async function loadGrades(){const r=await fetch('/api/grades');const d=await r.json();document.getElementById('grades-table').innerHTML=d.data.map(g=>{const p=((g.score/g.max_score)*100).toFixed(1);const gr=p>=90?'ممتاز':p>=80?'جيد جداً':p>=70?'جيد':p>=60?'مقبول':'ضعيف';return `<tr class="hover:bg-gray-50"><td class="px-4 py-3 font-semibold">${g.student_name}</td><td class="px-4 py-3">${g.subject}</td><td class="px-4 py-3">${g.score}/${g.max_score}</td><td class="px-4 py-3">${p}%</td><td class="px-4 py-3"><span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">${gr}</span></td><td class="px-4 py-3"><button onclick='openEditModal("grades",${g.id},${JSON.stringify(g)})' class="btn-action btn-edit">✏️</button><button onclick="deleteItem('grades',${g.id},'${g.student_name}')" class="btn-action btn-delete">🗑️</button></td></tr>`;}).join('');}
+
+    async function loadFees(){const r=await fetch('/api/fees');const d=await r.json();document.getElementById('fees-list').innerHTML=d.data.map(f=>`<div class="flex items-center p-4 bg-gray-50 rounded-lg"><div class="w-12 h-12 ${f.status==='paid'?'bg-green-500':'bg-red-500'} text-white rounded-full flex items-center justify-center text-xl">${f.status==='paid'?'💵':'⏳'}</div><div class="mr-4 flex-1"><p class="font-semibold">${f.student_name}</p><p class="text-sm text-gray-600">${f.type||''} - ${f.due_date||''}</p></div><p class="font-bold text-lg">${f.amount} جنيه</p><button onclick='openEditModal("fees",${f.id},${JSON.stringify(f)})' class="btn-action btn-edit mr-2">✏️</button><button onclick="deleteItem('fees',${f.id},'${f.student_name}')" class="btn-action btn-delete">🗑️</button></div>`).join('');}
+
+    async function loadRevenue(){const r=await fetch('/api/revenue');const d=await r.json();let total=0;d.data.forEach(x=>total+=x.amount);document.getElementById('revenue-list').innerHTML=d.data.map(x=>`<div class="flex items-center p-4 bg-green-50 rounded-lg"><div class="w-12 h-12 bg-green-500 text-white rounded-full flex items-center justify-center text-xl">💵</div><div class="mr-4 flex-1"><p class="font-semibold">${x.source}</p><p class="text-sm text-gray-600">${x.date}</p></div><p class="font-bold text-lg text-green-600">${x.amount} جنيه</p><button onclick='openEditModal("revenue",${x.id},${JSON.stringify(x)})' class="btn-action btn-edit mr-2">✏️</button><button onclick="deleteItem('revenue',${x.id},'${x.source}')" class="btn-action btn-delete">🗑️</button></div>`).join('');document.getElementById('total-revenue').textContent=total;}
+
+    async function loadExpenses(){const r=await fetch('/api/expenses');const d=await r.json();document.getElementById('expenses-list').innerHTML=d.data.map(x=>`<div class="flex items-center p-4 bg-red-50 rounded-lg"><div class="w-12 h-12 bg-red-500 text-white rounded-full flex items-center justify-center text-xl">💸</div><div class="mr-4 flex-1"><p class="font-semibold">${x.category}</p><p class="text-sm text-gray-600">${x.date}</p></div><p class="font-bold text-lg text-red-600">${x.amount} جنيه</p><button onclick='openEditModal("expenses",${x.id},${JSON.stringify(x)})' class="btn-action btn-edit mr-2">✏️</button><button onclick="deleteItem('expenses',${x.id},'${x.category}')" class="btn-action btn-delete">🗑️</button></div>`).join('');}
+
+    async function loadCertificates(){const r=await fetch('/api/students');const d=await r.json();document.getElementById('certificates-list').innerHTML=d.data.map(s=>`<a href="/certificate/${s.id}" target="_blank" class="block bg-gradient-to-br from-blue-500 to-purple-600 text-white p-6 rounded-xl hover:shadow-xl transition"><div class="text-4xl mb-2">🎓</div><h4 class="font-bold text-lg">${s.name}</h4><p class="text-sm opacity-90">${s.grade} - ${s.section}</p><div class="mt-4 bg-white text-blue-600 px-4 py-2 rounded-lg text-sm font-semibold text-center">عرض الشهادة</div></a>`).join('');}
+
+    async function loadSchoolInfo(){const r=await fetch('/api/school');const d=(await r.json()).data;document.getElementById('school-info').innerHTML=`<div class="bg-gradient-to-br from-blue-50 to-purple-50 p-6 rounded-xl"><div class="flex items-center mb-4"><div class="text-6xl ml-4">${d.logo||'🏫'}</div><div><h3 class="text-2xl font-bold text-blue-900">${d.name}</h3><p class="text-gray-600">العام: ${d.academic_year}</p></div></div><div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4"><div class="bg-white p-3 rounded-lg"><p class="text-sm text-gray-500">📍 العنوان</p><p class="font-semibold">${d.address}</p></div><div class="bg-white p-3 rounded-lg"><p class="text-sm text-gray-500">📞 الهاتف</p><p class="font-semibold">${d.phone}</p></div><div class="bg-white p-3 rounded-lg"><p class="text-sm text-gray-500">📧 البريد</p><p class="font-semibold">${d.email}</p></div><div class="bg-white p-3 rounded-lg"><p class="text-sm text-gray-500">🏢 الفروع</p><p class="font-semibold">${d.branches}</p></div></div></div>`;}
+
+    async function loadClinic(){const r=await fetch('/api/clinic');const d=await r.json();document.getElementById('clinic-list').innerHTML=d.data.map(c=>`<div class="flex items-center p-4 bg-red-50 rounded-lg"><div class="w-12 h-12 bg-red-500 text-white rounded-full flex items-center justify-center text-xl">🏥</div><div class="mr-4 flex-1"><p class="font-semibold">${c.student_name}</p><p class="text-sm text-gray-600">${c.date} - ${c.complaint}</p><p class="text-sm text-green-700">العلاج: ${c.treatment}</p></div><button onclick='openEditModal("clinic",${c.id},${JSON.stringify(c)})' class="btn-action btn-edit">✏️</button><button onclick="deleteItem('clinic',${c.id},'${c.student_name}')" class="btn-action btn-delete">🗑️</button></div>`).join('');}
+
+    async function loadTransport(){const r=await fetch('/api/transport');const d=await r.json();document.getElementById('transport-list').innerHTML=d.data.map(t=>`<div class="bg-yellow-50 p-6 rounded-xl border border-yellow-200"><h4 class="font-bold text-lg">🚌 ${t.bus_name}</h4><p class="text-sm text-gray-700 mt-2">🛣️ ${t.route}</p><p class="text-sm text-gray-700">👨‍✈️ ${t.driver||'-'}</p><p class="text-sm text-gray-700">👥 ${t.students_count||0}/${t.capacity||0}</p><div class="flex gap-2 mt-4"><button onclick='openEditModal("transport",${t.id},${JSON.stringify(t)})' class="btn-action btn-edit flex-1">✏️ تعديل</button><button onclick="deleteItem('transport',${t.id},'${t.bus_name}')" class="btn-action btn-delete flex-1">🗑️ حذف</button></div></div>`).join('');}
+
+    async function loadLibrary(){const r=await fetch('/api/library');const d=await r.json();document.getElementById('library-table').innerHTML=d.data.map(b=>`<tr class="hover:bg-gray-50"><td class="px-4 py-3 font-semibold">${b.book_title}</td><td class="px-4 py-3">${b.author||'-'}</td><td class="px-4 py-3"><span class="px-2 py-1 rounded-full text-xs ${b.status==='متاح'?'bg-green-100 text-green-800':'bg-red-100 text-red-800'}">${b.status}</span></td><td class="px-4 py-3">${b.borrower||'-'}</td><td class="px-4 py-3"><button onclick='openEditModal("library",${b.id},${JSON.stringify(b)})' class="btn-action btn-edit">✏️</button><button onclick="deleteItem('library',${b.id},'${b.book_title}')" class="btn-action btn-delete">🗑️</button></td></tr>`).join('');}
+
+    async function loadInventory(){const r=await fetch('/api/inventory');const d=await r.json();document.getElementById('inventory-table').innerHTML=d.data.map(i=>`<tr class="hover:bg-gray-50"><td class="px-4 py-3 font-semibold">${i.item_name}</td><td class="px-4 py-3">${i.category}</td><td class="px-4 py-3">${i.quantity}</td><td class="px-4 py-3">${i.location||'-'}</td><td class="px-4 py-3"><button onclick='openEditModal("inventory",${i.id},${JSON.stringify(i)})' class="btn-action btn-edit">✏️</button><button onclick="deleteItem('inventory',${i.id},'${i.item_name}')" class="btn-action btn-delete">🗑️</button></td></tr>`).join('');}
+
+    async function loadCalendar(){const r=await fetch('/api/calendar_events');const d=await r.json();document.getElementById('calendar-list').innerHTML=d.data.map(e=>`<div class="flex items-center p-4 bg-blue-50 rounded-lg"><div class="w-12 h-12 bg-blue-500 text-white rounded-full flex items-center justify-center text-xl">📅</div><div class="mr-4 flex-1"><p class="font-semibold">${e.title}</p><p class="text-sm text-gray-600">${e.date} - ${e.type||''}</p><p class="text-sm text-gray-500">${e.description||''}</p></div><button onclick='openEditModal("calendar_events",${e.id},${JSON.stringify(e)})' class="btn-action btn-edit">✏️</button><button onclick="deleteItem('calendar_events',${e.id},'${e.title}')" class="btn-action btn-delete">🗑️</button></div>`).join('');}
+
+    async function loadAudit(){const r=await fetch('/api/audit_log');const d=await r.json();document.getElementById('audit-table').innerHTML=d.data.map(a=>`<tr class="hover:bg-gray-50"><td class="px-4 py-3">${a.user_name}</td><td class="px-4 py-3"><span class="bg-purple-100 text-purple-800 px-2 py-1 rounded-full text-xs">${a.action}</span></td><td class="px-4 py-3">${a.details}</td><td class="px-4 py-3 text-sm text-gray-500">${a.date}</td></tr>`).join('');}
+
+    async function loadNotifications(){const r=await fetch('/api/notifications');const d=await r.json();document.getElementById('notifications-list').innerHTML=d.data.length?d.data.map(n=>`<div class="flex items-center p-4 bg-green-50 rounded-lg"><div class="w-12 h-12 bg-green-500 text-white rounded-full flex items-center justify-center text-xl">📱</div><div class="mr-4 flex-1"><p class="font-semibold">${n.type} → ${n.recipient}</p><p class="text-sm text-gray-600">${n.message}</p><p class="text-xs text-gray-400">${n.date}</p></div><span class="px-2 py-1 rounded-full text-xs bg-green-100 text-green-800">${n.status}</span></div>`).join(''):'<p class="text-gray-500 text-center py-8">لا توجد إشعارات</p>';}
+
+    async function loadSettings(){const r=await fetch('/api/settings');const d=await r.json();document.getElementById('settings-list').innerHTML=d.data.map(s=>`<div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg"><p class="font-semibold">${s.key}</p><p class="text-blue-600 font-mono">${s.value}</p></div>`).join('');}
+
+    // ======== Charts ========
+    window.addEventListener('load', () => {
+      new Chart(document.getElementById('attendanceChart'), { type: 'doughnut', data: { labels: ['حاضر', 'غائب', 'متأخر'], datasets: [{ data: [75, 15, 10], backgroundColor: ['#10b981', '#ef4444', '#f59e0b'] }] }, options: { responsive: true } });
+      new Chart(document.getElementById('revenueChart'), { type: 'bar', data: { labels: ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو'], datasets: [{ label: 'الإيرادات', data: [45000, 52000, 48000, 61000, 55000, 67000], backgroundColor: '#3b82f6' }] }, options: { responsive: true } });
+      loadStudents(); loadTeachers(); loadRevenue(); loadAttendance();
+    });
+  </script>
+</body>
+</html>
           </div>
         </div>
       </div>
