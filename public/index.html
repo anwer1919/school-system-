@@ -13,21 +13,47 @@
     .nav-item:hover { background: rgba(255,255,255,0.1); }
     .nav-item.active { background: rgba(255,255,255,0.2); border-right: 4px solid white; }
     .card { transition: transform 0.2s; }
-    .card:hover { transform: translateY(-5px); }
+    .card:hover { transform: translateY(-3px); }
     .fade-in { animation: fadeIn 0.5s; }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+    .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); }
+    .modal.show { display: flex; align-items: center; justify-content: center; }
+    .modal-content { background: white; padding: 30px; border-radius: 15px; max-width: 500px; width: 90%; max-height: 90vh; overflow-y: auto; }
+    .btn-action { padding: 6px 12px; border-radius: 6px; font-size: 12px; margin: 0 2px; cursor: pointer; border: none; }
+    .btn-edit { background: #3b82f6; color: white; }
+    .btn-edit:hover { background: #2563eb; }
+    .btn-delete { background: #ef4444; color: white; }
+    .btn-delete:hover { background: #dc2626; }
+    .btn-add { background: linear-gradient(135deg, #10b981, #059669); color: white; padding: 10px 20px; border-radius: 8px; font-weight: 600; }
+    .btn-add:hover { transform: scale(1.05); }
+    .form-input { width: 100%; padding: 10px; border: 2px solid #e5e7eb; border-radius: 8px; margin-bottom: 15px; }
+    .form-input:focus { outline: none; border-color: #3b82f6; }
+    .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #10b981; color: white; padding: 15px 30px; border-radius: 10px; z-index: 2000; display: none; }
+    .toast.show { display: block; animation: slideDown 0.3s; }
+    @keyframes slideDown { from { top: -50px; opacity: 0; } to { top: 20px; opacity: 1; } }
   </style>
 </head>
 <body class="bg-gray-100">
+  <div id="toast" class="toast"></div>
+  
+  <!-- Modal -->
+  <div id="modal" class="modal">
+    <div class="modal-content">
+      <div class="flex justify-between items-center mb-4">
+        <h3 id="modal-title" class="text-xl font-bold text-gray-800"></h3>
+        <button onclick="closeModal()" class="text-gray-500 hover:text-gray-700 text-2xl">&times;</button>
+      </div>
+      <form id="modal-form"></form>
+    </div>
+  </div>
+
   <div class="flex h-screen">
-    
     <!-- Sidebar -->
     <div class="sidebar w-64 bg-gradient-to-b from-blue-800 to-blue-900 text-white flex flex-col overflow-y-auto">
       <div class="p-6 border-b border-blue-700">
         <h1 class="text-2xl font-bold">🏫 مدرسة النور</h1>
         <p class="text-blue-200 text-sm mt-1">نظام الإدارة المتكامل</p>
       </div>
-      
       <nav class="mt-4 flex-1">
         <a href="#" onclick="showPage('dashboard')" class="nav-item active flex items-center px-6 py-3 text-blue-100"><span class="ml-3">📊</span> لوحة التحكم</a>
         <a href="#" onclick="showPage('students')" class="nav-item flex items-center px-6 py-3 text-blue-100"><span class="ml-3">👥</span> الطلاب</a>
@@ -54,7 +80,6 @@
         <a href="#" onclick="showPage('settings')" class="nav-item flex items-center px-6 py-3 text-blue-100"><span class="ml-3">⚙️</span> الإعدادات</a>
         <a href="#" onclick="showPage('reports')" class="nav-item flex items-center px-6 py-3 text-blue-100"><span class="ml-3">📄</span> التقارير</a>
       </nav>
-      
       <div class="p-4 border-t border-blue-700">
         <div class="flex items-center mb-3">
           <div class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">👤</div>
@@ -80,7 +105,7 @@
           <div class="card bg-white rounded-xl shadow-md p-6 border-r-4 border-blue-500"><div class="flex justify-between"><div><p class="text-gray-500 text-sm">الطلاب</p><p class="text-3xl font-bold mt-2" id="total-students">0</p></div><div class="bg-blue-100 p-4 rounded-full text-3xl">👥</div></div></div>
           <div class="card bg-white rounded-xl shadow-md p-6 border-r-4 border-green-500"><div class="flex justify-between"><div><p class="text-gray-500 text-sm">المعلمون</p><p class="text-3xl font-bold mt-2" id="total-teachers">0</p></div><div class="bg-green-100 p-4 rounded-full text-3xl">👨‍🏫</div></div></div>
           <div class="card bg-white rounded-xl shadow-md p-6 border-r-4 border-yellow-500"><div class="flex justify-between"><div><p class="text-gray-500 text-sm">الإيرادات</p><p class="text-3xl font-bold mt-2" id="total-revenue">0</p></div><div class="bg-yellow-100 p-4 rounded-full text-3xl">💰</div></div></div>
-          <div class="card bg-white rounded-xl shadow-md p-6 border-r-4 border-purple-500"><div class="flex justify-between"><div><p class="text-gray-500 text-sm">الحضور اليوم</p><p class="text-3xl font-bold mt-2" id="total-attendance">0</p></div><div class="bg-purple-100 p-4 rounded-full text-3xl">✅</div></div></div>
+          <div class="card bg-white rounded-xl shadow-md p-6 border-r-4 border-purple-500"><div class="flex justify-between"><div><p class="text-gray-500 text-sm">الحضور</p><p class="text-3xl font-bold mt-2" id="total-attendance">0</p></div><div class="bg-purple-100 p-4 rounded-full text-3xl">✅</div></div></div>
         </div>
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
           <div class="bg-white rounded-xl shadow-md p-6"><h3 class="text-lg font-bold mb-4">📊 الحضور</h3><canvas id="attendanceChart"></canvas></div>
@@ -88,163 +113,212 @@
         </div>
       </div>
 
-      <!-- Students -->
-      <div id="students" class="page p-6 hidden fade-in"><div class="bg-white rounded-xl shadow-md p-6"><h3 class="text-xl font-bold mb-6">👥 الطلاب</h3><div class="overflow-x-auto"><table class="w-full"><thead class="bg-gray-50"><tr><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">الرقم</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">الاسم</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">الصف</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">الشعبة</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">رقم الجلوس</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">الحالة</th></tr></thead><tbody id="students-table"></tbody></table></div></div></div>
+      <!-- Students Page -->
+      <div id="students" class="page p-6 hidden fade-in">
+        <div class="bg-white rounded-xl shadow-md p-6">
+          <div class="flex justify-between items-center mb-6">
+            <h3 class="text-xl font-bold">👥 إدارة الطلاب</h3>
+            <button onclick="openAddModal('students')" class="btn-add">+ إضافة طالب</button>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full">
+              <thead class="bg-gray-50"><tr>
+                <th class="px-4 py-3 text-right text-xs font-medium text-gray-500">الرقم</th>
+                <th class="px-4 py-3 text-right text-xs font-medium text-gray-500">الاسم</th>
+                <th class="px-4 py-3 text-right text-xs font-medium text-gray-500">الصف</th>
+                <th class="px-4 py-3 text-right text-xs font-medium text-gray-500">الشعبة</th>
+                <th class="px-4 py-3 text-right text-xs font-medium text-gray-500">رقم الجلوس</th>
+                <th class="px-4 py-3 text-right text-xs font-medium text-gray-500">الحالة</th>
+                <th class="px-4 py-3 text-right text-xs font-medium text-gray-500">الإجراءات</th>
+              </tr></thead>
+              <tbody id="students-table"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
 
       <!-- Parents -->
-      <div id="parents" class="page p-6 hidden fade-in"><div class="bg-white rounded-xl shadow-md p-6"><h3 class="text-xl font-bold mb-6">👨‍👩‍👧 أولياء الأمور</h3><div class="overflow-x-auto"><table class="w-full"><thead class="bg-gray-50"><tr><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">الاسم</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">الهاتف</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">البريد</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">الوظيفة</th></tr></thead><tbody id="parents-table"></tbody></table></div></div></div>
+      <div id="parents" class="page p-6 hidden fade-in">
+        <div class="bg-white rounded-xl shadow-md p-6">
+          <div class="flex justify-between items-center mb-6"><h3 class="text-xl font-bold">👨‍👩‍👧 أولياء الأمور</h3><button onclick="openAddModal('parents')" class="btn-add">+ إضافة ولي أمر</button></div>
+          <div class="overflow-x-auto"><table class="w-full"><thead class="bg-gray-50"><tr><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">الاسم</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">الهاتف</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">البريد</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">الوظيفة</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">الإجراءات</th></tr></thead><tbody id="parents-table"></tbody></table></div>
+        </div>
+      </div>
 
       <!-- Teachers -->
-      <div id="teachers" class="page p-6 hidden fade-in"><div class="bg-white rounded-xl shadow-md p-6"><h3 class="text-xl font-bold mb-6">👨‍🏫 المعلمون</h3><div id="teachers-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div></div></div>
+      <div id="teachers" class="page p-6 hidden fade-in">
+        <div class="bg-white rounded-xl shadow-md p-6">
+          <div class="flex justify-between items-center mb-6"><h3 class="text-xl font-bold">👨‍🏫 المعلمون</h3><button onclick="openAddModal('teachers')" class="btn-add">+ إضافة معلم</button></div>
+          <div id="teachers-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div>
+        </div>
+      </div>
 
       <!-- Employees -->
-      <div id="employees" class="page p-6 hidden fade-in"><div class="bg-white rounded-xl shadow-md p-6"><h3 class="text-xl font-bold mb-6">👔 الموظفين</h3><div class="overflow-x-auto"><table class="w-full"><thead class="bg-gray-50"><tr><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">الاسم</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">الوظيفة</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">الهاتف</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">الراتب</th></tr></thead><tbody id="employees-table"></tbody></table></div></div></div>
+      <div id="employees" class="page p-6 hidden fade-in">
+        <div class="bg-white rounded-xl shadow-md p-6">
+          <div class="flex justify-between items-center mb-6"><h3 class="text-xl font-bold">👔 الموظفين</h3><button onclick="openAddModal('employees')" class="btn-add">+ إضافة موظف</button></div>
+          <div class="overflow-x-auto"><table class="w-full"><thead class="bg-gray-50"><tr><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">الاسم</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">الوظيفة</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">الهاتف</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">الراتب</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">الإجراءات</th></tr></thead><tbody id="employees-table"></tbody></table></div>
+        </div>
+      </div>
 
       <!-- Subjects -->
-      <div id="subjects" class="page p-6 hidden fade-in"><div class="bg-white rounded-xl shadow-md p-6"><h3 class="text-xl font-bold mb-6">📚 المواد</h3><div class="overflow-x-auto"><table class="w-full"><thead class="bg-gray-50"><tr><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">الكود</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">الاسم</th></tr></thead><tbody id="subjects-table"></tbody></table></div></div></div>
+      <div id="subjects" class="page p-6 hidden fade-in">
+        <div class="bg-white rounded-xl shadow-md p-6">
+          <div class="flex justify-between items-center mb-6"><h3 class="text-xl font-bold">📚 المواد</h3><button onclick="openAddModal('subjects')" class="btn-add">+ إضافة مادة</button></div>
+          <div class="overflow-x-auto"><table class="w-full"><thead class="bg-gray-50"><tr><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">الكود</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">الاسم</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">الإجراءات</th></tr></thead><tbody id="subjects-table"></tbody></table></div>
+        </div>
+      </div>
 
       <!-- Schedules -->
-      <div id="schedules" class="page p-6 hidden fade-in"><div class="bg-white rounded-xl shadow-md p-6"><h3 class="text-xl font-bold mb-6">🕐 جدول الحصص</h3><div class="overflow-x-auto"><table class="w-full"><thead class="bg-gray-50"><tr><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">اليوم</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">الحصة</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">المادة</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">المعلم</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">القاعة</th></tr></thead><tbody id="schedules-table"></tbody></table></div></div></div>
+      <div id="schedules" class="page p-6 hidden fade-in">
+        <div class="bg-white rounded-xl shadow-md p-6">
+          <div class="flex justify-between items-center mb-6"><h3 class="text-xl font-bold">🕐 جدول الحصص</h3><button onclick="openAddModal('schedules')" class="btn-add">+ إضافة حصة</button></div>
+          <div class="overflow-x-auto"><table class="w-full"><thead class="bg-gray-50"><tr><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">اليوم</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">الحصة</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">المادة</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">المعلم</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">القاعة</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">الإجراءات</th></tr></thead><tbody id="schedules-table"></tbody></table></div>
+        </div>
+      </div>
 
       <!-- Attendance -->
-      <div id="attendance" class="page p-6 hidden fade-in"><div class="bg-white rounded-xl shadow-md p-6"><h3 class="text-xl font-bold mb-6">📅 الحضور</h3><div id="attendance-list" class="space-y-3"></div></div></div>
+      <div id="attendance" class="page p-6 hidden fade-in">
+        <div class="bg-white rounded-xl shadow-md p-6">
+          <div class="flex justify-between items-center mb-6"><h3 class="text-xl font-bold">📅 الحضور</h3><button onclick="openAddModal('attendance')" class="btn-add">+ تسجيل حضور</button></div>
+          <div id="attendance-list" class="space-y-3"></div>
+        </div>
+      </div>
 
       <!-- Exams -->
-      <div id="exams" class="page p-6 hidden fade-in"><div class="bg-white rounded-xl shadow-md p-6"><h3 class="text-xl font-bold mb-6">📝 الامتحانات</h3><div class="overflow-x-auto"><table class="w-full"><thead class="bg-gray-50"><tr><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">الامتحان</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">المادة</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">التاريخ</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">الحالة</th></tr></thead><tbody id="exams-table"></tbody></table></div></div></div>
+      <div id="exams" class="page p-6 hidden fade-in">
+        <div class="bg-white rounded-xl shadow-md p-6">
+          <div class="flex justify-between items-center mb-6"><h3 class="text-xl font-bold">📝 الامتحانات</h3><button onclick="openAddModal('exams')" class="btn-add">+ إضافة امتحان</button></div>
+          <div class="overflow-x-auto"><table class="w-full"><thead class="bg-gray-50"><tr><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">الامتحان</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">المادة</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">التاريخ</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">الحالة</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">الإجراءات</th></tr></thead><tbody id="exams-table"></tbody></table></div>
+        </div>
+      </div>
 
       <!-- Grades -->
-      <div id="grades" class="page p-6 hidden fade-in"><div class="bg-white rounded-xl shadow-md p-6"><h3 class="text-xl font-bold mb-6">🎯 الدرجات</h3><div class="overflow-x-auto"><table class="w-full"><thead class="bg-gray-50"><tr><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">الطالب</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">المادة</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">الدرجة</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">النسبة</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">التقدير</th></tr></thead><tbody id="grades-table"></tbody></table></div></div></div>
+      <div id="grades" class="page p-6 hidden fade-in">
+        <div class="bg-white rounded-xl shadow-md p-6">
+          <div class="flex justify-between items-center mb-6"><h3 class="text-xl font-bold">🎯 الدرجات</h3><button onclick="openAddModal('grades')" class="btn-add">+ رصد درجة</button></div>
+          <div class="overflow-x-auto"><table class="w-full"><thead class="bg-gray-50"><tr><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">الطالب</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">المادة</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">الدرجة</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">النسبة</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">التقدير</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">الإجراءات</th></tr></thead><tbody id="grades-table"></tbody></table></div>
+        </div>
+      </div>
 
       <!-- Fees -->
-      <div id="fees" class="page p-6 hidden fade-in"><div class="bg-white rounded-xl shadow-md p-6"><h3 class="text-xl font-bold mb-6">💰 الرسوم</h3><div id="fees-list" class="space-y-3"></div></div></div>
+      <div id="fees" class="page p-6 hidden fade-in">
+        <div class="bg-white rounded-xl shadow-md p-6">
+          <div class="flex justify-between items-center mb-6"><h3 class="text-xl font-bold">💰 الرسوم</h3><button onclick="openAddModal('fees')" class="btn-add">+ إضافة رسم</button></div>
+          <div id="fees-list" class="space-y-3"></div>
+        </div>
+      </div>
 
       <!-- Revenue -->
-      <div id="revenue" class="page p-6 hidden fade-in"><div class="bg-white rounded-xl shadow-md p-6"><h3 class="text-xl font-bold mb-6">💵 الإيرادات</h3><div id="revenue-list" class="space-y-3"></div></div></div>
+      <div id="revenue" class="page p-6 hidden fade-in">
+        <div class="bg-white rounded-xl shadow-md p-6">
+          <div class="flex justify-between items-center mb-6"><h3 class="text-xl font-bold">💵 الإيرادات</h3><button onclick="openAddModal('revenue')" class="btn-add">+ إضافة إيراد</button></div>
+          <div id="revenue-list" class="space-y-3"></div>
+        </div>
+      </div>
 
       <!-- Expenses -->
-      <div id="expenses" class="page p-6 hidden fade-in"><div class="bg-white rounded-xl shadow-md p-6"><h3 class="text-xl font-bold mb-6">💸 المصروفات</h3><div id="expenses-list" class="space-y-3"></div></div></div>
+      <div id="expenses" class="page p-6 hidden fade-in">
+        <div class="bg-white rounded-xl shadow-md p-6">
+          <div class="flex justify-between items-center mb-6"><h3 class="text-xl font-bold">💸 المصروفات</h3><button onclick="openAddModal('expenses')" class="btn-add">+ إضافة مصروف</button></div>
+          <div id="expenses-list" class="space-y-3"></div>
+        </div>
+      </div>
 
       <!-- Certificates -->
-      <div id="certificates" class="page p-6 hidden fade-in"><div class="bg-white rounded-xl shadow-md p-6"><h3 class="text-xl font-bold mb-6">🎓 الشهادات</h3><div id="certificates-list" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div></div></div>
+      <div id="certificates" class="page p-6 hidden fade-in">
+        <div class="bg-white rounded-xl shadow-md p-6">
+          <h3 class="text-xl font-bold mb-6">🎓 الشهادات</h3>
+          <div id="certificates-list" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div>
+        </div>
+      </div>
 
       <!-- School -->
-      <div id="school" class="page p-6 hidden fade-in"><div class="bg-white rounded-xl shadow-md p-6"><h3 class="text-xl font-bold mb-6">🏢 بيانات المدرسة</h3><div id="school-info"></div></div></div>
+      <div id="school" class="page p-6 hidden fade-in">
+        <div class="bg-white rounded-xl shadow-md p-6">
+          <h3 class="text-xl font-bold mb-6">🏢 بيانات المدرسة</h3>
+          <div id="school-info"></div>
+        </div>
+      </div>
 
       <!-- Clinic -->
-      <div id="clinic" class="page p-6 hidden fade-in"><div class="bg-white rounded-xl shadow-md p-6"><h3 class="text-xl font-bold mb-6">🏥 العيادة</h3><div id="clinic-list" class="space-y-3"></div></div></div>
+      <div id="clinic" class="page p-6 hidden fade-in">
+        <div class="bg-white rounded-xl shadow-md p-6">
+          <div class="flex justify-between items-center mb-6"><h3 class="text-xl font-bold">🏥 العيادة</h3><button onclick="openAddModal('clinic')" class="btn-add">+ سجل طبي</button></div>
+          <div id="clinic-list" class="space-y-3"></div>
+        </div>
+      </div>
 
       <!-- Transport -->
-      <div id="transport" class="page p-6 hidden fade-in"><div class="bg-white rounded-xl shadow-md p-6"><h3 class="text-xl font-bold mb-6">🚌 النقل</h3><div id="transport-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div></div></div>
+      <div id="transport" class="page p-6 hidden fade-in">
+        <div class="bg-white rounded-xl shadow-md p-6">
+          <div class="flex justify-between items-center mb-6"><h3 class="text-xl font-bold">🚌 النقل</h3><button onclick="openAddModal('transport')" class="btn-add">+ إضافة باص</button></div>
+          <div id="transport-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+        </div>
+      </div>
 
       <!-- Library -->
-      <div id="library" class="page p-6 hidden fade-in"><div class="bg-white rounded-xl shadow-md p-6"><h3 class="text-xl font-bold mb-6">📚 المكتبة</h3><div class="overflow-x-auto"><table class="w-full"><thead class="bg-gray-50"><tr><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">العنوان</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">المؤلف</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">الحالة</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">المُعار لـ</th></tr></thead><tbody id="library-table"></tbody></table></div></div></div>
+      <div id="library" class="page p-6 hidden fade-in">
+        <div class="bg-white rounded-xl shadow-md p-6">
+          <div class="flex justify-between items-center mb-6"><h3 class="text-xl font-bold">📚 المكتبة</h3><button onclick="openAddModal('library')" class="btn-add">+ إضافة كتاب</button></div>
+          <div class="overflow-x-auto"><table class="w-full"><thead class="bg-gray-50"><tr><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">العنوان</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">المؤلف</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">الحالة</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">المُعار لـ</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">الإجراءات</th></tr></thead><tbody id="library-table"></tbody></table></div>
+        </div>
+      </div>
 
       <!-- Inventory -->
-      <div id="inventory" class="page p-6 hidden fade-in"><div class="bg-white rounded-xl shadow-md p-6"><h3 class="text-xl font-bold mb-6">🏪 المخازن</h3><div class="overflow-x-auto"><table class="w-full"><thead class="bg-gray-50"><tr><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">الصنف</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">الفئة</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">الكمية</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">الموقع</th></tr></thead><tbody id="inventory-table"></tbody></table></div></div></div>
+      <div id="inventory" class="page p-6 hidden fade-in">
+        <div class="bg-white rounded-xl shadow-md p-6">
+          <div class="flex justify-between items-center mb-6"><h3 class="text-xl font-bold">🏪 المخازن</h3><button onclick="openAddModal('inventory')" class="btn-add">+ إضافة صنف</button></div>
+          <div class="overflow-x-auto"><table class="w-full"><thead class="bg-gray-50"><tr><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">الصنف</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">الفئة</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">الكمية</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">الموقع</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">الإجراءات</th></tr></thead><tbody id="inventory-table"></tbody></table></div>
+        </div>
+      </div>
 
       <!-- Calendar -->
-      <div id="calendar" class="page p-6 hidden fade-in"><div class="bg-white rounded-xl shadow-md p-6"><h3 class="text-xl font-bold mb-6">📆 التقويم</h3><div id="calendar-list" class="space-y-3"></div></div></div>
+      <div id="calendar" class="page p-6 hidden fade-in">
+        <div class="bg-white rounded-xl shadow-md p-6">
+          <div class="flex justify-between items-center mb-6"><h3 class="text-xl font-bold">📆 التقويم</h3><button onclick="openAddModal('calendar_events')" class="btn-add">+ إضافة حدث</button></div>
+          <div id="calendar-list" class="space-y-3"></div>
+        </div>
+      </div>
 
       <!-- Audit -->
-      <div id="audit" class="page p-6 hidden fade-in"><div class="bg-white rounded-xl shadow-md p-6"><h3 class="text-xl font-bold mb-6">📋 سجل النشاط</h3><div class="overflow-x-auto"><table class="w-full"><thead class="bg-gray-50"><tr><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">المستخدم</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">العملية</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">التفاصيل</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">التاريخ</th></tr></thead><tbody id="audit-table"></tbody></table></div></div></div>
+      <div id="audit" class="page p-6 hidden fade-in">
+        <div class="bg-white rounded-xl shadow-md p-6">
+          <h3 class="text-xl font-bold mb-6">📋 سجل النشاط</h3>
+          <div class="overflow-x-auto"><table class="w-full"><thead class="bg-gray-50"><tr><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">المستخدم</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">العملية</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">التفاصيل</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">التاريخ</th></tr></thead><tbody id="audit-table"></tbody></table></div>
+        </div>
+      </div>
 
       <!-- Notifications -->
-      <div id="notifications" class="page p-6 hidden fade-in"><div class="bg-white rounded-xl shadow-md p-6"><h3 class="text-xl font-bold mb-6">🔔 الإشعارات</h3><div id="notifications-list" class="space-y-3"></div></div></div>
+      <div id="notifications" class="page p-6 hidden fade-in">
+        <div class="bg-white rounded-xl shadow-md p-6">
+          <h3 class="text-xl font-bold mb-6">🔔 الإشعارات</h3>
+          <div id="notifications-list" class="space-y-3"></div>
+        </div>
+      </div>
 
       <!-- Settings -->
-      <div id="settings" class="page p-6 hidden fade-in"><div class="bg-white rounded-xl shadow-md p-6"><h3 class="text-xl font-bold mb-6">⚙️ الإعدادات</h3><div id="settings-list" class="space-y-3"></div></div></div>
+      <div id="settings" class="page p-6 hidden fade-in">
+        <div class="bg-white rounded-xl shadow-md p-6">
+          <h3 class="text-xl font-bold mb-6">⚙️ الإعدادات</h3>
+          <div id="settings-list" class="space-y-3"></div>
+        </div>
+      </div>
 
       <!-- Reports -->
       <div id="reports" class="page p-6 hidden fade-in">
         <div class="bg-white rounded-xl shadow-md p-6">
           <h3 class="text-xl font-bold mb-6">📄 التقارير</h3>
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <a href="/api/reports/students" target="_blank" class="bg-gradient-to-br from-blue-500 to-blue-600 text-white p-6 rounded-xl hover:shadow-xl"><div class="text-4xl mb-2">👥</div><h4 class="font-bold text-lg">تقرير الطلاب</h4><p class="text-sm opacity-90 mt-2">قائمة كاملة بالطلاب</p></a>
-            <a href="/api/reports/attendance" target="_blank" class="bg-gradient-to-br from-green-500 to-green-600 text-white p-6 rounded-xl hover:shadow-xl"><div class="text-4xl mb-2">📅</div><h4 class="font-bold text-lg">تقرير الحضور</h4><p class="text-sm opacity-90 mt-2">سجل الحضور والغياب</p></a>
-            <a href="/api/reports/fees" target="_blank" class="bg-gradient-to-br from-yellow-500 to-yellow-600 text-white p-6 rounded-xl hover:shadow-xl"><div class="text-4xl mb-2">💰</div><h4 class="font-bold text-lg">التقرير المالي</h4><p class="text-sm opacity-90 mt-2">الرسوم والمدفوعات</p></a>
-            <a href="/api/reports/grades" target="_blank" class="bg-gradient-to-br from-purple-500 to-purple-600 text-white p-6 rounded-xl hover:shadow-xl"><div class="text-4xl mb-2">🎯</div><h4 class="font-bold text-lg">كشوف الدرجات</h4><p class="text-sm opacity-90 mt-2">درجات الطلاب</p></a>
-            <a href="/api/reports/teachers" target="_blank" class="bg-gradient-to-br from-pink-500 to-pink-600 text-white p-6 rounded-xl hover:shadow-xl"><div class="text-4xl mb-2">👨‍🏫</div><h4 class="font-bold text-lg">تقرير المعلمين</h4><p class="text-sm opacity-90 mt-2">بيانات المعلمين</p></a>
-            <a href="/api/reports/financial" target="_blank" class="bg-gradient-to-br from-indigo-500 to-indigo-600 text-white p-6 rounded-xl hover:shadow-xl"><div class="text-4xl mb-2">💵</div><h4 class="font-bold text-lg">التقرير المالي الشامل</h4><p class="text-sm opacity-90 mt-2">الإيرادات والمصروفات</p></a>
+            <a href="/api/reports/students" target="_blank" class="bg-gradient-to-br from-blue-500 to-blue-600 text-white p-6 rounded-xl hover:shadow-xl"><div class="text-4xl mb-2">👥</div><h4 class="font-bold text-lg">تقرير الطلاب</h4></a>
+            <a href="/api/reports/attendance" target="_blank" class="bg-gradient-to-br from-green-500 to-green-600 text-white p-6 rounded-xl hover:shadow-xl"><div class="text-4xl mb-2">📅</div><h4 class="font-bold text-lg">تقرير الحضور</h4></a>
+            <a href="/api/reports/fees" target="_blank" class="bg-gradient-to-br from-yellow-500 to-yellow-600 text-white p-6 rounded-xl hover:shadow-xl"><div class="text-4xl mb-2">💰</div><h4 class="font-bold text-lg">التقرير المالي</h4></a>
+            <a href="/api/reports/grades" target="_blank" class="bg-gradient-to-br from-purple-500 to-purple-600 text-white p-6 rounded-xl hover:shadow-xl"><div class="text-4xl mb-2">🎯</div><h4 class="font-bold text-lg">كشوف الدرجات</h4></a>
+            <a href="/api/reports/teachers" target="_blank" class="bg-gradient-to-br from-pink-500 to-pink-600 text-white p-6 rounded-xl hover:shadow-xl"><div class="text-4xl mb-2">👨‍🏫</div><h4 class="font-bold text-lg">تقرير المعلمين</h4></a>
+            <a href="/api/reports/financial" target="_blank" class="bg-gradient-to-br from-indigo-500 to-indigo-600 text-white p-6 rounded-xl hover:shadow-xl"><div class="text-4xl mb-2">💵</div><h4 class="font-bold text-lg">التقرير الشامل</h4></a>
           </div>
         </div>
       </div>
 
     </div>
   </div>
-
-  <script>
-    document.getElementById('current-date').textContent = new Date().toLocaleDateString('ar-EG', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
-    const user = JSON.parse(localStorage.getItem('user') || '{}');
-    if (user.name) { document.getElementById('user-name').textContent = user.name; }
-
-    function logout() {
-      if (confirm('هل تريد تسجيل الخروج؟')) {
-        localStorage.removeItem('user');
-        window.location.href = '/login';
-      }
-    }
-
-    function showPage(pageName) {
-      document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
-      document.getElementById(pageName).classList.remove('hidden');
-      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-      event.target.closest('.nav-item').classList.add('active');
-      const titles = { dashboard:'لوحة التحكم', students:'الطلاب', parents:'أولياء الأمور', teachers:'المعلمون', employees:'الموظفين', subjects:'المواد', schedules:'جدول الحصص', attendance:'الحضور', exams:'الامتحانات', grades:'الدرجات', fees:'الرسوم', revenue:'الإيرادات', expenses:'المصروفات', certificates:'الشهادات', school:'بيانات المدرسة', clinic:'العيادة', transport:'النقل', library:'المكتبة', inventory:'المخازن', calendar:'التقويم', audit:'سجل النشاط', notifications:'الإشعارات', settings:'الإعدادات', reports:'التقارير' };
-      document.getElementById('page-title').textContent = titles[pageName] || '';
-      
-      const loaders = { students:loadStudents, parents:loadParents, teachers:loadTeachers, employees:loadEmployees, subjects:loadSubjects, schedules:loadSchedules, attendance:loadAttendance, exams:loadExams, grades:loadGrades, fees:loadFees, revenue:loadRevenue, expenses:loadExpenses, certificates:loadCertificates, school:loadSchoolInfo, clinic:loadClinic, transport:loadTransport, library:loadLibrary, inventory:loadInventory, calendar:loadCalendar, audit:loadAudit, notifications:loadNotifications, settings:loadSettings };
-      if (loaders[pageName]) loaders[pageName]();
-    }
-
-    async function loadStudents(){const r=await fetch('/api/students');const d=await r.json();document.getElementById('students-table').innerHTML=d.data.map(s=>`<tr class="hover:bg-gray-50"><td class="px-4 py-3">${s.id}</td><td class="px-4 py-3 font-semibold">${s.name}</td><td class="px-4 py-3">${s.grade}</td><td class="px-4 py-3">${s.section}</td><td class="px-4 py-3">${s.seat_number||'-'}</td><td class="px-4 py-3"><span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">${s.status}</span></td></tr>`).join('');document.getElementById('total-students').textContent=d.count;}
-
-    async function loadParents(){const r=await fetch('/api/parents');const d=await r.json();document.getElementById('parents-table').innerHTML=d.data.map(p=>`<tr class="hover:bg-gray-50"><td class="px-4 py-3 font-semibold">${p.name}</td><td class="px-4 py-3">${p.phone}</td><td class="px-4 py-3">${p.email}</td><td class="px-4 py-3">${p.job||'-'}</td></tr>`).join('');}
-
-    async function loadTeachers(){const r=await fetch('/api/teachers');const d=await r.json();document.getElementById('teachers-list').innerHTML=d.data.map(t=>`<div class="bg-gradient-to-br from-blue-50 to-purple-50 p-6 rounded-xl border border-blue-100"><div class="flex items-center mb-4"><div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 text-white rounded-full flex items-center justify-center text-2xl">👨‍🏫</div><div class="mr-4"><h4 class="font-bold text-lg">${t.name}</h4><p class="text-sm text-gray-600">${t.subject_name||'-'}</p></div></div><div class="space-y-2 text-sm"><p>📧 ${t.email}</p><p>📱 ${t.phone}</p><p>💰 ${t.salary} جنيه</p></div></div>`).join('');document.getElementById('total-teachers').textContent=d.count;}
-
-    async function loadEmployees(){const r=await fetch('/api/employees');const d=await r.json();document.getElementById('employees-table').innerHTML=d.data.map(e=>`<tr class="hover:bg-gray-50"><td class="px-4 py-3 font-semibold">${e.name}</td><td class="px-4 py-3"><span class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">${e.role}</span></td><td class="px-4 py-3">${e.phone}</td><td class="px-4 py-3">${e.salary} جنيه</td></tr>`).join('');}
-
-    async function loadSubjects(){const r=await fetch('/api/subjects');const d=await r.json();document.getElementById('subjects-table').innerHTML=d.data.map(s=>`<tr class="hover:bg-gray-50"><td class="px-4 py-3 font-mono text-blue-600">${s.code}</td><td class="px-4 py-3 font-semibold">${s.name}</td></tr>`).join('');}
-
-    async function loadSchedules(){const r=await fetch('/api/schedules');const d=await r.json();document.getElementById('schedules-table').innerHTML=d.data.map(s=>`<tr class="hover:bg-gray-50"><td class="px-4 py-3 font-semibold">${s.day}</td><td class="px-4 py-3">الحصة ${s.period}</td><td class="px-4 py-3">${s.subject}</td><td class="px-4 py-3">${s.teacher}</td><td class="px-4 py-3">${s.room}</td></tr>`).join('');}
-
-    async function loadAttendance(){const r=await fetch('/api/attendance');const d=await r.json();document.getElementById('attendance-list').innerHTML=d.data.map(a=>{const s=a.status==='present'?'حاضر':a.status==='absent'?'غائب':'متأخر';const c=a.status==='present'?'bg-green-500':a.status==='absent'?'bg-red-500':'bg-yellow-500';return `<div class="flex items-center p-4 bg-gray-50 rounded-lg"><div class="w-12 h-12 ${c} text-white rounded-full flex items-center justify-center text-xl">${a.status==='present'?'✅':a.status==='absent'?'❌':'⏰'}</div><div class="mr-4 flex-1"><p class="font-semibold">${a.student_name}</p><p class="text-sm text-gray-600">${a.date}</p></div><span class="px-3 py-1 rounded-full text-sm ${a.status==='present'?'bg-green-100 text-green-800':a.status==='absent'?'bg-red-100 text-red-800':'bg-yellow-100 text-yellow-800'}">${s}</span></div>`;}).join('');document.getElementById('total-attendance').textContent=d.data.filter(a=>a.status==='present').length;}
-
-    async function loadExams(){const r=await fetch('/api/exams');const d=await r.json();document.getElementById('exams-table').innerHTML=d.data.map(e=>`<tr class="hover:bg-gray-50"><td class="px-4 py-3 font-semibold">${e.name}</td><td class="px-4 py-3">${e.subject}</td><td class="px-4 py-3">${e.date}</td><td class="px-4 py-3"><span class="px-2 py-1 rounded-full text-xs ${e.status==='مكتمل'?'bg-green-100 text-green-800':'bg-yellow-100 text-yellow-800'}">${e.status}</span></td></tr>`).join('');}
-
-    async function loadGrades(){const r=await fetch('/api/grades');const d=await r.json();document.getElementById('grades-table').innerHTML=d.data.map(g=>{const p=((g.score/g.max_score)*100).toFixed(1);const gr=p>=90?'ممتاز':p>=80?'جيد جداً':p>=70?'جيد':p>=60?'مقبول':'ضعيف';return `<tr class="hover:bg-gray-50"><td class="px-4 py-3 font-semibold">${g.student_name}</td><td class="px-4 py-3">${g.subject}</td><td class="px-4 py-3">${g.score}/${g.max_score}</td><td class="px-4 py-3">${p}%</td><td class="px-4 py-3"><span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm">${gr}</span></td></tr>`;}).join('');}
-
-    async function loadFees(){const r=await fetch('/api/fees');const d=await r.json();document.getElementById('fees-list').innerHTML=d.data.map(f=>`<div class="flex items-center p-4 bg-gray-50 rounded-lg"><div class="w-12 h-12 ${f.status==='paid'?'bg-green-500':'bg-red-500'} text-white rounded-full flex items-center justify-center text-xl">${f.status==='paid'?'💵':'⏳'}</div><div class="mr-4 flex-1"><p class="font-semibold">${f.student_name}</p><p class="text-sm text-gray-600">${f.type} - ${f.due_date}</p></div><p class="font-bold text-lg">${f.amount} جنيه</p></div>`).join('');}
-
-    async function loadRevenue(){const r=await fetch('/api/revenue');const d=await r.json();let total=0;d.data.forEach(x=>total+=x.amount);document.getElementById('revenue-list').innerHTML=d.data.map(x=>`<div class="flex items-center p-4 bg-green-50 rounded-lg"><div class="w-12 h-12 bg-green-500 text-white rounded-full flex items-center justify-center text-xl">💵</div><div class="mr-4 flex-1"><p class="font-semibold">${x.source}</p><p class="text-sm text-gray-600">${x.date}</p><p class="text-xs text-gray-500">${x.notes||''}</p></div><p class="font-bold text-lg text-green-600">${x.amount} جنيه</p></div>`).join('');document.getElementById('total-revenue').textContent=total;}
-
-    async function loadExpenses(){const r=await fetch('/api/expenses');const d=await r.json();document.getElementById('expenses-list').innerHTML=d.data.map(x=>`<div class="flex items-center p-4 bg-red-50 rounded-lg"><div class="w-12 h-12 bg-red-500 text-white rounded-full flex items-center justify-center text-xl">💸</div><div class="mr-4 flex-1"><p class="font-semibold">${x.category}</p><p class="text-sm text-gray-600">${x.date}</p><p class="text-xs text-gray-500">${x.notes||''}</p></div><p class="font-bold text-lg text-red-600">${x.amount} جنيه</p></div>`).join('');}
-
-    async function loadCertificates(){const r=await fetch('/api/students');const d=await r.json();document.getElementById('certificates-list').innerHTML=d.data.map(s=>`<a href="/certificate/${s.id}" target="_blank" class="block bg-gradient-to-br from-blue-500 to-purple-600 text-white p-6 rounded-xl hover:shadow-xl transition"><div class="text-4xl mb-2">🎓</div><h4 class="font-bold text-lg">${s.name}</h4><p class="text-sm opacity-90">${s.grade} - ${s.section}</p><button class="mt-4 bg-white text-blue-600 px-4 py-2 rounded-lg text-sm font-semibold w-full">عرض الشهادة</button></a>`).join('');}
-
-    async function loadSchoolInfo(){const r=await fetch('/api/school');const d=(await r.json()).data;document.getElementById('school-info').innerHTML=`<div class="bg-gradient-to-br from-blue-50 to-purple-50 p-6 rounded-xl"><div class="flex items-center mb-4"><div class="text-6xl ml-4">${d.logo||'🏫'}</div><div><h3 class="text-2xl font-bold text-blue-900">${d.name}</h3><p class="text-gray-600">العام: ${d.academic_year}</p></div></div><div class="grid grid-cols-1 md:grid-cols-2 gap-4 mt-4"><div class="bg-white p-3 rounded-lg"><p class="text-sm text-gray-500">📍 العنوان</p><p class="font-semibold">${d.address}</p></div><div class="bg-white p-3 rounded-lg"><p class="text-sm text-gray-500">📞 الهاتف</p><p class="font-semibold">${d.phone}</p></div><div class="bg-white p-3 rounded-lg"><p class="text-sm text-gray-500">📧 البريد</p><p class="font-semibold">${d.email}</p></div><div class="bg-white p-3 rounded-lg"><p class="text-sm text-gray-500">🏢 الفروع</p><p class="font-semibold">${d.branches}</p></div></div></div>`;}
-
-    async function loadClinic(){const r=await fetch('/api/clinic');const d=await r.json();document.getElementById('clinic-list').innerHTML=d.data.map(c=>`<div class="flex items-center p-4 bg-red-50 rounded-lg"><div class="w-12 h-12 bg-red-500 text-white rounded-full flex items-center justify-center text-xl">🏥</div><div class="mr-4 flex-1"><p class="font-semibold">${c.student_name}</p><p class="text-sm text-gray-600">${c.date} - ${c.complaint}</p><p class="text-sm text-green-700">العلاج: ${c.treatment}</p></div></div>`).join('');}
-
-    async function loadTransport(){const r=await fetch('/api/transport');const d=await r.json();document.getElementById('transport-list').innerHTML=d.data.map(t=>`<div class="bg-yellow-50 p-6 rounded-xl border border-yellow-200"><h4 class="font-bold text-lg">🚌 ${t.bus_name}</h4><p class="text-sm text-gray-700 mt-2">🛣️ ${t.route}</p><p class="text-sm text-gray-700">👨‍✈️ ${t.driver}</p><p class="text-sm text-gray-700">👥 ${t.students_count}/${t.capacity}</p></div>`).join('');}
-
-    async function loadLibrary(){const r=await fetch('/api/library');const d=await r.json();document.getElementById('library-table').innerHTML=d.data.map(b=>`<tr class="hover:bg-gray-50"><td class="px-4 py-3 font-semibold">${b.book_title}</td><td class="px-4 py-3">${b.author}</td><td class="px-4 py-3"><span class="px-2 py-1 rounded-full text-xs ${b.status==='متاح'?'bg-green-100 text-green-800':'bg-red-100 text-red-800'}">${b.status}</span></td><td class="px-4 py-3">${b.borrower||'-'}</td></tr>`).join('');}
-
-    async function loadInventory(){const r=await fetch('/api/inventory');const d=await r.json();document.getElementById('inventory-table').innerHTML=d.data.map(i=>`<tr class="hover:bg-gray-50"><td class="px-4 py-3 font-semibold">${i.item_name}</td><td class="px-4 py-3">${i.category}</td><td class="px-4 py-3">${i.quantity}</td><td class="px-4 py-3">${i.location}</td></tr>`).join('');}
-
-    async function loadCalendar(){const r=await fetch('/api/calendar_events');const d=await r.json();document.getElementById('calendar-list').innerHTML=d.data.map(e=>`<div class="flex items-center p-4 bg-blue-50 rounded-lg"><div class="w-12 h-12 bg-blue-500 text-white rounded-full flex items-center justify-center text-xl">📅</div><div class="mr-4 flex-1"><p class="font-semibold">${e.title}</p><p class="text-sm text-gray-600">${e.date} - ${e.type}</p><p class="text-sm text-gray-500">${e.description}</p></div></div>`).join('');}
-
-    async function loadAudit(){const r=await fetch('/api/audit_log');const d=await r.json();document.getElementById('audit-table').innerHTML=d.data.map(a=>`<tr class="hover:bg-gray-50"><td class="px-4 py-3">${a.user_name}</td><td class="px-4 py-3"><span class="bg-purple-100 text-purple-800 px-2 py-1 rounded-full text-xs">${a.action}</span></td><td class="px-4 py-3">${a.details}</td><td class="px-4 py-3 text-sm text-gray-500">${a.date}</td></tr>`).join('');}
-
-    async function loadNotifications(){const r=await fetch('/api/notifications');const d=await r.json();document.getElementById('notifications-list').innerHTML=d.data.map(n=>`<div class="flex items-center p-4 bg-green-50 rounded-lg"><div class="w-12 h-12 bg-green-500 text-white rounded-full flex items-center justify-center text-xl">📱</div><div class="mr-4 flex-1"><p class="font-semibold">${n.type} → ${n.recipient}</p><p class="text-sm text-gray-600">${n.message}</p><p class="text-xs text-gray-400">${n.date}</p></div><span class="px-2 py-1 rounded-full text-xs bg-green-100 text-green-800">${n.status}</span></div>`).join('');}
-
-    async function loadSettings(){const r=await fetch('/api/settings');const d=await r.json();document.getElementById('settings-list').innerHTML=d.data.map(s=>`<div class="flex items-center justify-between p-4 bg-gray-50 rounded-lg"><p class="font-semibold">${s.key}</p><p class="text-blue-600 font-mono">${s.value}</p></div>`).join('');}
-
-    window.addEventListener('load', () => {
-      new Chart(document.getElementById('attendanceChart'), { type: 'doughnut', data: { labels: ['حاضر', 'غائب', 'متأخر'], datasets: [{ data: [75, 15, 10], backgroundColor: ['#10b981', '#ef4444', '#f59e0b'] }] }, options: { responsive: true } });
-      new Chart(document.getElementById('revenueChart'), { type: 'bar', data: { labels: ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو'], datasets: [{ label: 'الإيرادات', data: [45000, 52000, 48000, 61000, 55000, 67000], backgroundColor: '#3b82f6' }] }, options: { responsive: true } });
-      loadStudents(); loadTeachers(); loadRevenue(); loadAttendance();
-    });
-  </script>
-</body>
-</html>
