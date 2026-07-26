@@ -606,6 +606,16 @@
       new Chart(document.getElementById('revenueChart'), { type: 'bar', data: { labels: ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو'], datasets: [{ label: 'الإيرادات', data: [45000, 52000, 48000, 61000, 55000, 67000], backgroundColor: '#3b82f6' }] }, options: { responsive: true } });
       loadStudents(); loadTeachers(); loadRevenue(); loadAttendance();
     });
+               <script>
+    // 🔒 التحقق من تسجيل الدخول فور فتح الصفحة
+    const currentUser = JSON.parse(localStorage.getItem('user') || 'null');
+    if (!currentUser || !currentUser.name) {
+        window.location.href = '/login';
+    }
+
+    // باقي الكود القديم يأتي هنا...
+    document.getElementById('current-date').textContent = new Date().toLocaleDateString('ar-EG', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
+    // ...
   </script>
 </body>
 </html>
