@@ -420,58 +420,190 @@ ${(gradesData || []).map(g=>`<tr><td>${g.subject}</td><td>${g.score}</td><td>${g
 
 // ======== التقارير ========
 function makeReport(title, headers, rows, extra = '') {
+  const rowsHtml = rows && rows.length > 0 ? rows : '<tr><td colspan="' + headers.length + '" style="text-align:center; padding:20px; color:#999;">لا توجد بيانات</td></tr>';
+  
   return `<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><title>${title}</title>
-<style>body{font-family:Arial;padding:40px}h1{text-align:center;color:#1e40af}table{width:100%;border-collapse:collapse;margin-top:20px}th{background:#1e40af;color:white;padding:10px}td{padding:8px;border:1px solid #ddd;text-align:center}.pbtn{display:block;margin:20px auto;padding:10px 30px;background:#1e40af;color:white;border:none;border-radius:5px;cursor:pointer;font-size:16px}@media print{.pbtn{display:none}}</style></head>
-<body><h1>${title}</h1><p style="text-align:center">تاريخ: ${new Date().toLocaleDateString('ar-EG')}</p>${extra}
-<table><tr>${headers.map(h=>`<th>${h}</th>`).join('')}</tr>${rows}</table>
-<button class="pbtn" onclick="window.print()">🖨️ طباعة</button></body></html>`;
+<style>
+body{font-family:'Segoe UI',Arial,sans-serif;padding:40px;background:#f5f5f5}
+h1{text-align:center;color:#1e40af;margin-bottom:10px}
+p.date{text-align:center;color:#666;margin-bottom:30px}
+table{width:100%;border-collapse:collapse;margin-top:20px;background:white;box-shadow:0 2px 4px rgba(0,0,0,0.1)}
+th{background:#1e40af;color:white;padding:12px;text-align:center;font-weight:600}
+td{padding:10px;border:1px solid #ddd;text-align:center}
+tr:nth-child(even){background:#f9f9f9}
+tr:hover{background:#e0f2fe}
+.summary{background:#f0f9ff;padding:20px;border-radius:10px;text-align:center;margin:20px 0;border:2px solid #3b82f6}
+.summary h2{margin:10px 0;color:#1e40af}
+.pbtn{display:block;margin:30px auto;padding:12px 40px;background:#1e40af;color:white;border:none;border-radius:8px;cursor:pointer;font-size:16px;font-weight:600}
+.pbtn:hover{background:#1e3a8a}
+@media print{.pbtn{display:none}body{background:white;padding:20px}}
+</style></head>
+<body>
+<h1>${title}</h1>
+<p class="date">تاريخ التقرير: ${new Date().toLocaleDateString('ar-EG', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+${extra}
+<table>
+<thead><tr>${headers.map(h=>`<th>${h}</th>`).join('')}</tr></thead>
+<tbody>${rowsHtml}</tbody>
+</table>
+<button class="pbtn" onclick="window.print()">🖨️ طباعة التقرير</button>
+</body></html>`;
 }
 
 app.get('/api/reports/students', async (req, res) => {
-  const { data } = await supabase.from('students').select('*');
-  const r = (data || []).map(s => `<tr><td>${s.id}</td><td>${s.name}</td><td>${s.grade}</td><td>${s.section}</td><td>${s.seat_number||'-'}</td><td>${s.status}</td></tr>`).join('');
-  res.send(makeReport('📄 تقرير الطلاب', ['الرقم','الاسم','الصف','الشعبة','رقم الجلوس','الحالة'], r));
+  try {
+    const { data, error } = await supabase.from('students').select('*');
+    if (error) throw error;
+    
+    const r = (data || []).map(s => 
+      `<tr><td>${s.id}</td><td>${s.name}</td><td>${s.grade}</td><td>${s.section}</td><td>${s.seat_number||'-'}</td><td>${s.status}</td></tr>`
+    ).join('');
+    
+    res.send(makeReport('📄 تقرير الطلاب', ['الرقم','الاسم','الصف','الشعبة','رقم الجلوس','الحالة'], r));
+  } catch (err) {
+    console.error('Error in students report:', err);
+    res.status(500).send('حدث خطأ في تحميل التقرير');
+  }
 });
 
 app.get('/api/reports/attendance', async (req, res) => {
-  const { data } = await supabase.from('attendance').select('*');
-  const r = (data || []).map(a => `<tr><td>${a.student_name}</td><td>${a.date}</td><td>${a.status==='present'?'حاضر':a.status==='absent'?'غائب':'متأخر'}</td></tr>`).join('');
-  res.send(makeReport('📅 تقرير الحضور', ['الطالب','التاريخ','الحالة'], r));
+  try {
+    const { data, error } = await supabase.from('attendance').select('*');
+    if (error) throw error;
+    
+    const r = (data || []).map(a => {
+      const status = a.status==='present'?'حاضر':a.status==='absent'?'غائب':'متأخر';
+      return `<tr><td>${a.student_name}</td><td>${a.date}</td><td>${status}</td></tr>`;
+    }).join('');
+    
+    res.send(makeReport('📅 تقرير الحضور والغياب', ['الطالب','التاريخ','الحالة'], r));
+  } catch (err) {
+    console.error('Error in attendance report:', err);
+    res.status(500).send('حدث خطأ في تحميل التقرير');
+  }
 });
 
 app.get('/api/reports/fees', async (req, res) => {
-  const { data } = await supabase.from('fees').select('*');
-  let total=0,paid=0;
-  (data || []).forEach(f=>{total+=f.amount;if(f.status==='paid')paid+=f.amount;});
-  const r = (data || []).map(f => `<tr><td>${f.student_name}</td><td>${f.amount}</td><td>${f.type||'-'}</td><td>${f.due_date||'-'}</td><td>${f.status==='paid'?'مدفوع':'غير مدفوع'}</td></tr>`).join('');
-  res.send(makeReport('💰 التقرير المالي', ['الطالب','المبلغ','النوع','الاستحقاق','الحالة'], r, `<div style="background:#f0f9ff;padding:15px;border-radius:10px;text-align:center;margin:20px 0"><b>الإجمالي: ${total} | المدفوع: ${paid} | المتبقي: ${total-paid}</b></div>`));
+  try {
+    const { data, error } = await supabase.from('fees').select('*');
+    if (error) throw error;
+    
+    let total=0,paid=0;
+    (data || []).forEach(f=>{
+      total+=f.amount;
+      if(f.status==='paid') paid+=f.amount;
+    });
+    
+    const r = (data || []).map(f => 
+      `<tr><td>${f.student_name}</td><td>${f.amount} جنيه</td><td>${f.type||'-'}</td><td>${f.due_date||'-'}</td><td>${f.status==='paid'?'مدفوع':'غير مدفوع'}</td></tr>`
+    ).join('');
+    
+    const extra = `<div class="summary">
+      <h2>💰 ملخص التقرير المالي</h2>
+      <p><strong>الإجمالي:</strong> ${total} جنيه</p>
+      <p><strong>المدفوع:</strong> ${paid} جنيه</p>
+      <p><strong>المتبقي:</strong> ${total-paid} جنيه</p>
+    </div>`;
+    
+    res.send(makeReport('💰 التقرير المالي', ['الطالب','المبلغ','النوع','الاستحقاق','الحالة'], r, extra));
+  } catch (err) {
+    console.error('Error in fees report:', err);
+    res.status(500).send('حدث خطأ في تحميل التقرير');
+  }
 });
 
 app.get('/api/reports/grades', async (req, res) => {
-  const { data } = await supabase.from('grades').select('*');
-  const r = (data || []).map(g => { const p=((g.score/g.max_score)*100).toFixed(1); const gr=p>=90?'ممتاز':p>=70?'جيد':'مقبول'; return `<tr><td>${g.student_name}</td><td>${g.subject}</td><td>${g.score}/${g.max_score}</td><td>${p}%</td><td>${gr}</td></tr>`; }).join('');
-  res.send(makeReport('🎯 كشوف الدرجات', ['الطالب','المادة','الدرجة','النسبة','التقدير'], r));
+  try {
+    const { data, error } = await supabase.from('grades').select('*');
+    if (error) throw error;
+    
+    const r = (data || []).map(g => {
+      const p = ((g.score/g.max_score)*100).toFixed(1);
+      const gr = p>=90?'ممتاز':p>=80?'جيد جداً':p>=70?'جيد':p>=60?'مقبول':'ضعيف';
+      return `<tr><td>${g.student_name}</td><td>${g.subject}</td><td>${g.score}/${g.max_score}</td><td>${p}%</td><td>${gr}</td></tr>`;
+    }).join('');
+    
+    res.send(makeReport('🎯 كشوف الدرجات', ['الطالب','المادة','الدرجة','النسبة','التقدير'], r));
+  } catch (err) {
+    console.error('Error in grades report:', err);
+    res.status(500).send('حدث خطأ في تحميل التقرير');
+  }
 });
 
 app.get('/api/reports/teachers', async (req, res) => {
-  const { data } = await supabase.from('teachers').select('*');
-  const r = (data || []).map(t => `<tr><td>${t.name}</td><td>${t.email}</td><td>${t.phone}</td><td>${t.salary||0}</td></tr>`).join('');
-  res.send(makeReport('👨‍🏫 تقرير المعلمين', ['الاسم','البريد','الهاتف','الراتب'], r));
+  try {
+    const { data, error } = await supabase.from('teachers').select('*');
+    if (error) throw error;
+    
+    const r = (data || []).map(t => 
+      `<tr><td>${t.name}</td><td>${t.email}</td><td>${t.phone}</td><td>${t.salary||0} جنيه</td></tr>`
+    ).join('');
+    
+    res.send(makeReport('👨‍🏫 تقرير المعلمين', ['الاسم','البريد','الهاتف','الراتب'], r));
+  } catch (err) {
+    console.error('Error in teachers report:', err);
+    res.status(500).send('حدث خطأ في تحميل التقرير');
+  }
 });
 
 app.get('/api/reports/financial', async (req, res) => {
-  const { data: rev } = await supabase.from('revenue').select('*');
-  const { data: exp } = await supabase.from('expenses').select('*');
-  let tr=0,te=0;
-  (rev || []).forEach(r=>tr+=r.amount);
-  (exp || []).forEach(e=>te+=e.amount);
-  const rr = (rev || []).map(r=>`<tr><td>${r.source}</td><td>${r.amount}</td><td>${r.date}</td></tr>`).join('');
-  const er = (exp || []).map(e=>`<tr><td>${e.category}</td><td>${e.amount}</td><td>${e.date}</td></tr>`).join('');
-  res.send(`<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><title>التقرير المالي</title><style>body{font-family:Arial;padding:40px}h1{text-align:center;color:#1e40af}h2{color:#1e40af;margin-top:30px}table{width:100%;border-collapse:collapse;margin-top:10px}th{background:#1e40af;color:white;padding:10px}td{padding:8px;border:1px solid #ddd;text-align:center}.sum{background:#f0f9ff;padding:15px;border-radius:10px;text-align:center;margin:20px 0}.pbtn{display:block;margin:20px auto;padding:10px 30px;background:#1e40af;color:white;border:none;border-radius:5px;cursor:pointer}@media print{.pbtn{display:none}}</style></head><body><h1>💰 التقرير المالي</h1><div class="sum"><b>الإيرادات: ${tr} | المصروفات: ${te} | الصافي: ${tr-te}</b></div><h2>الإيرادات</h2><table><tr><th>المصدر</th><th>المبلغ</th><th>التاريخ</th></tr>${rr}</table><h2>المصروفات</h2><table><tr><th>البند</th><th>المبلغ</th><th>التاريخ</th></tr>${er}</table><button class="pbtn" onclick="window.print()">🖨️ طباعة</button></body></html>`);
-});
-
-// ======== تشغيل الخادم ========
-app.listen(PORT, async () => {
-  console.log(`🚀 النظام يعمل على المنفذ ${PORT}`);
-  await checkConnection();
+  try {
+    const { data: rev, error: revError } = await supabase.from('revenue').select('*');
+    if (revError) throw revError;
+    
+    const { data: exp, error: expError } = await supabase.from('expenses').select('*');
+    if (expError) throw expError;
+    
+    let tr=0,te=0;
+    (rev || []).forEach(r=>tr+=r.amount);
+    (exp || []).forEach(e=>te+=e.amount);
+    
+    const rr = (rev || []).map(r=>`<tr><td>${r.source}</td><td>${r.amount} جنيه</td><td>${r.date}</td><td>${r.notes||'-'}</td></tr>`).join('');
+    const er = (exp || []).map(e=>`<tr><td>${e.category}</td><td>${e.amount} جنيه</td><td>${e.date}</td><td>${e.notes||'-'}</td></tr>`).join('');
+    
+    const extra = `<div class="summary">
+      <h2>💵 ملخص التقرير المالي الشامل</h2>
+      <p><strong>إجمالي الإيرادات:</strong> ${tr} جنيه</p>
+      <p><strong>إجمالي المصروفات:</strong> ${te} جنيه</p>
+      <p><strong>صافي الربح:</strong> ${tr-te} جنيه</p>
+    </div>`;
+    
+    res.send(`<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><title>التقرير المالي الشامل</title>
+<style>
+body{font-family:'Segoe UI',Arial,sans-serif;padding:40px;background:#f5f5f5}
+h1{text-align:center;color:#1e40af;margin-bottom:10px}
+h2{color:#1e40af;margin-top:30px;border-bottom:2px solid #3b82f6;padding-bottom:10px}
+p.date{text-align:center;color:#666;margin-bottom:30px}
+table{width:100%;border-collapse:collapse;margin-top:15px;background:white;box-shadow:0 2px 4px rgba(0,0,0,0.1)}
+th{background:#1e40af;color:white;padding:12px;text-align:center;font-weight:600}
+td{padding:10px;border:1px solid #ddd;text-align:center}
+tr:nth-child(even){background:#f9f9f9}
+tr:hover{background:#e0f2fe}
+.summary{background:#f0f9ff;padding:20px;border-radius:10px;text-align:center;margin:20px 0;border:2px solid #3b82f6}
+.summary h2{margin:10px 0;color:#1e40af;border:none}
+.summary p{margin:10px 0;font-size:18px}
+.pbtn{display:block;margin:30px auto;padding:12px 40px;background:#1e40af;color:white;border:none;border-radius:8px;cursor:pointer;font-size:16px;font-weight:600}
+.pbtn:hover{background:#1e3a8a}
+@media print{.pbtn{display:none}body{background:white;padding:20px}}
+</style></head>
+<body>
+<h1>💰 التقرير المالي الشامل</h1>
+<p class="date">تاريخ التقرير: ${new Date().toLocaleDateString('ar-EG', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}</p>
+${extra}
+<h2>📈 الإيرادات</h2>
+<table>
+<thead><tr><th>المصدر</th><th>المبلغ</th><th>التاريخ</th><th>ملاحظات</th></tr></thead>
+<tbody>${rr || '<tr><td colspan="4" style="text-align:center;padding:20px;color:#999;">لا توجد إيرادات</td></tr>'}</tbody>
+</table>
+<h2>📉 المصروفات</h2>
+<table>
+<thead><tr><th>البند</th><th>المبلغ</th><th>التاريخ</th><th>ملاحظات</th></tr></thead>
+<tbody>${er || '<tr><td colspan="4" style="text-align:center;padding:20px;color:#999;">لا توجد مصروفات</td></tr>'}</tbody>
+</table>
+<button class="pbtn" onclick="window.print()">🖨️ طباعة التقرير</button>
+</body></html>`);
+  } catch (err) {
+    console.error('Error in financial report:', err);
+    res.status(500).send('حدث خطأ في تحميل التقرير');
+  }
 });
