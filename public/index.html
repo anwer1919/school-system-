@@ -353,29 +353,46 @@
     }
 
     async function loadStudents(){
-      try {
-        const r = await fetch('/api/students', { headers: { 'x-user-role': userRole } });
-        if(r.status === 403){ showToast('⛔ غير مصرح','error'); return; }
-        const d = await r.json();
-        document.getElementById('students-table').innerHTML = d.data.map(s => `
-          <tr class="hover:bg-gray-50">
-            <td class="px-4 py-3">${s.id}</td>
-            <td class="px-4 py-3 font-semibold">${s.name}</td>
-            <td class="px-4 py-3">${s.grade}</td>
-            <td class="px-4 py-3">${s.section}</td>
-            <td class="px-4 py-3">${s.seat_number||'-'}</td>
-            <td class="px-4 py-3"><span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">${s.status}</span></td>
-            <td class="px-4 py-3">
-              <button onclick='openEditModal("students",${s.id},${JSON.stringify(s).replace(/"/g, "&quot;")})' class="btn-action btn-edit">✏️</button>
-              <button onclick="deleteItem('students',${s.id},'${s.name}')" class="btn-action btn-delete">🗑️</button>
-            </td>
-          </tr>
-        `).join('');
-        document.getElementById('total-students').textContent = d.count || d.data.length;
-      } catch (err) {
-        console.error('خطأ في تحميل الطلاب:', err);
-      }
+  console.log('🌐 [Frontend] جاري طلب بيانات الطلاب...');
+  try {
+    const res = await fetch('/api/students');
+    const result = await res.json();
+    
+    console.log('📦 [Frontend] الاستجابة من الخادم:', result);
+    
+    if (!result.success) {
+      alert('❌ فشل جلب البيانات من الخادم: ' + result.message);
+      return;
     }
+    
+    if (!result.data || result.data.length === 0) {
+      alert('⚠️ الخادم أرجع نجاح، لكن مصفوفة البيانات فارغة! تأكد من وجود بيانات في جدول students في Supabase.');
+      document.getElementById('students-table').innerHTML = '<tr><td colspan="7" class="text-center py-4 text-gray-500">لا توجد بيانات</td></tr>';
+      return;
+    }
+
+    // إذا وصلنا هنا، فالبيانات موجودة وسنقوم بعرضها
+    console.log('✅ [Frontend] سيتم عرض', result.data.length, 'طالب');
+    document.getElementById('students-table').innerHTML = result.data.map(s => `
+      <tr class="hover:bg-gray-50">
+        <td class="px-4 py-3">${s.id}</td>
+        <td class="px-4 py-3 font-semibold">${s.name}</td>
+        <td class="px-4 py-3">${s.grade}</td>
+        <td class="px-4 py-3">${s.section}</td>
+        <td class="px-4 py-3">${s.seat_number||'-'}</td>
+        <td class="px-4 py-3"><span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">${s.status}</span></td>
+        <td class="px-4 py-3">
+          <button onclick="deleteItem('students',${s.id},'${s.name}')" class="btn-action btn-delete">🗑️</button>
+        </td>
+      </tr>
+    `).join('');
+    
+    document.getElementById('total-students').textContent = result.count;
+  } catch (err) {
+    console.error('❌ [Frontend] خطأ غير متوقع:', err);
+    alert('حدث خطأ في الاتصال: ' + err.message);
+  }
+}
 
     async function loadParents(){
       try {
