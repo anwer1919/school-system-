@@ -111,11 +111,17 @@ function buildSidebar() {
   const items = menuItems[userRole] || menuItems['مدير'];
   
   nav.innerHTML = items.map((item, i) => 
-    `<a href="#" onclick="showPage('${item.id}')" class="nav-item ${i===0?'active':''} flex items-center px-6 py-3 text-blue-100">
-      <span class="ml-3 text-lg">${item.icon}</span> ${item.label}
-    </a>`
-  ).join('');
+    `<a href="#" onclick=function showPage(pageName) {
+  // التحقق من الصلاحيات
+  const allowedPages = (menuItems[userRole] || []).map(item => item.id);
+  if (!allowedPages.includes(pageName)) {
+    showToast('⛔ ليس لديك صلاحية للوصول إلى هذه الصفحة', 'error');
+    return;
+  }
   
+  // باقي الكود الأصلي...
+  document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
+  // ...
   // تحديث اسم المستخدم مع دوره
   document.getElementById('user-name').textContent = `${currentUser?.name || 'المستخدم'} (${userRole})`;
 }
