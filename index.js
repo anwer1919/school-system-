@@ -10,6 +10,27 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 app.use(express.static('public'));
+// ======== نظام الصلاحيات ========
+const rolePermissions = {
+  'مدير': ['*'], // يرى كل شيء
+  'تسجيل الطلاب': ['students', 'parents', 'attendance', 'school_info', 'audit_log'],
+  'التقارير': ['reports', 'certificates', 'audit_log', 'students', 'teachers', 'grades', 'attendance', 'fees', 'revenue', 'expenses', 'school_info'],
+  'الشؤون المالية': ['fees', 'revenue', 'expenses', 'students', 'parents', 'school_info', 'audit_log']
+};
+
+// Middleware للتحقق من الصلاحيات
+function checkPermission(table) {
+  return (req, res, next) => {
+    const userRole = req.headers['x-user-role'] || 'مدير';
+    const permissions = rolePermissions[userRole] || [];
+    
+    if (permissions.includes('*') || permissions.includes(table)) {
+      next();
+    } else {
+      res.status(403).json({ success: false, message: '⛔ ليس لديك صلاحية للوصول' });
+    }
+  };
+}
 
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
 
