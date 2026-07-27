@@ -15,16 +15,14 @@ const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY
 
 async function checkConnection() {
   const { data, error } = await supabase.from('school_info').select('*').limit(1);
-  if (error) console.error('❌ خطأ:', error.message);
+  if (error) console.error('❌ خطأ الاتصال:', error.message);
   else console.log('✅ تم الاتصال بـ Supabase بنجاح!');
 }
 
 async function logAction(userName, action, details) {
   try {
     await supabase.from('audit_log').insert([{
-      user_name: userName,
-      action: action,
-      details: details,
+      user_name: userName, action, details,
       date: new Date().toLocaleString('ar-EG')
     }]);
   } catch (err) { console.error('Audit error:', err.message); }
@@ -43,6 +41,9 @@ function checkPermission(table) {
     const userRole = req.headers['x-user-role'] || 'مدير';
     const permissions = rolePermissions[userRole] || [];
     
+    // 🔍 تتبع للتشخيص
+    console.log(`🔐 [${userRole}] يحاول الوصول لـ ${table} - ${permissions.includes('*') || permissions.includes(table) ? '✅ مسموح' : '❌ مرفوض'}`);
+    
     if (permissions.includes('*') || permissions.includes(table)) {
       next();
     } else {
@@ -57,33 +58,43 @@ app.get('/login', (req, res) => res.sendFile(__dirname + '/public/login.html'));
 app.post('/api/login', async (req, res) => {
   try {
     const { email, password } = req.body;
+    console.log('🔑 محاولة دخول:', email);
+    
     if (!email || !password) return res.status(400).json({ success: false, message: 'البريد وكلمة المرور مطلوبان' });
 
     const { data: users, error } = await supabase.from('users').select('*').eq('email', email).limit(1);
-    if (error || !users || users.length === 0) return res.status(401).json({ success: false, message: 'بيانات غير صحيحة' });
+    if (error) { console.error('❌ خطأ في البحث:', error); return res.status(500).json({ success: false, message: error.message }); }
+    if (!users || users.length === 0) return res.status(401).json({ success: false, message: 'بيانات غير صحيحة' });
 
     const user = users[0];
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(401).json({ success: false, message: 'كلمة المرور غير صحيحة' });
 
     await logAction(user.name, 'تسجيل دخول', 'دخول ناجح');
+    console.log('✅ دخول ناجح:', user.name, '- الدور:', user.role);
     res.json({ success: true, user: { id: user.id, name: user.name, role: user.role, email: user.email } });
   } catch (err) {
-    console.error('Login error:', err);
-    res.status(500).json({ success: false, message: 'خطأ في الخادم' });
+    console.error('❌ Login error:', err);
+    res.status(500).json({ success: false, message: 'خطأ في الخادم: ' + err.message });
   }
 });
 
 const tables = ['students','teachers','employees','parents','attendance','fees','grades','exams','schedules','revenue','expenses','notifications','audit_log','school_info','terms','grades_levels','sections','rooms','subjects','clinic','transport','library','inventory','calendar_events','settings'];
 
+// GET
 tables.forEach(table => {
   app.get(`/api/${table}`, checkPermission(table), async (req, res) => {
     try {
       const { data, error } = await supabase.from(table).select('*');
-      if (error) return res.status(500).json({ success: false, message: error.message });
+      if (error) {
+        console.error(`❌ GET ${table}:`, error.message);
+        return res.status(500).json({ success: false, message: error.message });
+      }
+      console.log(`✅ GET ${table}: ${data?.length || 0} سجل`);
       if (table === 'school_info') res.json({ success: true, data: data?.[0] || null });
       else res.json({ success: true, count: data?.length || 0, data: data || [] });
     } catch (err) {
+      console.error(`❌ GET ${table} error:`, err);
       res.status(500).json({ success: false, message: 'خطأ في الخادم' });
     }
   });
@@ -101,24 +112,37 @@ const createConfig = {
   calendar_events: { action: 'إضافة حدث' }
 };
 
+// POST
 Object.keys(createConfig).forEach(table => {
   app.post(`/api/${table}`, checkPermission(table), async (req, res) => {
     try {
+      console.log(`📝 POST ${table}:`, JSON.stringify(req.body));
       const { data, error } = await supabase.from(table).insert([req.body]).select();
-      if (error) return res.status(500).json({ success: false, message: error.message });
+      if (error) {
+        console.error(`❌ POST ${table}:`, error.message, error.details);
+        return res.status(500).json({ success: false, message: error.message + ' | ' + (error.details || '') });
+      }
+      console.log(`✅ POST ${table} نجح:`, data[0]);
       await logAction('المستخدم', createConfig[table].action, JSON.stringify(req.body));
       res.json({ success: true, data: data[0], message: '✅ تمت الإضافة بنجاح' });
     } catch (err) {
-      res.status(500).json({ success: false, message: 'خطأ في الخادم' });
+      console.error(`❌ POST ${table} error:`, err);
+      res.status(500).json({ success: false, message: 'خطأ في الخادم: ' + err.message });
     }
   });
 });
 
+// PUT
 Object.keys(createConfig).forEach(table => {
   app.put(`/api/${table}/:id`, checkPermission(table), async (req, res) => {
     try {
+      console.log(`✏️ PUT ${table} #${req.params.id}:`, JSON.stringify(req.body));
       const { data, error } = await supabase.from(table).update(req.body).eq('id', req.params.id).select();
-      if (error) return res.status(500).json({ success: false, message: error.message });
+      if (error) {
+        console.error(`❌ PUT ${table}:`, error.message);
+        return res.status(500).json({ success: false, message: error.message });
+      }
+      console.log(`✅ PUT ${table} نجح`);
       await logAction('المستخدم', 'تعديل', `${table} #${req.params.id}`);
       res.json({ success: true, message: '✅ تم التعديل بنجاح' });
     } catch (err) {
@@ -127,11 +151,17 @@ Object.keys(createConfig).forEach(table => {
   });
 });
 
+// DELETE
 Object.keys(createConfig).forEach(table => {
   app.delete(`/api/${table}/:id`, checkPermission(table), async (req, res) => {
     try {
+      console.log(`🗑️ DELETE ${table} #${req.params.id}`);
       const { error } = await supabase.from(table).delete().eq('id', req.params.id);
-      if (error) return res.status(500).json({ success: false, message: error.message });
+      if (error) {
+        console.error(`❌ DELETE ${table}:`, error.message);
+        return res.status(500).json({ success: false, message: error.message });
+      }
+      console.log(`✅ DELETE ${table} نجح`);
       await logAction('المستخدم', 'حذف', `${table} #${req.params.id}`);
       res.json({ success: true, message: '🗑️ تم الحذف بنجاح' });
     } catch (err) {
@@ -140,6 +170,7 @@ Object.keys(createConfig).forEach(table => {
   });
 });
 
+// الشهادات
 app.get('/certificate/:id', async (req, res) => {
   try {
     const { data: schoolData } = await supabase.from('school_info').select('*').limit(1);
@@ -165,6 +196,7 @@ app.get('/certificate/:id', async (req, res) => {
   }
 });
 
+// التقارير (مبسطة)
 function makeReport(title, headers, rows, extra = '') {
   const rowsHtml = rows && rows.length > 0 ? rows : '<tr><td colspan="' + headers.length + '" style="text-align:center;padding:20px;color:#999;">لا توجد بيانات</td></tr>';
   return `<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><title>${title}</title><style>body{font-family:Arial,sans-serif;padding:40px;background:#f5f5f5}h1{text-align:center;color:#1e40af}table{width:100%;border-collapse:collapse;margin-top:20px;background:white;box-shadow:0 2px 4px rgba(0,0,0,0.1)}th{background:#1e40af;color:white;padding:12px}td{padding:10px;border:1px solid #ddd;text-align:center}tr:nth-child(even){background:#f9f9f9}.summary{background:#f0f9ff;padding:20px;border-radius:10px;text-align:center;margin:20px 0;border:2px solid #3b82f6}.pbtn{display:block;margin:30px auto;padding:12px 40px;background:#1e40af;color:white;border:none;border-radius:8px;cursor:pointer;font-size:16px}@media print{.pbtn{display:none}body{background:white}}</style></head><body><h1>${title}</h1><p style="text-align:center">تاريخ: ${new Date().toLocaleDateString('ar-EG')}</p>${extra}<table><tr>${headers.map(h=>`<th>${h}</th>`).join('')}</tr>${rowsHtml}</table><button class="pbtn" onclick="window.print()">🖨️ طباعة</button></body></html>`;
