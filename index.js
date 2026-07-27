@@ -10,27 +10,6 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 app.use(express.static('public'));
-// ======== نظام الصلاحيات ========
-const rolePermissions = {
-  'مدير': ['*'], // يرى كل شيء
-  'تسجيل الطلاب': ['students', 'parents', 'attendance', 'school_info', 'audit_log'],
-  'التقارير': ['reports', 'certificates', 'audit_log', 'students', 'teachers', 'grades', 'attendance', 'fees', 'revenue', 'expenses', 'school_info'],
-  'الشؤون المالية': ['fees', 'revenue', 'expenses', 'students', 'parents', 'school_info', 'audit_log']
-};
-
-// Middleware للتحقق من الصلاحيات
-function checkPermission(table) {
-  return (req, res, next) => {
-    const userRole = req.headers['x-user-role'] || 'مدير';
-    const permissions = rolePermissions[userRole] || [];
-    
-    if (permissions.includes('*') || permissions.includes(table)) {
-      next();
-    } else {
-      res.status(403).json({ success: false, message: '⛔ ليس لديك صلاحية للوصول' });
-    }
-  };
-}
 
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
 
@@ -51,6 +30,27 @@ async function logAction(userName, action, details) {
       date: new Date().toLocaleString('ar-EG')
     }]);
   } catch (err) { console.error('Audit error:', err.message); }
+}
+
+// ======== نظام الصلاحيات ========
+const rolePermissions = {
+  'مدير': ['*'],
+  'تسجيل الطلاب': ['students', 'parents', 'attendance', 'school_info', 'audit_log'],
+  'التقارير': ['reports', 'certificates', 'audit_log', 'students', 'teachers', 'grades', 'attendance', 'fees', 'revenue', 'expenses', 'school_info'],
+  'الشؤون المالية': ['fees', 'revenue', 'expenses', 'students', 'parents', 'school_info', 'audit_log']
+};
+
+function checkPermission(table) {
+  return (req, res, next) => {
+    const userRole = req.headers['x-user-role'] || 'مدير';
+    const permissions = rolePermissions[userRole] || [];
+    
+    if (permissions.includes('*') || permissions.includes(table)) {
+      next();
+    } else {
+      res.status(403).json({ success: false, message: '⛔ ليس لديك صلاحية للوصول' });
+    }
+  };
 }
 
 // الصفحات
@@ -78,7 +78,7 @@ app.post('/api/login', async (req, res) => {
   }
 });
 
-// GET لكل الجداول
+// GET لكل الجداول مع الصلاحيات
 const tables = ['students','teachers','employees','parents','attendance','fees','grades','exams','schedules','revenue','expenses','notifications','audit_log','school_info','terms','grades_levels','sections','rooms','subjects','clinic','transport','library','inventory','calendar_events','settings'];
 
 tables.forEach(table => {
@@ -94,7 +94,7 @@ tables.forEach(table => {
   });
 });
 
-// POST (إضافة)
+// POST (إضافة) مع الصلاحيات
 const createConfig = {
   students: { action: 'إضافة طالب' }, teachers: { action: 'إضافة معلم' },
   employees: { action: 'إضافة موظف' }, parents: { action: 'إضافة ولي أمر' },
@@ -108,7 +108,7 @@ const createConfig = {
 };
 
 Object.keys(createConfig).forEach(table => {
-  app.post(`/api/${table}`, async (req, res) => {
+  app.post(`/api/${table}`, checkPermission(table), async (req, res) => {
     try {
       const { data, error } = await supabase.from(table).insert([req.body]).select();
       if (error) return res.status(500).json({ success: false, message: error.message });
@@ -120,9 +120,9 @@ Object.keys(createConfig).forEach(table => {
   });
 });
 
-// PUT (تعديل)
+// PUT (تعديل) مع الصلاحيات
 Object.keys(createConfig).forEach(table => {
-  app.put(`/api/${table}/:id`, async (req, res) => {
+  app.put(`/api/${table}/:id`, checkPermission(table), async (req, res) => {
     try {
       const { data, error } = await supabase.from(table).update(req.body).eq('id', req.params.id).select();
       if (error) return res.status(500).json({ success: false, message: error.message });
@@ -134,9 +134,9 @@ Object.keys(createConfig).forEach(table => {
   });
 });
 
-// DELETE (حذف)
+// DELETE (حذف) مع الصلاحيات
 Object.keys(createConfig).forEach(table => {
-  app.delete(`/api/${table}/:id`, async (req, res) => {
+  app.delete(`/api/${table}/:id`, checkPermission(table), async (req, res) => {
     try {
       const { error } = await supabase.from(table).delete().eq('id', req.params.id);
       if (error) return res.status(500).json({ success: false, message: error.message });
@@ -151,16 +151,13 @@ Object.keys(createConfig).forEach(table => {
 // الشهادات
 app.get('/certificate/:id', async (req, res) => {
   try {
-    // جلب بيانات المدرسة
     const { data: schoolData } = await supabase.from('school_info').select('*').limit(1);
     const school = schoolData?.[0] || { name: 'مدرسة النور الخاصة', logo: '🏫', academic_year: '2026-2027' };
 
-    // جلب بيانات الطالب
     const { data: students } = await supabase.from('students').select('*').eq('id', req.params.id).limit(1);
     if (!students || students.length === 0) return res.status(404).send('الطالب غير موجود');
     const student = students[0];
 
-    // جلب درجات الطالب
     const { data: gradesData } = await supabase.from('grades').select('*').eq('student_id', req.params.id);
     
     let ts = 0, tm = 0;
@@ -178,221 +175,38 @@ app.get('/certificate/:id', async (req, res) => {
 <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
 * { box-sizing: border-box; margin: 0; padding: 0; }
-body {
-  font-family: 'Cairo', 'Amiri', serif;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  padding: 40px 20px;
-  min-height: 100vh;
-}
-.cert {
-  max-width: 850px;
-  margin: auto;
-  background: #fffef5;
-  padding: 50px;
-  border: 20px double #d4af37;
-  border-radius: 15px;
-  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-  position: relative;
-}
-.cert::before {
-  content: '';
-  position: absolute;
-  top: 15px; left: 15px; right: 15px; bottom: 15px;
-  border: 2px solid #d4af37;
-  border-radius: 8px;
-  pointer-events: none;
-}
-.header {
-  text-align: center;
-  border-bottom: 3px double #d4af37;
-  padding-bottom: 20px;
-  margin-bottom: 30px;
-}
-.school-logo {
-  font-size: 70px;
-  margin-bottom: 10px;
-}
-.header h1 {
-  color: #1e40af;
-  font-size: 38px;
-  font-weight: 700;
-  margin-bottom: 5px;
-}
-.header .sub {
-  color: #666;
-  font-size: 16px;
-  font-style: italic;
-}
-.header .year {
-  color: #d4af37;
-  font-size: 18px;
-  font-weight: 600;
-  margin-top: 10px;
-}
-.title {
-  text-align: center;
-  font-size: 42px;
-  color: #d4af37;
-  margin: 30px 0;
-  font-weight: 700;
-  text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
-}
-.intro {
-  text-align: center;
-  font-size: 20px;
-  color: #333;
-  margin: 20px 0;
-}
-.student-name {
-  display: inline-block;
-  font-size: 34px;
-  color: #1e40af;
-  font-weight: 700;
-  border-bottom: 3px solid #d4af37;
-  padding: 5px 40px 10px;
-  margin: 15px 0;
-}
-.student-info {
-  text-align: center;
-  font-size: 18px;
-  color: #555;
-  margin: 15px 0;
-}
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin: 30px 0;
-  font-size: 16px;
-}
-th {
-  background: #1e40af;
-  color: white;
-  padding: 14px 10px;
-  font-weight: 600;
-  font-size: 17px;
-}
-td {
-  padding: 12px 10px;
-  border: 1px solid #ddd;
-  text-align: center;
-}
+body { font-family: 'Cairo', 'Amiri', serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px 20px; min-height: 100vh; }
+.cert { max-width: 850px; margin: auto; background: #fffef5; padding: 50px; border: 20px double #d4af37; border-radius: 15px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); position: relative; }
+.cert::before { content: ''; position: absolute; top: 15px; left: 15px; right: 15px; bottom: 15px; border: 2px solid #d4af37; border-radius: 8px; pointer-events: none; }
+.header { text-align: center; border-bottom: 3px double #d4af37; padding-bottom: 20px; margin-bottom: 30px; }
+.school-logo { font-size: 70px; margin-bottom: 10px; }
+.header h1 { color: #1e40af; font-size: 38px; font-weight: 700; margin-bottom: 5px; }
+.header .sub { color: #666; font-size: 16px; font-style: italic; }
+.header .year { color: #d4af37; font-size: 18px; font-weight: 600; margin-top: 10px; }
+.title { text-align: center; font-size: 42px; color: #d4af37; margin: 30px 0; font-weight: 700; }
+.intro { text-align: center; font-size: 20px; color: #333; margin: 20px 0; }
+.student-name { display: inline-block; font-size: 34px; color: #1e40af; font-weight: 700; border-bottom: 3px solid #d4af37; padding: 5px 40px 10px; margin: 15px 0; }
+.student-info { text-align: center; font-size: 18px; color: #555; margin: 15px 0; }
+table { width: 100%; border-collapse: collapse; margin: 30px 0; font-size: 16px; }
+th { background: #1e40af; color: white; padding: 14px 10px; font-weight: 600; font-size: 17px; }
+td { padding: 12px 10px; border: 1px solid #ddd; text-align: center; }
 tr:nth-child(even) { background: #fafafa; }
-tr:hover { background: #f0f9ff; }
-
-/* صف المجموع الكلي */
-.total-row {
-  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%) !important;
-  font-weight: 700;
-  font-size: 18px;
-  border-top: 3px solid #d4af37;
-}
-.total-row td {
-  padding: 15px 10px;
-  color: #1e40af;
-}
-.total-label {
-  text-align: right !important;
-  padding-right: 20px !important;
-  font-size: 19px;
-}
-.total-value {
-  font-size: 22px;
-  color: #1e40af;
-  font-weight: 700;
-}
-
-/* النسبة والتقدير */
-.result-section {
-  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-  padding: 20px;
-  border-radius: 15px;
-  margin: 20px 0;
-  border: 2px solid #d4af37;
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 20px;
-}
-.result-item {
-  text-align: center;
-  flex: 1;
-  min-width: 150px;
-}
-.result-label {
-  font-size: 16px;
-  color: #92400e;
-  font-weight: 600;
-  margin-bottom: 8px;
-}
-.result-value {
-  font-size: 32px;
-  color: #1e40af;
-  font-weight: 700;
-}
-.grade-badge {
-  display: inline-block;
-  padding: 8px 25px;
-  background: ${gColor};
-  color: white;
-  font-size: 22px;
-  font-weight: 700;
-  border-radius: 30px;
-  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-}
-
-.footer {
-  display: flex;
-  justify-content: space-between;
-  margin-top: 60px;
-  padding-top: 20px;
-  border-top: 2px solid #d4af37;
-}
-.signature {
-  text-align: center;
-  flex: 1;
-}
-.signature .label {
-  font-size: 16px;
-  color: #666;
-  margin-bottom: 40px;
-}
-.signature .line {
-  border-top: 2px solid #333;
-  width: 180px;
-  margin: 0 auto 8px;
-}
-.signature .name {
-  font-size: 14px;
-  color: #333;
-  font-weight: 600;
-}
-
-.print-btn {
-  display: block;
-  margin: 25px auto;
-  padding: 15px 50px;
-  background: linear-gradient(135deg, #1e40af, #3b82f6);
-  color: white;
-  border: none;
-  border-radius: 30px;
-  font-size: 18px;
-  font-weight: 600;
-  cursor: pointer;
-  box-shadow: 0 4px 15px rgba(30,64,175,0.3);
-  transition: all 0.3s;
-  font-family: 'Cairo', sans-serif;
-}
-.print-btn:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 20px rgba(30,64,175,0.4);
-}
-
-@media print {
-  body { background: white; padding: 0; }
-  .cert { box-shadow: none; border: 15px double #d4af37; }
-  .print-btn { display: none; }
-}
+.total-row { background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%) !important; font-weight: 700; font-size: 18px; border-top: 3px solid #d4af37; }
+.total-row td { padding: 15px 10px; color: #1e40af; }
+.total-label { text-align: right !important; padding-right: 20px !important; font-size: 19px; }
+.total-value { font-size: 22px; color: #1e40af; font-weight: 700; }
+.result-section { background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); padding: 20px; border-radius: 15px; margin: 20px 0; border: 2px solid #d4af37; display: flex; justify-content: space-around; align-items: center; flex-wrap: wrap; gap: 20px; }
+.result-item { text-align: center; flex: 1; min-width: 150px; }
+.result-label { font-size: 16px; color: #92400e; font-weight: 600; margin-bottom: 8px; }
+.result-value { font-size: 32px; color: #1e40af; font-weight: 700; }
+.grade-badge { display: inline-block; padding: 8px 25px; background: ${gColor}; color: white; font-size: 22px; font-weight: 700; border-radius: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+.footer { display: flex; justify-content: space-between; margin-top: 60px; padding-top: 20px; border-top: 2px solid #d4af37; }
+.signature { text-align: center; flex: 1; }
+.signature .label { font-size: 16px; color: #666; margin-bottom: 40px; }
+.signature .line { border-top: 2px solid #333; width: 180px; margin: 0 auto 8px; }
+.signature .name { font-size: 14px; color: #333; font-weight: 600; }
+.print-btn { display: block; margin: 25px auto; padding: 15px 50px; background: linear-gradient(135deg, #1e40af, #3b82f6); color: white; border: none; border-radius: 30px; font-size: 18px; font-weight: 600; cursor: pointer; font-family: 'Cairo', sans-serif; }
+@media print { body { background: white; padding: 0; } .cert { box-shadow: none; } .print-btn { display: none; } }
 </style>
 </head>
 <body>
@@ -403,86 +217,36 @@ tr:hover { background: #f0f9ff; }
     <div class="sub">Al-Noor Private School</div>
     <div class="year">العام الدراسي: ${school.academic_year || '2026-2027'}</div>
   </div>
-
   <div class="title">✨ شهادة تقدير ✨</div>
-
   <div class="intro">تشهد إدارة المدرسة بأن الطالب/ة</div>
-  <div style="text-align:center;">
-    <div class="student-name">${student.name}</div>
-  </div>
-  <div class="student-info">
-    بالصف <strong>${student.grade}</strong> - شعبة <strong>${student.section}</strong>
-    ${student.seat_number ? `- رقم الجلوس <strong>${student.seat_number}</strong>` : ''}
-  </div>
+  <div style="text-align:center;"><div class="student-name">${student.name}</div></div>
+  <div class="student-info">بالصف <strong>${student.grade}</strong> - شعبة <strong>${student.section}</strong>${student.seat_number ? ` - رقم الجلوس <strong>${student.seat_number}</strong>` : ''}</div>
   <div class="intro" style="margin-top:20px;">قد أدّى/أدّت الامتحانات في المواد التالية وحصل/ت على الدرجات المبينة قرين كل مادة</div>
-
   <table>
-    <thead>
-      <tr>
-        <th style="width:10%">م</th>
-        <th style="width:40%">المادة</th>
-        <th style="width:17%">درجة الطالب/ة</th>
-        <th style="width:16%">المجموع الكلي</th>
-        <th style="width:17%">النسبة</th>
-      </tr>
-    </thead>
+    <thead><tr><th style="width:10%">م</th><th style="width:40%">المادة</th><th style="width:17%">درجة الطالب/ة</th><th style="width:16%">المجموع الكلي</th><th style="width:17%">النسبة</th></tr></thead>
     <tbody>
-      ${(gradesData || []).map((g, i) => `
-        <tr>
-          <td>${i + 1}</td>
-          <td style="font-weight:600">${g.subject}</td>
-          <td>${g.score}</td>
-          <td>${g.max_score}</td>
-          <td>${((g.score/g.max_score)*100).toFixed(1)}%</td>
-        </tr>
-      `).join('')}
-      <tr class="total-row">
-        <td colspan="2" class="total-label">المجموع الكلي</td>
-        <td class="total-value">${ts}</td>
-        <td class="total-value">${tm}</td>
-        <td class="total-value">${p}%</td>
-      </tr>
+      ${(gradesData || []).map((g, i) => `<tr><td>${i + 1}</td><td style="font-weight:600">${g.subject}</td><td>${g.score}</td><td>${g.max_score}</td><td>${((g.score/g.max_score)*100).toFixed(1)}%</td></tr>`).join('')}
+      <tr class="total-row"><td colspan="2" class="total-label">المجموع الكلي</td><td class="total-value">${ts}</td><td class="total-value">${tm}</td><td class="total-value">${p}%</td></tr>
     </tbody>
   </table>
-
   <div class="result-section">
-    <div class="result-item">
-      <div class="result-label">النسبة المئوية</div>
-      <div class="result-value">${p}%</div>
-    </div>
-    <div class="result-item">
-      <div class="result-label">التقدير النهائي</div>
-      <div class="grade-badge">${g}</div>
-    </div>
+    <div class="result-item"><div class="result-label">النسبة المئوية</div><div class="result-value">${p}%</div></div>
+    <div class="result-item"><div class="result-label">التقدير النهائي</div><div class="grade-badge">${g}</div></div>
   </div>
-
   <div class="footer">
-    <div class="signature">
-      <div class="label">التاريخ</div>
-      <div class="line"></div>
-      <div class="name">${today}</div>
-    </div>
-    <div class="signature">
-      <div class="label">توقيع مدير المدرسة</div>
-      <div class="line"></div>
-      <div class="name">_________________</div>
-    </div>
-    <div class="signature">
-      <div class="label">ختم المدرسة</div>
-      <div class="line"></div>
-      <div class="name">_________________</div>
-    </div>
+    <div class="signature"><div class="label">التاريخ</div><div class="line"></div><div class="name">${today}</div></div>
+    <div class="signature"><div class="label">توقيع مدير المدرسة</div><div class="line"></div><div class="name">_________________</div></div>
+    <div class="signature"><div class="label">ختم المدرسة</div><div class="line"></div><div class="name">_________________</div></div>
   </div>
 </div>
-
 <button class="print-btn" onclick="window.print()">🖨️ طباعة الشهادة</button>
-</body>
-</html>`);
+</body></html>`);
   } catch (err) {
     console.error(err);
     res.status(500).send('خطأ في الخادم');
   }
 });
+
 // التقارير
 function makeReport(title, headers, rows, extra = '') {
   const rowsHtml = rows && rows.length > 0 ? rows : '<tr><td colspan="' + headers.length + '" style="text-align:center;padding:20px;color:#999;">لا توجد بيانات</td></tr>';
