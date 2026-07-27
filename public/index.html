@@ -55,30 +55,73 @@
         <p class="text-blue-200 text-sm mt-1">نظام الإدارة المتكامل</p>
       </div>
       <nav class="mt-4 flex-1 text-sm">
-        <a href="#" onclick="showPage('dashboard')" class="nav-item active flex items-center px-6 py-3 text-blue-100"><span class="ml-3 text-lg">📊</span> لوحة التحكم</a>
-        <a href="#" onclick="showPage('students')" class="nav-item flex items-center px-6 py-3 text-blue-100"><span class="ml-3 text-lg">👥</span> الطلاب</a>
-        <a href="#" onclick="showPage('parents')" class="nav-item flex items-center px-6 py-3 text-blue-100"><span class="ml-3 text-lg">👨‍👩‍👧</span> أولياء الأمور</a>
-        <a href="#" onclick="showPage('teachers')" class="nav-item flex items-center px-6 py-3 text-blue-100"><span class="ml-3 text-lg">👨‍🏫</span> المعلمون</a>
-        <a href="#" onclick="showPage('employees')" class="nav-item flex items-center px-6 py-3 text-blue-100"><span class="ml-3 text-lg">👔</span> الموظفون</a>
-        <a href="#" onclick="showPage('subjects')" class="nav-item flex items-center px-6 py-3 text-blue-100"><span class="ml-3 text-lg">📚</span> المواد</a>
-        <a href="#" onclick="showPage('schedules')" class="nav-item flex items-center px-6 py-3 text-blue-100"><span class="ml-3 text-lg">🕐</span> جدول الحصص</a>
-        <a href="#" onclick="showPage('attendance')" class="nav-item flex items-center px-6 py-3 text-blue-100"><span class="ml-3 text-lg">📅</span> الحضور</a>
-        <a href="#" onclick="showPage('exams')" class="nav-item flex items-center px-6 py-3 text-blue-100"><span class="ml-3 text-lg">📝</span> الامتحانات</a>
-        <a href="#" onclick="showPage('grades')" class="nav-item flex items-center px-6 py-3 text-blue-100"><span class="ml-3 text-lg">🎯</span> الدرجات</a>
-        <a href="#" onclick="showPage('fees')" class="nav-item flex items-center px-6 py-3 text-blue-100"><span class="ml-3 text-lg">💰</span> الرسوم</a>
-        <a href="#" onclick="showPage('revenue')" class="nav-item flex items-center px-6 py-3 text-blue-100"><span class="ml-3 text-lg">💵</span> الإيرادات</a>
-        <a href="#" onclick="showPage('expenses')" class="nav-item flex items-center px-6 py-3 text-blue-100"><span class="ml-3 text-lg">💸</span> المصروفات</a>
-        <a href="#" onclick="showPage('certificates')" class="nav-item flex items-center px-6 py-3 text-blue-100"><span class="ml-3 text-lg">🎓</span> الشهادات</a>
-        <a href="#" onclick="showPage('school')" class="nav-item flex items-center px-6 py-3 text-blue-100"><span class="ml-3 text-lg">🏢</span> بيانات المدرسة</a>
-        <a href="#" onclick="showPage('clinic')" class="nav-item flex items-center px-6 py-3 text-blue-100"><span class="ml-3 text-lg">🏥</span> العيادة</a>
-        <a href="#" onclick="showPage('transport')" class="nav-item flex items-center px-6 py-3 text-blue-100"><span class="ml-3 text-lg">🚌</span> النقل</a>
-        <a href="#" onclick="showPage('library')" class="nav-item flex items-center px-6 py-3 text-blue-100"><span class="ml-3 text-lg">📖</span> المكتبة</a>
-        <a href="#" onclick="showPage('inventory')" class="nav-item flex items-center px-6 py-3 text-blue-100"><span class="ml-3 text-lg">🏪</span> المخازن</a>
-        <a href="#" onclick="showPage('calendar')" class="nav-item flex items-center px-6 py-3 text-blue-100"><span class="ml-3 text-lg">📆</span> التقويم</a>
-        <a href="#" onclick="showPage('audit')" class="nav-item flex items-center px-6 py-3 text-blue-100"><span class="ml-3 text-lg">📋</span> سجل النشاط</a>
-        <a href="#" onclick="showPage('notifications')" class="nav-item flex items-center px-6 py-3 text-blue-100"><span class="ml-3 text-lg">🔔</span> الإشعارات</a>
-        <a href="#" onclick="showPage('settings')" class="nav-item flex items-center px-6 py-3 text-blue-100"><span class="ml-3 text-lg">⚙️</span> الإعدادات</a>
-        <a href="#" onclick="showPage('reports')" class="nav-item flex items-center px-6 py-3 text-blue-100"><span class="ml-3 text-lg">📄</span> التقارير</a>
+        // ======== نظام الصلاحيات - القائمة الجانبية ========
+const userRole = currentUser?.role || 'مدير';
+
+const menuItems = {
+  'مدير': [
+    { id: 'dashboard', icon: '📊', label: 'لوحة التحكم' },
+    { id: 'students', icon: '👥', label: 'الطلاب' },
+    { id: 'parents', icon: '👨‍👩‍👧', label: 'أولياء الأمور' },
+    { id: 'teachers', icon: '👨‍🏫', label: 'المعلمون' },
+    { id: 'employees', icon: '👔', label: 'الموظفون' },
+    { id: 'subjects', icon: '📚', label: 'المواد' },
+    { id: 'schedules', icon: '🕐', label: 'جدول الحصص' },
+    { id: 'attendance', icon: '📅', label: 'الحضور' },
+    { id: 'exams', icon: '📝', label: 'الامتحانات' },
+    { id: 'grades', icon: '🎯', label: 'الدرجات' },
+    { id: 'fees', icon: '💰', label: 'الرسوم' },
+    { id: 'revenue', icon: '💵', label: 'الإيرادات' },
+    { id: 'expenses', icon: '💸', label: 'المصروفات' },
+    { id: 'certificates', icon: '🎓', label: 'الشهادات' },
+    { id: 'school', icon: '🏢', label: 'بيانات المدرسة' },
+    { id: 'clinic', icon: '🏥', label: 'العيادة' },
+    { id: 'transport', icon: '🚌', label: 'النقل' },
+    { id: 'library', icon: '📖', label: 'المكتبة' },
+    { id: 'inventory', icon: '🏪', label: 'المخازن' },
+    { id: 'calendar', icon: '📆', label: 'التقويم' },
+    { id: 'audit', icon: '📋', label: 'سجل النشاط' },
+    { id: 'notifications', icon: '🔔', label: 'الإشعارات' },
+    { id: 'settings', icon: '⚙️', label: 'الإعدادات' },
+    { id: 'reports', icon: '📄', label: 'التقارير' }
+  ],
+  'تسجيل الطلاب': [
+    { id: 'dashboard', icon: '📊', label: 'لوحة التحكم' },
+    { id: 'students', icon: '👥', label: 'الطلاب' },
+    { id: 'parents', icon: '👨‍👩‍👧', label: 'أولياء الأمور' },
+    { id: 'attendance', icon: '📅', label: 'الحضور' }
+  ],
+  'التقارير': [
+    { id: 'dashboard', icon: '📊', label: 'لوحة التحكم' },
+    { id: 'reports', icon: '📄', label: 'التقارير' },
+    { id: 'certificates', icon: '🎓', label: 'الشهادات' },
+    { id: 'audit', icon: '📋', label: 'سجل النشاط' }
+  ],
+  'الشؤون المالية': [
+    { id: 'dashboard', icon: '📊', label: 'لوحة التحكم' },
+    { id: 'fees', icon: '💰', label: 'الرسوم' },
+    { id: 'revenue', icon: '💵', label: 'الإيرادات' },
+    { id: 'expenses', icon: '💸', label: 'المصروفات' }
+  ]
+};
+
+// بناء القائمة الجانبية حسب الدور
+function buildSidebar() {
+  const nav = document.getElementById('sidebar-nav');
+  const items = menuItems[userRole] || menuItems['مدير'];
+  
+  nav.innerHTML = items.map((item, i) => 
+    `<a href="#" onclick="showPage('${item.id}')" class="nav-item ${i===0?'active':''} flex items-center px-6 py-3 text-blue-100">
+      <span class="ml-3 text-lg">${item.icon}</span> ${item.label}
+    </a>`
+  ).join('');
+  
+  // تحديث اسم المستخدم مع دوره
+  document.getElementById('user-name').textContent = `${currentUser?.name || 'المستخدم'} (${userRole})`;
+}
+
+// تشغيل بناء القائمة
+buildSidebar();
       </nav>
       <div class="p-4 border-t border-blue-700">
         <div class="flex items-center mb-3">
