@@ -82,7 +82,7 @@ app.post('/api/login', async (req, res) => {
 const tables = ['students','teachers','employees','parents','attendance','fees','grades','exams','schedules','revenue','expenses','notifications','audit_log','school_info','terms','grades_levels','sections','rooms','subjects','clinic','transport','library','inventory','calendar_events','settings'];
 
 tables.forEach(table => {
-  app.get(`/api/${table}`, async (req, res) => {
+  app.get(`/api/${table}`, checkPermission(table), async (req, res) => {
     try {
       const { data, error } = await supabase.from(table).select('*');
       if (error) return res.status(500).json({ success: false, message: error.message });
