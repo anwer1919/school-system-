@@ -239,15 +239,45 @@
 
     // بناء القائمة الجانبية
     function buildSidebar() {
-      const nav = document.getElementById('sidebar-nav');
-      const items = menuItems[userRole] || menuItems['مدير'];
-      nav.innerHTML = items.map((item, i) => 
-        `<a href="#" onclick="showPage('${item.id}', event)" class="nav-item ${i===0?'active':''} flex items-center px-6 py-3 text-blue-100">
-          <span class="ml-3 text-lg">${item.icon}</span> ${item.label}
-        </a>`
-      ).join('');
+      const nav =document.getElementById('modal-form').addEventListener('submit', async (e) => {
+  e.preventDefault();
+  const formData = new FormData(e.target);
+  const data = {};
+  formData.forEach((v, k) => data[k] = v);
+  
+  console.log('📝 إرسال البيانات:', data, 'الدور:', userRole);
+  
+  try {
+    const url = currentEditId ? `/api/${currentTable}/${currentEditId}` : `/api/${currentTable}`;
+    const method = currentEditId ? 'PUT' : 'POST';
+    const res = await fetch(url, {
+      method,
+      headers: { 
+        'Content-Type': 'application/json',
+        'x-user-role': userRole
+      },
+      body: JSON.stringify(data)
+    });
+    const result = await res.json();
+    console.log('📥 استجابة الخادم:', result, 'Status:', res.status);
+    
+    if (res.status === 403) {
+      showToast('⛔ ' + (result.message || 'ليس لديك صلاحية'), 'error');
+      return;
     }
-
+    if (result.success) {
+      showToast(currentEditId ? '✅ تم التعديل بنجاح' : '✅ تمت الإضافة بنجاح');
+      closeModal();
+      const loaders = { students:loadStudents, teachers:loadTeachers, employees:loadEmployees, parents:loadParents, subjects:loadSubjects, schedules:loadSchedules, attendance:loadAttendance, exams:loadExams, grades:loadGrades, fees:loadFees, revenue:loadRevenue, expenses:loadExpenses, clinic:loadClinic, transport:loadTransport, library:loadLibrary, inventory:loadInventory, calendar_events:loadCalendar };
+      if (loaders[currentTable]) loaders[currentTable]();
+    } else {
+      showToast('❌ ' + (result.message || 'حدث خطأ'), 'error');
+    }
+  } catch (err) {
+    console.error('❌ خطأ:', err);
+    showToast('❌ خطأ في الاتصال', 'error');
+  }
+});
     // عرض معلومات المستخدم
     function displayUserInfo() {
       document.getElementById('user-name').textContent = currentUser?.name || 'المستخدم';
