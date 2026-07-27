@@ -75,7 +75,10 @@
         const data = await response.json();
         
         if (data.success) {
-          localStorage.setItem('user', JSON.stringify(data.user));
+          localStorage.setItem('user', JSON.stringify({
+  ...data.user,
+  role: data.user.role || 'مدير'
+}));
           window.location.href = '/';
         } else {
           errorMsg.textContent = '❌ ' + (data.message || 'بيانات الدخول غير صحيحة');
