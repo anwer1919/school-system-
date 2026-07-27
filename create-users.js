@@ -18,27 +18,18 @@ async function createUsers() {
     ];
 
     for (const user of users) {
-      // حذف القديم
       await supabase.from('users').delete().eq('email', user.email);
-      // إنشاء جديد
-      await supabase.from('users').insert([{
-        ...user,
-        password: hashedPassword
-      }]);
+      await supabase.from('users').insert([{ ...user, password: hashedPassword }]);
       console.log(`✅ تم إنشاء: ${user.name} (${user.role})`);
     }
 
     console.log('\n🎉 تم إنشاء كل المستخدمين بنجاح!');
-    console.log('\n📋 بيانات الدخول:');
+    console.log('\n📋 بيانات الدخول (كلمة المرور: 123456):');
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
-    console.log('👑 المدير:');
-    console.log('   📧 admin@school.com | 🔑 123456');
-    console.log('📝 تسجيل الطلاب:');
-    console.log('   📧 students@school.com | 🔑 123456');
-    console.log('📊 التقارير:');
-    console.log('   📧 reports@school.com | 🔑 123456');
-    console.log('💰 الشؤون المالية:');
-    console.log('   📧 finance@school.com | 🔑 123456');
+    console.log('👑 admin@school.com');
+    console.log('📝 students@school.com');
+    console.log('📊 reports@school.com');
+    console.log('💰 finance@school.com');
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
   } catch (err) {
     console.error('❌ خطأ:', err.message);
