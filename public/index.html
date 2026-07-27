@@ -38,7 +38,6 @@
 <body class="bg-gray-100">
   <div id="toast" class="toast"></div>
   
-  <!-- Modal -->
   <div id="modal" class="modal">
     <div class="modal-content">
       <div class="flex justify-between items-center mb-4 border-b pb-2">
@@ -50,16 +49,12 @@
   </div>
 
   <div class="flex h-screen">
-    <!-- Sidebar -->
     <div class="sidebar w-64 bg-gradient-to-b from-blue-900 to-blue-800 text-white flex flex-col overflow-y-auto flex-shrink-0">
       <div class="p-6 border-b border-blue-700">
         <h1 class="text-2xl font-bold">🏫 مدرسة النور</h1>
         <p class="text-blue-200 text-sm mt-1">نظام الإدارة المتكامل</p>
       </div>
-      
-      <!-- القائمة الجانبية - سيتم بناؤها ديناميكياً -->
       <nav class="mt-4 flex-1 text-sm" id="sidebar-nav"></nav>
-      
       <div class="p-4 border-t border-blue-700">
         <div class="flex items-center mb-3">
           <div class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center text-xl">👤</div>
@@ -73,14 +68,12 @@
       </div>
     </div>
 
-    <!-- Main Content -->
     <div class="flex-1 overflow-auto bg-gray-50">
       <div class="bg-white shadow-sm px-6 py-4 flex justify-between items-center sticky top-0 z-10">
         <h2 id="page-title" class="text-2xl font-bold text-gray-800">لوحة التحكم</h2>
         <span class="text-sm text-gray-600 bg-gray-100 px-3 py-1 rounded-full">📅 <span id="current-date"></span></span>
       </div>
 
-      <!-- Dashboard -->
       <div id="dashboard" class="page p-6 fade-in">
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
           <div class="card bg-white rounded-xl shadow-sm p-6 border-r-4 border-blue-500"><div class="flex justify-between"><div><p class="text-gray-500 text-sm">إجمالي الطلاب</p><p class="text-3xl font-bold mt-2 text-gray-800" id="total-students">0</p></div><div class="bg-blue-100 p-3 rounded-full text-2xl">👥</div></div></div>
@@ -94,73 +87,20 @@
         </div>
       </div>
 
-      <!-- Students -->
       <div id="students" class="page p-6 hidden fade-in"><div class="bg-white rounded-xl shadow-sm p-6"><div class="flex justify-between items-center mb-6"><h3 class="text-xl font-bold">👥 إدارة الطلاب</h3><button onclick="openAddModal('students')" class="btn-add">+ إضافة طالب</button></div><div class="overflow-x-auto"><table class="w-full"><thead class="bg-gray-50"><tr><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">الرقم</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">الاسم</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">الصف</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">الشعبة</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">رقم الجلوس</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">الحالة</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">الإجراءات</th></tr></thead><tbody id="students-table"></tbody></table></div></div></div>
 
-      <!-- Parents -->
       <div id="parents" class="page p-6 hidden fade-in"><div class="bg-white rounded-xl shadow-sm p-6"><div class="flex justify-between items-center mb-6"><h3 class="text-xl font-bold">👨‍👩‍👧 أولياء الأمور</h3><button onclick="openAddModal('parents')" class="btn-add">+ إضافة ولي أمر</button></div><div class="overflow-x-auto"><table class="w-full"><thead class="bg-gray-50"><tr><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">الاسم</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">الهاتف</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">البريد</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">الوظيفة</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">الإجراءات</th></tr></thead><tbody id="parents-table"></tbody></table></div></div></div>
 
-      <!-- Teachers -->
       <div id="teachers" class="page p-6 hidden fade-in"><div class="bg-white rounded-xl shadow-sm p-6"><div class="flex justify-between items-center mb-6"><h3 class="text-xl font-bold">👨‍🏫 المعلمون</h3><button onclick="openAddModal('teachers')" class="btn-add">+ إضافة معلم</button></div><div id="teachers-list" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4"></div></div></div>
 
-      <!-- Employees -->
-      <div id="employees" class="page p-6 hidden fade-in"><div class="bg-white rounded-xl shadow-sm p-6"><div class="flex justify-between items-center mb-6"><h3 class="text-xl font-bold">👔 الموظفون</h3><button onclick="openAddModal('employees')" class="btn-add">+ إضافة موظف</button></div><div class="overflow-x-auto"><table class="w-full"><thead class="bg-gray-50"><tr><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">الاسم</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">الوظيفة</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">الهاتف</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">الراتب</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">الإجراءات</th></tr></thead><tbody id="employees-table"></tbody></table></div></div></div>
-
-      <!-- Subjects -->
-      <div id="subjects" class="page p-6 hidden fade-in"><div class="bg-white rounded-xl shadow-sm p-6"><div class="flex justify-between items-center mb-6"><h3 class="text-xl font-bold">📚 المواد</h3><button onclick="openAddModal('subjects')" class="btn-add">+ إضافة مادة</button></div><div class="overflow-x-auto"><table class="w-full"><thead class="bg-gray-50"><tr><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">الكود</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">الاسم</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">الإجراءات</th></tr></thead><tbody id="subjects-table"></tbody></table></div></div></div>
-
-      <!-- Schedules -->
-      <div id="schedules" class="page p-6 hidden fade-in"><div class="bg-white rounded-xl shadow-sm p-6"><div class="flex justify-between items-center mb-6"><h3 class="text-xl font-bold">🕐 جدول الحصص</h3><button onclick="openAddModal('schedules')" class="btn-add">+ إضافة حصة</button></div><div class="overflow-x-auto"><table class="w-full"><thead class="bg-gray-50"><tr><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">اليوم</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">الحصة</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">المادة</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">المعلم</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">القاعة</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">الإجراءات</th></tr></thead><tbody id="schedules-table"></tbody></table></div></div></div>
-
-      <!-- Attendance -->
-      <div id="attendance" class="page p-6 hidden fade-in"><div class="bg-white rounded-xl shadow-sm p-6"><div class="flex justify-between items-center mb-6"><h3 class="text-xl font-bold">📅 الحضور</h3><button onclick="openAddModal('attendance')" class="btn-add">+ تسجيل حضور</button></div><div id="attendance-list" class="space-y-3"></div></div></div>
-
-      <!-- Exams -->
-      <div id="exams" class="page p-6 hidden fade-in"><div class="bg-white rounded-xl shadow-sm p-6"><div class="flex justify-between items-center mb-6"><h3 class="text-xl font-bold">📝 الامتحانات</h3><button onclick="openAddModal('exams')" class="btn-add">+ إضافة امتحان</button></div><div class="overflow-x-auto"><table class="w-full"><thead class="bg-gray-50"><tr><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">الامتحان</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">المادة</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">التاريخ</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">الحالة</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">الإجراءات</th></tr></thead><tbody id="exams-table"></tbody></table></div></div></div>
-
-      <!-- Grades -->
-      <div id="grades" class="page p-6 hidden fade-in"><div class="bg-white rounded-xl shadow-sm p-6"><div class="flex justify-between items-center mb-6"><h3 class="text-xl font-bold">🎯 الدرجات</h3><button onclick="openAddModal('grades')" class="btn-add">+ رصد درجة</button></div><div class="overflow-x-auto"><table class="w-full"><thead class="bg-gray-50"><tr><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">الطالب</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">المادة</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">الدرجة</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">النسبة</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">التقدير</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">الإجراءات</th></tr></thead><tbody id="grades-table"></tbody></table></div></div></div>
-
-      <!-- Fees -->
       <div id="fees" class="page p-6 hidden fade-in"><div class="bg-white rounded-xl shadow-sm p-6"><div class="flex justify-between items-center mb-6"><h3 class="text-xl font-bold">💰 الرسوم</h3><button onclick="openAddModal('fees')" class="btn-add">+ إضافة رسم</button></div><div id="fees-list" class="space-y-3"></div></div></div>
 
-      <!-- Revenue -->
       <div id="revenue" class="page p-6 hidden fade-in"><div class="bg-white rounded-xl shadow-sm p-6"><div class="flex justify-between items-center mb-6"><h3 class="text-xl font-bold">💵 الإيرادات</h3><button onclick="openAddModal('revenue')" class="btn-add">+ إضافة إيراد</button></div><div id="revenue-list" class="space-y-3"></div></div></div>
 
-      <!-- Expenses -->
       <div id="expenses" class="page p-6 hidden fade-in"><div class="bg-white rounded-xl shadow-sm p-6"><div class="flex justify-between items-center mb-6"><h3 class="text-xl font-bold">💸 المصروفات</h3><button onclick="openAddModal('expenses')" class="btn-add">+ إضافة مصروف</button></div><div id="expenses-list" class="space-y-3"></div></div></div>
 
-      <!-- Certificates -->
-      <div id="certificates" class="page p-6 hidden fade-in"><div class="bg-white rounded-xl shadow-sm p-6"><h3 class="text-xl font-bold mb-6">🎓 الشهادات</h3><div id="certificates-list" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div></div></div>
+      <div id="attendance" class="page p-6 hidden fade-in"><div class="bg-white rounded-xl shadow-sm p-6"><div class="flex justify-between items-center mb-6"><h3 class="text-xl font-bold">📅 الحضور</h3><button onclick="openAddModal('attendance')" class="btn-add">+ تسجيل حضور</button></div><div id="attendance-list" class="space-y-3"></div></div></div>
 
-      <!-- School -->
-      <div id="school" class="page p-6 hidden fade-in"><div class="bg-white rounded-xl shadow-sm p-6"><h3 class="text-xl font-bold mb-6">🏢 بيانات المدرسة</h3><div id="school-info"></div></div></div>
-
-      <!-- Clinic -->
-      <div id="clinic" class="page p-6 hidden fade-in"><div class="bg-white rounded-xl shadow-sm p-6"><div class="flex justify-between items-center mb-6"><h3 class="text-xl font-bold">🏥 العيادة</h3><button onclick="openAddModal('clinic')" class="btn-add">+ سجل طبي</button></div><div id="clinic-list" class="space-y-3"></div></div></div>
-
-      <!-- Transport -->
-      <div id="transport" class="page p-6 hidden fade-in"><div class="bg-white rounded-xl shadow-sm p-6"><div class="flex justify-between items-center mb-6"><h3 class="text-xl font-bold">🚌 النقل</h3><button onclick="openAddModal('transport')" class="btn-add">+ إضافة باص</button></div><div id="transport-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div></div></div>
-
-      <!-- Library -->
-      <div id="library" class="page p-6 hidden fade-in"><div class="bg-white rounded-xl shadow-sm p-6"><div class="flex justify-between items-center mb-6"><h3 class="text-xl font-bold">📖 المكتبة</h3><button onclick="openAddModal('library')" class="btn-add">+ إضافة كتاب</button></div><div class="overflow-x-auto"><table class="w-full"><thead class="bg-gray-50"><tr><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">العنوان</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">المؤلف</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">الحالة</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">المُعار لـ</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">الإجراءات</th></tr></thead><tbody id="library-table"></tbody></table></div></div></div>
-
-      <!-- Inventory -->
-      <div id="inventory" class="page p-6 hidden fade-in"><div class="bg-white rounded-xl shadow-sm p-6"><div class="flex justify-between items-center mb-6"><h3 class="text-xl font-bold">🏪 المخازن</h3><button onclick="openAddModal('inventory')" class="btn-add">+ إضافة صنف</button></div><div class="overflow-x-auto"><table class="w-full"><thead class="bg-gray-50"><tr><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">الصنف</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">الفئة</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">الكمية</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">الموقع</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">الإجراءات</th></tr></thead><tbody id="inventory-table"></tbody></table></div></div></div>
-
-      <!-- Calendar -->
-      <div id="calendar" class="page p-6 hidden fade-in"><div class="bg-white rounded-xl shadow-sm p-6"><div class="flex justify-between items-center mb-6"><h3 class="text-xl font-bold">📆 التقويم</h3><button onclick="openAddModal('calendar_events')" class="btn-add">+ إضافة حدث</button></div><div id="calendar-list" class="space-y-3"></div></div></div>
-
-      <!-- Audit -->
-      <div id="audit" class="page p-6 hidden fade-in"><div class="bg-white rounded-xl shadow-sm p-6"><h3 class="text-xl font-bold mb-6">📋 سجل النشاط</h3><div class="overflow-x-auto"><table class="w-full"><thead class="bg-gray-50"><tr><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">المستخدم</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">العملية</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">التفاصيل</th><th class="px-4 py-3 text-right text-xs font-medium text-gray-500">التاريخ</th></tr></thead><tbody id="audit-table"></tbody></table></div></div></div>
-
-      <!-- Notifications -->
-      <div id="notifications" class="page p-6 hidden fade-in"><div class="bg-white rounded-xl shadow-sm p-6"><h3 class="text-xl font-bold mb-6">🔔 الإشعارات</h3><div id="notifications-list" class="space-y-3"></div></div></div>
-
-      <!-- Settings -->
-      <div id="settings" class="page p-6 hidden fade-in"><div class="bg-white rounded-xl shadow-sm p-6"><h3 class="text-xl font-bold mb-6">⚙️ الإعدادات</h3><div id="settings-list" class="space-y-3"></div></div></div>
-
-      <!-- Reports -->
       <div id="reports" class="page p-6 hidden fade-in">
         <div class="bg-white rounded-xl shadow-sm p-6">
           <h3 class="text-xl font-bold mb-6">📄 التقارير</h3>
@@ -168,9 +108,6 @@
             <a href="/api/reports/students" target="_blank" class="bg-gradient-to-br from-blue-500 to-blue-600 text-white p-6 rounded-xl hover:shadow-lg"><div class="text-4xl mb-2">👥</div><h4 class="font-bold text-lg">تقرير الطلاب</h4></a>
             <a href="/api/reports/attendance" target="_blank" class="bg-gradient-to-br from-green-500 to-green-600 text-white p-6 rounded-xl hover:shadow-lg"><div class="text-4xl mb-2">📅</div><h4 class="font-bold text-lg">تقرير الحضور</h4></a>
             <a href="/api/reports/fees" target="_blank" class="bg-gradient-to-br from-yellow-500 to-yellow-600 text-white p-6 rounded-xl hover:shadow-lg"><div class="text-4xl mb-2">💰</div><h4 class="font-bold text-lg">التقرير المالي</h4></a>
-            <a href="/api/reports/grades" target="_blank" class="bg-gradient-to-br from-purple-500 to-purple-600 text-white p-6 rounded-xl hover:shadow-lg"><div class="text-4xl mb-2">🎯</div><h4 class="font-bold text-lg">كشوف الدرجات</h4></a>
-            <a href="/api/reports/teachers" target="_blank" class="bg-gradient-to-br from-pink-500 to-pink-600 text-white p-6 rounded-xl hover:shadow-lg"><div class="text-4xl mb-2">👨‍🏫</div><h4 class="font-bold text-lg">تقرير المعلمين</h4></a>
-            <a href="/api/reports/financial" target="_blank" class="bg-gradient-to-br from-indigo-500 to-indigo-600 text-white p-6 rounded-xl hover:shadow-lg"><div class="text-4xl mb-2">💵</div><h4 class="font-bold text-lg">التقرير الشامل</h4></a>
           </div>
         </div>
       </div>
@@ -179,13 +116,11 @@
   </div>
 
   <script>
-    // ============ التحقق من تسجيل الدخول ============
     const currentUser = JSON.parse(localStorage.getItem('user') || 'null');
     if (!currentUser || !currentUser.name) {
       window.location.href = '/login';
     }
 
-    // ============ نظام الصلاحيات ============
     const userRole = currentUser?.role || 'مدير';
     
     const menuItems = {
@@ -194,25 +129,10 @@
         { id: 'students', icon: '👥', label: 'الطلاب' },
         { id: 'parents', icon: '👨‍👩‍👧', label: 'أولياء الأمور' },
         { id: 'teachers', icon: '👨‍🏫', label: 'المعلمون' },
-        { id: 'employees', icon: '👔', label: 'الموظفون' },
-        { id: 'subjects', icon: '📚', label: 'المواد' },
-        { id: 'schedules', icon: '🕐', label: 'جدول الحصص' },
         { id: 'attendance', icon: '📅', label: 'الحضور' },
-        { id: 'exams', icon: '📝', label: 'الامتحانات' },
-        { id: 'grades', icon: '🎯', label: 'الدرجات' },
         { id: 'fees', icon: '💰', label: 'الرسوم' },
         { id: 'revenue', icon: '💵', label: 'الإيرادات' },
         { id: 'expenses', icon: '💸', label: 'المصروفات' },
-        { id: 'certificates', icon: '🎓', label: 'الشهادات' },
-        { id: 'school', icon: '🏢', label: 'بيانات المدرسة' },
-        { id: 'clinic', icon: '🏥', label: 'العيادة' },
-        { id: 'transport', icon: '🚌', label: 'النقل' },
-        { id: 'library', icon: '📖', label: 'المكتبة' },
-        { id: 'inventory', icon: '🏪', label: 'المخازن' },
-        { id: 'calendar', icon: '📆', label: 'التقويم' },
-        { id: 'audit', icon: '📋', label: 'سجل النشاط' },
-        { id: 'notifications', icon: '🔔', label: 'الإشعارات' },
-        { id: 'settings', icon: '⚙️', label: 'الإعدادات' },
         { id: 'reports', icon: '📄', label: 'التقارير' }
       ],
       'تسجيل الطلاب': [
@@ -223,9 +143,7 @@
       ],
       'التقارير': [
         { id: 'dashboard', icon: '📊', label: 'لوحة التحكم' },
-        { id: 'reports', icon: '📄', label: 'التقارير' },
-        { id: 'certificates', icon: '🎓', label: 'الشهادات' },
-        { id: 'audit', icon: '📋', label: 'سجل النشاط' }
+        { id: 'reports', icon: '📄', label: 'التقارير' }
       ],
       'الشؤون المالية': [
         { id: 'dashboard', icon: '📊', label: 'لوحة التحكم' },
@@ -237,55 +155,22 @@
 
     const allowedPages = (menuItems[userRole] || menuItems['مدير']).map(item => item.id);
 
-    // بناء القائمة الجانبية
     function buildSidebar() {
-      const nav =document.getElementById('modal-form').addEventListener('submit', async (e) => {
-  e.preventDefault();
-  const formData = new FormData(e.target);
-  const data = {};
-  formData.forEach((v, k) => data[k] = v);
-  
-  console.log('📝 إرسال البيانات:', data, 'الدور:', userRole);
-  
-  try {
-    const url = currentEditId ? `/api/${currentTable}/${currentEditId}` : `/api/${currentTable}`;
-    const method = currentEditId ? 'PUT' : 'POST';
-    const res = await fetch(url, {
-      method,
-      headers: { 
-        'Content-Type': 'application/json',
-        'x-user-role': userRole
-      },
-      body: JSON.stringify(data)
-    });
-    const result = await res.json();
-    console.log('📥 استجابة الخادم:', result, 'Status:', res.status);
-    
-    if (res.status === 403) {
-      showToast('⛔ ' + (result.message || 'ليس لديك صلاحية'), 'error');
-      return;
+      const nav = document.getElementById('sidebar-nav');
+      const items = menuItems[userRole] || menuItems['مدير'];
+      nav.innerHTML = items.map((item, i) => 
+        `<a href="#" onclick="showPage('${item.id}', event)" class="nav-item ${i===0?'active':''} flex items-center px-6 py-3 text-blue-100">
+          <span class="ml-3 text-lg">${item.icon}</span> ${item.label}
+        </a>`
+      ).join('');
     }
-    if (result.success) {
-      showToast(currentEditId ? '✅ تم التعديل بنجاح' : '✅ تمت الإضافة بنجاح');
-      closeModal();
-      const loaders = { students:loadStudents, teachers:loadTeachers, employees:loadEmployees, parents:loadParents, subjects:loadSubjects, schedules:loadSchedules, attendance:loadAttendance, exams:loadExams, grades:loadGrades, fees:loadFees, revenue:loadRevenue, expenses:loadExpenses, clinic:loadClinic, transport:loadTransport, library:loadLibrary, inventory:loadInventory, calendar_events:loadCalendar };
-      if (loaders[currentTable]) loaders[currentTable]();
-    } else {
-      showToast('❌ ' + (result.message || 'حدث خطأ'), 'error');
-    }
-  } catch (err) {
-    console.error('❌ خطأ:', err);
-    showToast('❌ خطأ في الاتصال', 'error');
-  }
-});
-    // عرض معلومات المستخدم
+
     function displayUserInfo() {
       document.getElementById('user-name').textContent = currentUser?.name || 'المستخدم';
       document.getElementById('user-email').textContent = currentUser?.email || '';
       document.getElementById('user-role').textContent = userRole;
     }
 
-    // ============ الإعدادات العامة ============
     document.getElementById('current-date').textContent = new Date().toLocaleDateString('ar-EG', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
     function logout() {
@@ -303,56 +188,28 @@
       setTimeout(() => t.classList.remove('show'), 3000);
     }
 
-    // ============ نظام المودال ============
     const formConfigs = {
       students: { title: 'إضافة/تعديل طالب', fields: [
         { name: 'name', label: 'الاسم', type: 'text', required: true },
         { name: 'grade', label: 'الصف', type: 'text', required: true },
         { name: 'section', label: 'الشعبة', type: 'text', required: true },
-        { name: 'status', label: 'الحالة', type: 'select', options: ['نشط','متوقف','متخرج'] },
-        { name: 'seat_number', label: 'رقم الجلوس', type: 'text' },
-        { name: 'birth_date', label: 'تاريخ الميلاد', type: 'date' },
-        { name: 'gender', label: 'النوع', type: 'select', options: ['ذكر','أنثى'] }
+        { name: 'status', label: 'الحالة', type: 'select', options: ['نشط','متوقف','متخرج'] }
       ]},
       teachers: { title: 'إضافة/تعديل معلم', fields: [
         { name: 'name', label: 'الاسم', type: 'text', required: true },
         { name: 'email', label: 'البريد', type: 'email' },
         { name: 'phone', label: 'الهاتف', type: 'text', required: true },
-        { name: 'subject_id', label: 'رقم المادة', type: 'number' },
-        { name: 'salary', label: 'الراتب', type: 'number' }
-      ]},
-      employees: { title: 'إضافة/تعديل موظف', fields: [
-        { name: 'name', label: 'الاسم', type: 'text', required: true },
-        { name: 'email', label: 'البريد', type: 'email' },
-        { name: 'phone', label: 'الهاتف', type: 'text', required: true },
-        { name: 'role', label: 'الوظيفة', type: 'text', required: true },
         { name: 'salary', label: 'الراتب', type: 'number' }
       ]},
       parents: { title: 'إضافة/تعديل ولي أمر', fields: [
         { name: 'name', label: 'الاسم', type: 'text', required: true },
         { name: 'email', label: 'البريد', type: 'email' },
         { name: 'phone', label: 'الهاتف', type: 'text', required: true },
-        { name: 'address', label: 'العنوان', type: 'text' },
         { name: 'job', label: 'الوظيفة', type: 'text' }
-      ]},
-      subjects: { title: 'إضافة/تعديل مادة', fields: [
-        { name: 'name', label: 'اسم المادة', type: 'text', required: true },
-        { name: 'code', label: 'الكود', type: 'text', required: true },
-        { name: 'grade_id', label: 'رقم الصف', type: 'number' }
-      ]},
-      exams: { title: 'إضافة/تعديل امتحان', fields: [
-        { name: 'name', label: 'اسم الامتحان', type: 'text', required: true },
-        { name: 'subject', label: 'المادة', type: 'text', required: true },
-        { name: 'grade', label: 'الصف', type: 'text' },
-        { name: 'date', label: 'التاريخ', type: 'date', required: true },
-        { name: 'max_score', label: 'الدرجة الكاملة', type: 'number' },
-        { name: 'status', label: 'الحالة', type: 'select', options: ['قادم','مكتمل','ملغي'] }
       ]},
       fees: { title: 'إضافة/تعديل رسم', fields: [
         { name: 'student_name', label: 'اسم الطالب', type: 'text', required: true },
         { name: 'amount', label: 'المبلغ', type: 'number', required: true },
-        { name: 'type', label: 'النوع', type: 'text' },
-        { name: 'due_date', label: 'تاريخ الاستحقاق', type: 'date' },
         { name: 'status', label: 'الحالة', type: 'select', options: ['unpaid','paid','partial'] }
       ]},
       attendance: { title: 'تسجيل حضور', fields: [
@@ -360,65 +217,15 @@
         { name: 'date', label: 'التاريخ', type: 'date', required: true },
         { name: 'status', label: 'الحالة', type: 'select', options: ['present','absent','late'], required: true }
       ]},
-      grades: { title: 'رصد درجة', fields: [
-        { name: 'student_name', label: 'اسم الطالب', type: 'text', required: true },
-        { name: 'subject', label: 'المادة', type: 'text', required: true },
-        { name: 'score', label: 'الدرجة', type: 'number', required: true },
-        { name: 'max_score', label: 'من', type: 'number', required: true },
-        { name: 'exam_type', label: 'نوع الامتحان', type: 'text' }
-      ]},
-      schedules: { title: 'إضافة حصة', fields: [
-        { name: 'day', label: 'اليوم', type: 'select', options: ['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس'], required: true },
-        { name: 'period', label: 'رقم الحصة', type: 'number', required: true },
-        { name: 'subject', label: 'المادة', type: 'text', required: true },
-        { name: 'teacher', label: 'المعلم', type: 'text' },
-        { name: 'section', label: 'الشعبة', type: 'text' },
-        { name: 'room', label: 'القاعة', type: 'text' }
-      ]},
       revenue: { title: 'إضافة إيراد', fields: [
         { name: 'source', label: 'المصدر', type: 'text', required: true },
         { name: 'amount', label: 'المبلغ', type: 'number', required: true },
-        { name: 'date', label: 'التاريخ', type: 'date', required: true },
-        { name: 'notes', label: 'ملاحظات', type: 'text' }
+        { name: 'date', label: 'التاريخ', type: 'date', required: true }
       ]},
       expenses: { title: 'إضافة مصروف', fields: [
         { name: 'category', label: 'البند', type: 'text', required: true },
         { name: 'amount', label: 'المبلغ', type: 'number', required: true },
-        { name: 'date', label: 'التاريخ', type: 'date', required: true },
-        { name: 'notes', label: 'ملاحظات', type: 'text' }
-      ]},
-      clinic: { title: 'سجل طبي', fields: [
-        { name: 'student_name', label: 'اسم الطالب', type: 'text', required: true },
-        { name: 'date', label: 'التاريخ', type: 'date', required: true },
-        { name: 'complaint', label: 'الشكوى', type: 'text', required: true },
-        { name: 'treatment', label: 'العلاج', type: 'text' }
-      ]},
-      transport: { title: 'إضافة باص', fields: [
-        { name: 'bus_name', label: 'اسم الباص', type: 'text', required: true },
-        { name: 'route', label: 'المسار', type: 'text', required: true },
-        { name: 'driver', label: 'السائق', type: 'text' },
-        { name: 'capacity', label: 'السعة', type: 'number' },
-        { name: 'students_count', label: 'عدد الطلاب', type: 'number' }
-      ]},
-      library: { title: 'إضافة كتاب', fields: [
-        { name: 'book_title', label: 'عنوان الكتاب', type: 'text', required: true },
-        { name: 'author', label: 'المؤلف', type: 'text' },
-        { name: 'isbn', label: 'ISBN', type: 'text' },
-        { name: 'status', label: 'الحالة', type: 'select', options: ['متاح','مُعار','تالف'] },
-        { name: 'borrower', label: 'المُعار لـ', type: 'text' },
-        { name: 'due_date', label: 'تاريخ الإرجاع', type: 'date' }
-      ]},
-      inventory: { title: 'إضافة صنف', fields: [
-        { name: 'item_name', label: 'اسم الصنف', type: 'text', required: true },
-        { name: 'category', label: 'الفئة', type: 'text', required: true },
-        { name: 'quantity', label: 'الكمية', type: 'number', required: true },
-        { name: 'location', label: 'الموقع', type: 'text' }
-      ]},
-      calendar_events: { title: 'إضافة حدث', fields: [
-        { name: 'title', label: 'العنوان', type: 'text', required: true },
-        { name: 'date', label: 'التاريخ', type: 'date', required: true },
-        { name: 'type', label: 'النوع', type: 'select', options: ['أكاديمي','امتحان','عطلة','فعالية'] },
-        { name: 'description', label: 'الوصف', type: 'text' }
+        { name: 'date', label: 'التاريخ', type: 'date', required: true }
       ]}
     };
 
@@ -477,10 +284,14 @@
         const method = currentEditId ? 'PUT' : 'POST';
         const res = await fetch(url, {
           method,
-          headers: { 'Content-Type': 'application/json', 'x-user-role': userRole },
+          headers: { 
+            'Content-Type': 'application/json',
+            'x-user-role': userRole
+          },
           body: JSON.stringify(data)
         });
         const result = await res.json();
+        
         if (res.status === 403) {
           showToast('⛔ ' + (result.message || 'ليس لديك صلاحية'), 'error');
           return;
@@ -488,7 +299,7 @@
         if (result.success) {
           showToast(currentEditId ? '✅ تم التعديل بنجاح' : '✅ تمت الإضافة بنجاح');
           closeModal();
-          const loaders = { students:loadStudents, teachers:loadTeachers, employees:loadEmployees, parents:loadParents, subjects:loadSubjects, schedules:loadSchedules, attendance:loadAttendance, exams:loadExams, grades:loadGrades, fees:loadFees, revenue:loadRevenue, expenses:loadExpenses, clinic:loadClinic, transport:loadTransport, library:loadLibrary, inventory:loadInventory, calendar_events:loadCalendar };
+          const loaders = { students:loadStudents, teachers:loadTeachers, parents:loadParents, fees:loadFees, revenue:loadRevenue, expenses:loadExpenses, attendance:loadAttendance };
           if (loaders[currentTable]) loaders[currentTable]();
         } else {
           showToast('❌ ' + (result.message || 'حدث خطأ'), 'error');
@@ -499,31 +310,28 @@
     });
 
     async function deleteItem(table, id, name) {
-  if (!confirm(`هل أنت متأكد من حذف "${name}"؟`)) return;
-  console.log('🗑️ حذف:', table, id, 'الدور:', userRole);
-  try {
-    const res = await fetch(`/api/${table}/${id}`, { 
-      method: 'DELETE',
-      headers: { 'x-user-role': userRole }
-    });
-    const result = await res.json();
-    console.log('📥 استجابة الحذف:', result);
-    if (res.status === 403) {
-      showToast('⛔ ليس لديك صلاحية للحذف', 'error');
-      return;
+      if (!confirm(`هل أنت متأكد من حذف "${name}"؟`)) return;
+      try {
+        const res = await fetch(`/api/${table}/${id}`, { 
+          method: 'DELETE',
+          headers: { 'x-user-role': userRole }
+        });
+        const result = await res.json();
+        if (res.status === 403) {
+          showToast('⛔ ليس لديك صلاحية للحذف', 'error');
+          return;
+        }
+        if (result.success) {
+          showToast('🗑️ تم الحذف بنجاح');
+          const loaders = { students:loadStudents, teachers:loadTeachers, parents:loadParents, fees:loadFees, revenue:loadRevenue, expenses:loadExpenses, attendance:loadAttendance };
+          if (loaders[table]) loaders[table]();
+        }
+      } catch (err) {
+        showToast('❌ خطأ في الحذف', 'error');
+      }
     }
-    if (result.success) {
-      showToast('🗑️ تم الحذف بنجاح');
-      const loaders = { students:loadStudents, teachers:loadTeachers, employees:loadEmployees, parents:loadParents, subjects:loadSubjects, schedules:loadSchedules, attendance:loadAttendance, exams:loadExams, grades:loadGrades, fees:loadFees, revenue:loadRevenue, expenses:loadExpenses, clinic:loadClinic, transport:loadTransport, library:loadLibrary, inventory:loadInventory, calendar_events:loadCalendar };
-      if (loaders[table]) loaders[table]();
-    }
-  } catch (err) {
-    showToast('❌ خطأ في الحذف', 'error');
-  }
-}
-    // ============ التنقل بين الصفحات ============
+
     function showPage(pageName, event) {
-      // التحقق من الصلاحيات
       if (!allowedPages.includes(pageName)) {
         showToast('⛔ ليس لديك صلاحية للوصول إلى هذه الصفحة', 'error');
         return;
@@ -537,72 +345,196 @@
         if (navItem) navItem.classList.add('active');
       }
       
-      const titles = { dashboard:'لوحة التحكم', students:'الطلاب', parents:'أولياء الأمور', teachers:'المعلمون', employees:'الموظفون', subjects:'المواد', schedules:'جدول الحصص', attendance:'الحضور', exams:'الامتحانات', grades:'الدرجات', fees:'الرسوم', revenue:'الإيرادات', expenses:'المصروفات', certificates:'الشهادات', school:'بيانات المدرسة', clinic:'العيادة', transport:'النقل', library:'المكتبة', inventory:'المخازن', calendar:'التقويم', audit:'سجل النشاط', notifications:'الإشعارات', settings:'الإعدادات', reports:'التقارير' };
+      const titles = { dashboard:'لوحة التحكم', students:'الطلاب', parents:'أولياء الأمور', teachers:'المعلمون', attendance:'الحضور', fees:'الرسوم', revenue:'الإيرادات', expenses:'المصروفات', reports:'التقارير' };
       document.getElementById('page-title').textContent = titles[pageName] || '';
       
-      const loaders = { students:loadStudents, parents:loadParents, teachers:loadTeachers, employees:loadEmployees, subjects:loadSubjects, schedules:loadSchedules, attendance:loadAttendance, exams:loadExams, grades:loadGrades, fees:loadFees, revenue:loadRevenue, expenses:loadExpenses, certificates:loadCertificates, school:loadSchoolInfo, clinic:loadClinic, transport:loadTransport, library:loadLibrary, inventory:loadInventory, calendar:loadCalendar, audit:loadAudit, notifications:loadNotifications, settings:loadSettings };
+      const loaders = { students:loadStudents, parents:loadParents, teachers:loadTeachers, attendance:loadAttendance, fees:loadFees, revenue:loadRevenue, expenses:loadExpenses };
       if (loaders[pageName]) loaders[pageName]();
     }
 
-    // ============ دوال جلب البيانات ============
     async function loadStudents(){
-  console.log('🔍 جاري تحميل الطلاب...');
-  try {
-    const r = await fetch('/api/students', { headers: { 'x-user-role': userRole } });
-    console.log('📡 Status:', r.status);
-    if(r.status === 403){
-      console.log('⛔ غير مصرح');
-      showToast('⛔ غير مصرح','error');
-      return;
+      try {
+        const r = await fetch('/api/students', { headers: { 'x-user-role': userRole } });
+        if(r.status === 403){ showToast('⛔ غير مصرح','error'); return; }
+        const d = await r.json();
+        document.getElementById('students-table').innerHTML = d.data.map(s => `
+          <tr class="hover:bg-gray-50">
+            <td class="px-4 py-3">${s.id}</td>
+            <td class="px-4 py-3 font-semibold">${s.name}</td>
+            <td class="px-4 py-3">${s.grade}</td>
+            <td class="px-4 py-3">${s.section}</td>
+            <td class="px-4 py-3">${s.seat_number||'-'}</td>
+            <td class="px-4 py-3"><span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">${s.status}</span></td>
+            <td class="px-4 py-3">
+              <button onclick='openEditModal("students",${s.id},${JSON.stringify(s).replace(/"/g, "&quot;")})' class="btn-action btn-edit">✏️</button>
+              <button onclick="deleteItem('students',${s.id},'${s.name}')" class="btn-action btn-delete">🗑️</button>
+            </td>
+          </tr>
+        `).join('');
+        document.getElementById('total-students').textContent = d.count || d.data.length;
+      } catch (err) {
+        console.error('خطأ في تحميل الطلاب:', err);
+      }
     }
-    const d = await r.json();
-    console.log('📥 البيانات المستلمة:', d);
-    
-    if(!d.data || d.data.length === 0){
-      console.log('⚠️ لا توجد بيانات');
-      document.getElementById('students-table').innerHTML = '<tr><td colspan="7" style="text-align:center;padding:20px;color:#999;">لا توجد بيانات</td></tr>';
-      return;
+
+    async function loadParents(){
+      try {
+        const r = await fetch('/api/parents', { headers: { 'x-user-role': userRole } });
+        if(r.status === 403){ showToast('⛔ غير مصرح','error'); return; }
+        const d = await r.json();
+        document.getElementById('parents-table').innerHTML = d.data.map(p => `
+          <tr class="hover:bg-gray-50">
+            <td class="px-4 py-3 font-semibold">${p.name}</td>
+            <td class="px-4 py-3">${p.phone}</td>
+            <td class="px-4 py-3">${p.email||'-'}</td>
+            <td class="px-4 py-3">${p.job||'-'}</td>
+            <td class="px-4 py-3">
+              <button onclick='openEditModal("parents",${p.id},${JSON.stringify(p).replace(/"/g, "&quot;")})' class="btn-action btn-edit">✏️</button>
+              <button onclick="deleteItem('parents',${p.id},'${p.name}')" class="btn-action btn-delete">🗑️</button>
+            </td>
+          </tr>
+        `).join('');
+      } catch (err) {
+        console.error('خطأ في تحميل أولياء الأمور:', err);
+      }
     }
-    
-    document.getElementById('students-table').innerHTML = d.data.map(s => `
-      <tr class="hover:bg-gray-50">
-        <td class="px-4 py-3">${s.id}</td>
-        <td class="px-4 py-3 font-semibold">${s.name}</td>
-        <td class="px-4 py-3">${s.grade}</td>
-        <td class="px-4 py-3">${s.section}</td>
-        <td class="px-4 py-3">${s.seat_number||'-'}</td>
-        <td class="px-4 py-3"><span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">${s.status}</span></td>
-        <td class="px-4 py-3">
-          <button onclick='openEditModal("students",${s.id},${JSON.stringify(s).replace(/"/g, "&quot;")})' class="btn-action btn-edit">✏️</button>
-          <button onclick="deleteItem('students',${s.id},'${s.name}')" class="btn-action btn-delete">🗑️</button>
-        </td>
-      </tr>
-    `).join('');
-    
-    document.getElementById('total-students').textContent = d.count || d.data.length;
-    console.log('✅ تم تحميل', d.data.length, 'طالب');
-  } catch (err) {
-    console.error('❌ خطأ في تحميل الطلاب:', err);
-    showToast('❌ خطأ في تحميل البيانات', 'error');
-  }
-}
-    // ============ الرسوم البيانية ============
+
+    async function loadTeachers(){
+      try {
+        const r = await fetch('/api/teachers', { headers: { 'x-user-role': userRole } });
+        if(r.status === 403){ showToast('⛔ غير مصرح','error'); return; }
+        const d = await r.json();
+        document.getElementById('teachers-list').innerHTML = d.data.map(t => `
+          <div class="bg-gradient-to-br from-blue-50 to-purple-50 p-6 rounded-xl border border-blue-100">
+            <div class="flex items-center mb-4">
+              <div class="w-16 h-16 bg-gradient-to-br from-blue-500 to-purple-600 text-white rounded-full flex items-center justify-center text-2xl">👨‍🏫</div>
+              <div class="mr-4 flex-1">
+                <h4 class="font-bold text-lg">${t.name}</h4>
+                <p class="text-sm text-gray-600">${t.email||''}</p>
+              </div>
+            </div>
+            <div class="space-y-2 text-sm">
+              <p>📱 ${t.phone}</p>
+              <p>💰 ${t.salary||0} جنيه</p>
+            </div>
+            <div class="flex gap-2 mt-4">
+              <button onclick='openEditModal("teachers",${t.id},${JSON.stringify(t).replace(/"/g, "&quot;")})' class="btn-action btn-edit flex-1">✏️ تعديل</button>
+              <button onclick="deleteItem('teachers',${t.id},'${t.name}')" class="btn-action btn-delete flex-1">🗑️ حذف</button>
+            </div>
+          </div>
+        `).join('');
+        document.getElementById('total-teachers').textContent = d.count || d.data.length;
+      } catch (err) {
+        console.error('خطأ في تحميل المعلمين:', err);
+      }
+    }
+
+    async function loadAttendance(){
+      try {
+        const r = await fetch('/api/attendance', { headers: { 'x-user-role': userRole } });
+        if(r.status === 403){ showToast('⛔ غير مصرح','error'); return; }
+        const d = await r.json();
+        document.getElementById('attendance-list').innerHTML = d.data.map(a => {
+          const s = a.status==='present'?'حاضر':a.status==='absent'?'غائب':'متأخر';
+          const c = a.status==='present'?'bg-green-500':a.status==='absent'?'bg-red-500':'bg-yellow-500';
+          return `
+            <div class="flex items-center p-4 bg-gray-50 rounded-lg">
+              <div class="w-12 h-12 ${c} text-white rounded-full flex items-center justify-center text-xl">${a.status==='present'?'✅':a.status==='absent'?'❌':'⏰'}</div>
+              <div class="mr-4 flex-1">
+                <p class="font-semibold">${a.student_name}</p>
+                <p class="text-sm text-gray-600">${a.date}</p>
+              </div>
+              <span class="px-3 py-1 rounded-full text-sm ${a.status==='present'?'bg-green-100 text-green-800':a.status==='absent'?'bg-red-100 text-red-800':'bg-yellow-100 text-yellow-800'}">${s}</span>
+              <button onclick='openEditModal("attendance",${a.id},${JSON.stringify(a).replace(/"/g, "&quot;")})' class="btn-action btn-edit mr-2">✏️</button>
+              <button onclick="deleteItem('attendance',${a.id},'${a.student_name}')" class="btn-action btn-delete">🗑️</button>
+            </div>
+          `;
+        }).join('');
+        document.getElementById('total-attendance').textContent = d.data.filter(a=>a.status==='present').length;
+      } catch (err) {
+        console.error('خطأ في تحميل الحضور:', err);
+      }
+    }
+
+    async function loadFees(){
+      try {
+        const r = await fetch('/api/fees', { headers: { 'x-user-role': userRole } });
+        if(r.status === 403){ showToast('⛔ غير مصرح','error'); return; }
+        const d = await r.json();
+        document.getElementById('fees-list').innerHTML = d.data.map(f => `
+          <div class="flex items-center p-4 bg-gray-50 rounded-lg">
+            <div class="w-12 h-12 ${f.status==='paid'?'bg-green-500':'bg-red-500'} text-white rounded-full flex items-center justify-center text-xl">${f.status==='paid'?'💵':'⏳'}</div>
+            <div class="mr-4 flex-1">
+              <p class="font-semibold">${f.student_name}</p>
+              <p class="text-sm text-gray-600">${f.type||''} - ${f.due_date||''}</p>
+            </div>
+            <p class="font-bold text-lg">${f.amount} جنيه</p>
+            <button onclick='openEditModal("fees",${f.id},${JSON.stringify(f).replace(/"/g, "&quot;")})' class="btn-action btn-edit mr-2">✏️</button>
+            <button onclick="deleteItem('fees',${f.id},'${f.student_name}')" class="btn-action btn-delete">🗑️</button>
+          </div>
+        `).join('');
+      } catch (err) {
+        console.error('خطأ في تحميل الرسوم:', err);
+      }
+    }
+
+    async function loadRevenue(){
+      try {
+        const r = await fetch('/api/revenue', { headers: { 'x-user-role': userRole } });
+        if(r.status === 403){ showToast('⛔ غير مصرح','error'); return; }
+        const d = await r.json();
+        let total = 0;
+        d.data.forEach(x => total += x.amount);
+        document.getElementById('revenue-list').innerHTML = d.data.map(x => `
+          <div class="flex items-center p-4 bg-green-50 rounded-lg">
+            <div class="w-12 h-12 bg-green-500 text-white rounded-full flex items-center justify-center text-xl">💵</div>
+            <div class="mr-4 flex-1">
+              <p class="font-semibold">${x.source}</p>
+              <p class="text-sm text-gray-600">${x.date}</p>
+            </div>
+            <p class="font-bold text-lg text-green-600">${x.amount} جنيه</p>
+            <button onclick='openEditModal("revenue",${x.id},${JSON.stringify(x).replace(/"/g, "&quot;")})' class="btn-action btn-edit mr-2">✏️</button>
+            <button onclick="deleteItem('revenue',${x.id},'${x.source}')" class="btn-action btn-delete">🗑️</button>
+          </div>
+        `).join('');
+        document.getElementById('total-revenue').textContent = total;
+      } catch (err) {
+        console.error('خطأ في تحميل الإيرادات:', err);
+      }
+    }
+
+    async function loadExpenses(){
+      try {
+        const r = await fetch('/api/expenses', { headers: { 'x-user-role': userRole } });
+        if(r.status === 403){ showToast('⛔ غير مصرح','error'); return; }
+        const d = await r.json();
+        document.getElementById('expenses-list').innerHTML = d.data.map(x => `
+          <div class="flex items-center p-4 bg-red-50 rounded-lg">
+            <div class="w-12 h-12 bg-red-500 text-white rounded-full flex items-center justify-center text-xl">💸</div>
+            <div class="mr-4 flex-1">
+              <p class="font-semibold">${x.category}</p>
+              <p class="text-sm text-gray-600">${x.date}</p>
+            </div>
+            <p class="font-bold text-lg text-red-600">${x.amount} جنيه</p>
+            <button onclick='openEditModal("expenses",${x.id},${JSON.stringify(x).replace(/"/g, "&quot;")})' class="btn-action btn-edit mr-2">✏️</button>
+            <button onclick="deleteItem('expenses',${x.id},'${x.category}')" class="btn-action btn-delete">🗑️</button>
+          </div>
+        `).join('');
+      } catch (err) {
+        console.error('خطأ في تحميل المصروفات:', err);
+      }
+    }
+
     window.addEventListener('load', () => {
-      // بناء الواجهة حسب الصلاحيات
       buildSidebar();
       displayUserInfo();
+      loadStudents();
+      loadTeachers();
+      loadRevenue();
+      loadAttendance();
       
-      // تحميل البيانات المسموح بها
-      if (allowedPages.includes('students')) loadStudents();
-      if (allowedPages.includes('teachers')) loadTeachers();
-      if (allowedPages.includes('revenue')) loadRevenue();
-      if (allowedPages.includes('attendance')) loadAttendance();
-      
-      // الرسوم البيانية (فقط للمدير أو من لديه صلاحية)
-      if (userRole === 'مدير' || userRole === 'الشؤون المالية') {
-        new Chart(document.getElementById('attendanceChart'), { type: 'doughnut', data: { labels: ['حاضر', 'غائب', 'متأخر'], datasets: [{ data: [75, 15, 10], backgroundColor: ['#10b981', '#ef4444', '#f59e0b'] }] }, options: { responsive: true, plugins: { legend: { position: 'bottom' } } } });
-        new Chart(document.getElementById('revenueChart'), { type: 'bar', data: { labels: ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو'], datasets: [{ label: 'الإيرادات', data: [45000, 52000, 48000, 61000, 55000, 67000], backgroundColor: '#3b82f6', borderRadius: 5 }] }, options: { responsive: true, plugins: { legend: { display: false } } } });
-      }
+      new Chart(document.getElementById('attendanceChart'), { type: 'doughnut', data: { labels: ['حاضر', 'غائب', 'متأخر'], datasets: [{ data: [75, 15, 10], backgroundColor: ['#10b981', '#ef4444', '#f59e0b'] }] }, options: { responsive: true, plugins: { legend: { position: 'bottom' } } } });
+      new Chart(document.getElementById('revenueChart'), { type: 'bar', data: { labels: ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو'], datasets: [{ label: 'الإيرادات', data: [45000, 52000, 48000, 61000, 55000, 67000], backgroundColor: '#3b82f6', borderRadius: 5 }] }, options: { responsive: true, plugins: { legend: { display: false } } } });
     });
   </script>
 </body>
