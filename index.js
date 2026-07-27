@@ -258,53 +258,65 @@ td {
 tr:nth-child(even) { background: #fafafa; }
 tr:hover { background: #f0f9ff; }
 
-/* قسم المجموع الكلي الجديد */
-.summary-section {
-  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
-  padding: 25px;
-  border-radius: 15px;
-  margin: 30px 0;
-  border: 2px solid #d4af37;
+/* صف المجموع الكلي */
+.total-row {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%) !important;
+  font-weight: 700;
+  font-size: 18px;
+  border-top: 3px solid #d4af37;
 }
-.summary-row {
+.total-row td {
+  padding: 15px 10px;
+  color: #1e40af;
+}
+.total-label {
+  text-align: right !important;
+  padding-right: 20px !important;
+  font-size: 19px;
+}
+.total-value {
+  font-size: 22px;
+  color: #1e40af;
+  font-weight: 700;
+}
+
+/* النسبة والتقدير */
+.result-section {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  padding: 20px;
+  border-radius: 15px;
+  margin: 20px 0;
+  border: 2px solid #d4af37;
   display: flex;
   justify-content: space-around;
   align-items: center;
   flex-wrap: wrap;
   gap: 20px;
-  margin-bottom: 15px;
 }
-.summary-item {
+.result-item {
   text-align: center;
   flex: 1;
   min-width: 150px;
 }
-.summary-label {
+.result-label {
   font-size: 16px;
   color: #92400e;
   font-weight: 600;
   margin-bottom: 8px;
 }
-.summary-value {
-  font-size: 28px;
+.result-value {
+  font-size: 32px;
   color: #1e40af;
   font-weight: 700;
-}
-.summary-big {
-  font-size: 42px;
-  color: #1e40af;
-  font-weight: 700;
-  margin: 10px 0;
 }
 .grade-badge {
   display: inline-block;
-  padding: 10px 30px;
+  padding: 8px 25px;
   background: ${gColor};
   color: white;
-  font-size: 24px;
+  font-size: 22px;
   font-weight: 700;
   border-radius: 30px;
-  margin-top: 10px;
   box-shadow: 0 4px 6px rgba(0,0,0,0.1);
 }
 
@@ -387,10 +399,10 @@ tr:hover { background: #f0f9ff; }
     <thead>
       <tr>
         <th style="width:10%">م</th>
-        <th style="width:45%">المادة</th>
-        <th style="width:15%">الدرجة</th>
-        <th style="width:15%">من</th>
-        <th style="width:15%">النسبة</th>
+        <th style="width:40%">المادة</th>
+        <th style="width:17%">درجة الطالب/ة</th>
+        <th style="width:16%">المجموع الكلي</th>
+        <th style="width:17%">النسبة</th>
       </tr>
     </thead>
     <tbody>
@@ -403,23 +415,23 @@ tr:hover { background: #f0f9ff; }
           <td>${((g.score/g.max_score)*100).toFixed(1)}%</td>
         </tr>
       `).join('')}
+      <tr class="total-row">
+        <td colspan="2" class="total-label">المجموع الكلي</td>
+        <td class="total-value">${ts}</td>
+        <td class="total-value">${tm}</td>
+        <td class="total-value">${p}%</td>
+      </tr>
     </tbody>
   </table>
 
-  <div class="summary-section">
-    <div class="summary-row">
-      <div class="summary-item">
-        <div class="summary-label">مجموع الطالب/ة</div>
-        <div class="summary-big">${ts} <span style="font-size:24px;color:#666">من</span> ${tm}</div>
-      </div>
-      <div class="summary-item">
-        <div class="summary-label">النسبة المئوية</div>
-        <div class="summary-big">${p}%</div>
-      </div>
-      <div class="summary-item">
-        <div class="summary-label">التقدير النهائي</div>
-        <div class="grade-badge">${g}</div>
-      </div>
+  <div class="result-section">
+    <div class="result-item">
+      <div class="result-label">النسبة المئوية</div>
+      <div class="result-value">${p}%</div>
+    </div>
+    <div class="result-item">
+      <div class="result-label">التقدير النهائي</div>
+      <div class="grade-badge">${g}</div>
     </div>
   </div>
 
