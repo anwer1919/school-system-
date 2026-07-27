@@ -130,51 +130,326 @@ Object.keys(createConfig).forEach(table => {
 // الشهادات
 app.get('/certificate/:id', async (req, res) => {
   try {
+    // جلب بيانات المدرسة
+    const { data: schoolData } = await supabase.from('school_info').select('*').limit(1);
+    const school = schoolData?.[0] || { name: 'مدرسة النور الخاصة', logo: '🏫', academic_year: '2026-2027' };
+
+    // جلب بيانات الطالب
     const { data: students } = await supabase.from('students').select('*').eq('id', req.params.id).limit(1);
     if (!students || students.length === 0) return res.status(404).send('الطالب غير موجود');
     const student = students[0];
 
+    // جلب درجات الطالب
     const { data: gradesData } = await supabase.from('grades').select('*').eq('student_id', req.params.id);
+    
     let ts = 0, tm = 0;
     (gradesData || []).forEach(g => { ts += g.score; tm += g.max_score; });
     const p = tm > 0 ? ((ts / tm) * 100).toFixed(2) : 0;
     const g = p >= 90 ? 'ممتاز' : p >= 80 ? 'جيد جداً' : p >= 70 ? 'جيد' : p >= 60 ? 'مقبول' : 'ضعيف';
+    const gColor = p >= 90 ? '#10b981' : p >= 80 ? '#3b82f6' : p >= 70 ? '#f59e0b' : '#ef4444';
+    const today = new Date().toLocaleDateString('ar-EG', { year: 'numeric', month: 'long', day: 'numeric' });
 
-    res.send(`<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><title>شهادة - ${student.name}</title>
+    res.send(`<!DOCTYPE html>
+<html dir="rtl" lang="ar">
+<head>
+<meta charset="UTF-8">
+<title>شهادة تقدير - ${student.name}</title>
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
 <style>
-@import url('https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&display=swap');
-body{font-family:'Amiri',serif;background:linear-gradient(135deg,#667eea,#764ba2);margin:0;padding:40px 20px}
-.cert{max-width:800px;margin:auto;background:white;padding:60px 40px;border:15px double #d4af37;border-radius:10px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
-.hdr{text-align:center;border-bottom:3px double #d4af37;padding-bottom:20px;margin-bottom:30px}
-.hdr h1{color:#1e40af;font-size:42px;margin:0}
-.ttl{text-align:center;font-size:36px;color:#d4af37;margin:30px 0;font-weight:bold}
-.sn{text-align:center;font-size:32px;color:#1e40af;margin:20px 0;border-bottom:2px solid #d4af37;display:inline-block;padding:0 40px 10px}
-table{width:100%;border-collapse:collapse;margin:30px 0}
-th{background:#1e40af;color:white;padding:12px}
-td{padding:12px;border:1px solid #ddd;text-align:center}
-.sum{background:#fef3c7;padding:20px;border-radius:10px;margin:30px 0;text-align:center;font-size:20px}
-.pct{font-size:48px;color:#1e40af;font-weight:bold}
-.grd{font-size:32px;color:#d4af37;font-weight:bold}
-.pbtn{display:block;margin:20px auto;padding:15px 40px;background:#1e40af;color:white;border:none;border-radius:5px;font-size:18px;cursor:pointer}
-@media print{body{background:white;padding:0}.pbtn{display:none}}
-</style></head><body>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'Cairo', 'Amiri', serif;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 40px 20px;
+  min-height: 100vh;
+}
+.cert {
+  max-width: 850px;
+  margin: auto;
+  background: #fffef5;
+  padding: 50px;
+  border: 20px double #d4af37;
+  border-radius: 15px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  position: relative;
+}
+.cert::before {
+  content: '';
+  position: absolute;
+  top: 15px; left: 15px; right: 15px; bottom: 15px;
+  border: 2px solid #d4af37;
+  border-radius: 8px;
+  pointer-events: none;
+}
+.header {
+  text-align: center;
+  border-bottom: 3px double #d4af37;
+  padding-bottom: 20px;
+  margin-bottom: 30px;
+}
+.school-logo {
+  font-size: 70px;
+  margin-bottom: 10px;
+}
+.header h1 {
+  color: #1e40af;
+  font-size: 38px;
+  font-weight: 700;
+  margin-bottom: 5px;
+}
+.header .sub {
+  color: #666;
+  font-size: 16px;
+  font-style: italic;
+}
+.header .year {
+  color: #d4af37;
+  font-size: 18px;
+  font-weight: 600;
+  margin-top: 10px;
+}
+.title {
+  text-align: center;
+  font-size: 42px;
+  color: #d4af37;
+  margin: 30px 0;
+  font-weight: 700;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.1);
+}
+.intro {
+  text-align: center;
+  font-size: 20px;
+  color: #333;
+  margin: 20px 0;
+}
+.student-name {
+  display: inline-block;
+  font-size: 34px;
+  color: #1e40af;
+  font-weight: 700;
+  border-bottom: 3px solid #d4af37;
+  padding: 5px 40px 10px;
+  margin: 15px 0;
+}
+.student-info {
+  text-align: center;
+  font-size: 18px;
+  color: #555;
+  margin: 15px 0;
+}
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin: 30px 0;
+  font-size: 16px;
+}
+th {
+  background: #1e40af;
+  color: white;
+  padding: 14px 10px;
+  font-weight: 600;
+  font-size: 17px;
+}
+td {
+  padding: 12px 10px;
+  border: 1px solid #ddd;
+  text-align: center;
+}
+tr:nth-child(even) { background: #fafafa; }
+tr:hover { background: #f0f9ff; }
+
+/* قسم المجموع الكلي الجديد */
+.summary-section {
+  background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%);
+  padding: 25px;
+  border-radius: 15px;
+  margin: 30px 0;
+  border: 2px solid #d4af37;
+}
+.summary-row {
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin-bottom: 15px;
+}
+.summary-item {
+  text-align: center;
+  flex: 1;
+  min-width: 150px;
+}
+.summary-label {
+  font-size: 16px;
+  color: #92400e;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.summary-value {
+  font-size: 28px;
+  color: #1e40af;
+  font-weight: 700;
+}
+.summary-big {
+  font-size: 42px;
+  color: #1e40af;
+  font-weight: 700;
+  margin: 10px 0;
+}
+.grade-badge {
+  display: inline-block;
+  padding: 10px 30px;
+  background: ${gColor};
+  color: white;
+  font-size: 24px;
+  font-weight: 700;
+  border-radius: 30px;
+  margin-top: 10px;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+}
+
+.footer {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 60px;
+  padding-top: 20px;
+  border-top: 2px solid #d4af37;
+}
+.signature {
+  text-align: center;
+  flex: 1;
+}
+.signature .label {
+  font-size: 16px;
+  color: #666;
+  margin-bottom: 40px;
+}
+.signature .line {
+  border-top: 2px solid #333;
+  width: 180px;
+  margin: 0 auto 8px;
+}
+.signature .name {
+  font-size: 14px;
+  color: #333;
+  font-weight: 600;
+}
+
+.print-btn {
+  display: block;
+  margin: 25px auto;
+  padding: 15px 50px;
+  background: linear-gradient(135deg, #1e40af, #3b82f6);
+  color: white;
+  border: none;
+  border-radius: 30px;
+  font-size: 18px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 15px rgba(30,64,175,0.3);
+  transition: all 0.3s;
+  font-family: 'Cairo', sans-serif;
+}
+.print-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(30,64,175,0.4);
+}
+
+@media print {
+  body { background: white; padding: 0; }
+  .cert { box-shadow: none; border: 15px double #d4af37; }
+  .print-btn { display: none; }
+}
+</style>
+</head>
+<body>
 <div class="cert">
-<div class="hdr"><h1>🏫 مدرسة النور الخاصة</h1></div>
-<div class="ttl">شهادة تقدير</div>
-<div style="text-align:center"><p style="font-size:20px">تشهد المدرسة بأن الطالب</p><div class="sn">${student.name}</div><p style="font-size:20px">الصف ${student.grade} - شعبة ${student.section}</p></div>
-<table><tr><th>المادة</th><th>الدرجة</th><th>من</th><th>النسبة</th></tr>
-${(gradesData || []).map(g=>`<tr><td>${g.subject}</td><td>${g.score}</td><td>${g.max_score}</td><td>${((g.score/g.max_score)*100).toFixed(1)}%</td></tr>`).join('')}
-</table>
-<div class="sum"><div>المجموع</div><div class="pct">${ts}/${tm}</div><div>النسبة: ${p}%</div><div class="grd">التقدير: ${g}</div></div>
+  <div class="header">
+    <div class="school-logo">${school.logo || '🏫'}</div>
+    <h1>${school.name || 'مدرسة النور الخاصة'}</h1>
+    <div class="sub">Al-Noor Private School</div>
+    <div class="year">العام الدراسي: ${school.academic_year || '2026-2027'}</div>
+  </div>
+
+  <div class="title">✨ شهادة تقدير ✨</div>
+
+  <div class="intro">تشهد إدارة المدرسة بأن الطالب/ة</div>
+  <div style="text-align:center;">
+    <div class="student-name">${student.name}</div>
+  </div>
+  <div class="student-info">
+    بالصف <strong>${student.grade}</strong> - شعبة <strong>${student.section}</strong>
+    ${student.seat_number ? `- رقم الجلوس <strong>${student.seat_number}</strong>` : ''}
+  </div>
+  <div class="intro" style="margin-top:20px;">قد أدّى/أدّت الامتحانات في المواد التالية وحصل/ت على الدرجات المبينة قرين كل مادة</div>
+
+  <table>
+    <thead>
+      <tr>
+        <th style="width:10%">م</th>
+        <th style="width:45%">المادة</th>
+        <th style="width:15%">الدرجة</th>
+        <th style="width:15%">من</th>
+        <th style="width:15%">النسبة</th>
+      </tr>
+    </thead>
+    <tbody>
+      ${(gradesData || []).map((g, i) => `
+        <tr>
+          <td>${i + 1}</td>
+          <td style="font-weight:600">${g.subject}</td>
+          <td>${g.score}</td>
+          <td>${g.max_score}</td>
+          <td>${((g.score/g.max_score)*100).toFixed(1)}%</td>
+        </tr>
+      `).join('')}
+    </tbody>
+  </table>
+
+  <div class="summary-section">
+    <div class="summary-row">
+      <div class="summary-item">
+        <div class="summary-label">مجموع الطالب/ة</div>
+        <div class="summary-big">${ts} <span style="font-size:24px;color:#666">من</span> ${tm}</div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-label">النسبة المئوية</div>
+        <div class="summary-big">${p}%</div>
+      </div>
+      <div class="summary-item">
+        <div class="summary-label">التقدير النهائي</div>
+        <div class="grade-badge">${g}</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="footer">
+    <div class="signature">
+      <div class="label">التاريخ</div>
+      <div class="line"></div>
+      <div class="name">${today}</div>
+    </div>
+    <div class="signature">
+      <div class="label">توقيع مدير المدرسة</div>
+      <div class="line"></div>
+      <div class="name">_________________</div>
+    </div>
+    <div class="signature">
+      <div class="label">ختم المدرسة</div>
+      <div class="line"></div>
+      <div class="name">_________________</div>
+    </div>
+  </div>
 </div>
-<button class="pbtn" onclick="window.print()">🖨️ طباعة</button>
-</body></html>`);
+
+<button class="print-btn" onclick="window.print()">🖨️ طباعة الشهادة</button>
+</body>
+</html>`);
   } catch (err) {
     console.error(err);
     res.status(500).send('خطأ في الخادم');
   }
 });
-
 // التقارير
 function makeReport(title, headers, rows, extra = '') {
   const rowsHtml = rows && rows.length > 0 ? rows : '<tr><td colspan="' + headers.length + '" style="text-align:center;padding:20px;color:#999;">لا توجد بيانات</td></tr>';
