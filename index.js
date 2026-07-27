@@ -37,9 +37,8 @@ const rolePermissions = {
 };
 
 function checkPermission(table) {
-  return (req, res, next) => {
-    const userRole = req.headers['x-user-role'] || 'مدير';
-    const permissions = rolePermissions[userRole] || [];
+tables.forEach(table => {
+  app.get(`/api/${table}`, async (req, res) => {;
     
     // 🔍 تتبع للتشخيص
     console.log(`🔐 [${userRole}] يحاول الوصول لـ ${table} - ${permissions.includes('*') || permissions.includes(table) ? '✅ مسموح' : '❌ مرفوض'}`);
