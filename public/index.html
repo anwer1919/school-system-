@@ -499,27 +499,28 @@
     });
 
     async function deleteItem(table, id, name) {
-      if (!confirm(`هل أنت متأكد من حذف "${name}"؟`)) return;
-      try {
-        const res = await fetch(`/api/${table}/${id}`, { 
-          method: 'DELETE',
-          headers: { 'x-user-role': userRole }
-        });
-        const result = await res.json();
-        if (res.status === 403) {
-          showToast('⛔ ليس لديك صلاحية للحذف', 'error');
-          return;
-        }
-        if (result.success) {
-          showToast('🗑️ تم الحذف بنجاح');
-          const loaders = { students:loadStudents, teachers:loadTeachers, employees:loadEmployees, parents:loadParents, subjects:loadSubjects, schedules:loadSchedules, attendance:loadAttendance, exams:loadExams, grades:loadGrades, fees:loadFees, revenue:loadRevenue, expenses:loadExpenses, clinic:loadClinic, transport:loadTransport, library:loadLibrary, inventory:loadInventory, calendar_events:loadCalendar };
-          if (loaders[table]) loaders[table]();
-        }
-      } catch (err) {
-        showToast('❌ خطأ في الحذف', 'error');
-      }
+  if (!confirm(`هل أنت متأكد من حذف "${name}"؟`)) return;
+  console.log('🗑️ حذف:', table, id, 'الدور:', userRole);
+  try {
+    const res = await fetch(`/api/${table}/${id}`, { 
+      method: 'DELETE',
+      headers: { 'x-user-role': userRole }
+    });
+    const result = await res.json();
+    console.log('📥 استجابة الحذف:', result);
+    if (res.status === 403) {
+      showToast('⛔ ليس لديك صلاحية للحذف', 'error');
+      return;
     }
-
+    if (result.success) {
+      showToast('🗑️ تم الحذف بنجاح');
+      const loaders = { students:loadStudents, teachers:loadTeachers, employees:loadEmployees, parents:loadParents, subjects:loadSubjects, schedules:loadSchedules, attendance:loadAttendance, exams:loadExams, grades:loadGrades, fees:loadFees, revenue:loadRevenue, expenses:loadExpenses, clinic:loadClinic, transport:loadTransport, library:loadLibrary, inventory:loadInventory, calendar_events:loadCalendar };
+      if (loaders[table]) loaders[table]();
+    }
+  } catch (err) {
+    showToast('❌ خطأ في الحذف', 'error');
+  }
+}
     // ============ التنقل بين الصفحات ============
     function showPage(pageName, event) {
       // التحقق من الصلاحيات
