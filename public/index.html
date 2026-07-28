@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>لوحة التحكم - مدرسة النور</title>
+  <title>نظام مدرسة النور المتكامل</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
@@ -14,13 +14,10 @@
     .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); }
     .modal.show { display: flex; align-items: center; justify-content: center; }
     .modal-content { background: white; padding: 30px; border-radius: 15px; max-width: 500px; width: 90%; max-height: 90vh; overflow-y: auto; }
-    .btn-add { background: linear-gradient(135deg, #10b981, #059669); color: white; padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; transition: 0.2s; }
-    .btn-add:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3); }
+    .btn-add { background: linear-gradient(135deg, #10b981, #059669); color: white; padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; }
     .btn-action { padding: 6px 12px; border-radius: 6px; font-size: 12px; margin: 0 2px; cursor: pointer; border: none; }
-    .btn-edit { background: #3b82f6; color: white; }
     .btn-delete { background: #ef4444; color: white; }
-    .form-input { width: 100%; padding: 10px; border: 2px solid #e5e7eb; border-radius: 8px; margin-bottom: 15px; font-family: 'Cairo'; }
-    .form-input:focus { outline: none; border-color: #3b82f6; }
+    .form-input { width: 100%; padding: 10px; border: 2px solid #e5e7eb; border-radius: 8px; margin-bottom: 15px; }
     .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #10b981; color: white; padding: 15px 30px; border-radius: 10px; z-index: 2000; display: none; font-weight: bold; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
     .toast.show { display: block; animation: slideDown 0.3s; }
     @keyframes slideDown { from { top: -50px; opacity: 0; } to { top: 20px; opacity: 1; } }
@@ -29,7 +26,6 @@
 <body class="bg-gray-100">
   <div id="toast" class="toast"></div>
   
-  <!-- نافذة الإضافة/التعديل -->
   <div id="modal" class="modal">
     <div class="modal-content">
       <div class="flex justify-between items-center mb-4 border-b pb-2">
@@ -69,124 +65,82 @@
         <span class="text-sm text-gray-500 bg-gray-100 px-3 py-1 rounded-full" id="current-date"></span>
       </div>
 
-      <!-- صفحة لوحة التحكم -->
-      <div id="dashboard" class="page p-6">
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <div class="bg-white rounded-xl shadow-sm p-6 border-r-4 border-blue-500">
-            <p class="text-gray-500 text-sm">إجمالي الطلاب</p>
-            <p class="text-3xl font-bold mt-2 text-gray-800" id="total-students">0</p>
-          </div>
-          <div class="bg-white rounded-xl shadow-sm p-6 border-r-4 border-green-500">
-            <p class="text-gray-500 text-sm">المعلمون</p>
-            <p class="text-3xl font-bold mt-2 text-gray-800" id="total-teachers">0</p>
-          </div>
-          <div class="bg-white rounded-xl shadow-sm p-6 border-r-4 border-yellow-500">
-            <p class="text-gray-500 text-sm">الإيرادات</p>
-            <p class="text-3xl font-bold mt-2 text-gray-800" id="total-revenue">0</p>
-          </div>
-          <div class="bg-white rounded-xl shadow-sm p-6 border-r-4 border-purple-500">
-            <p class="text-gray-500 text-sm">الحضور اليوم</p>
-            <p class="text-3xl font-bold mt-2 text-gray-800" id="total-attendance">0</p>
-          </div>
-        </div>
+      <!-- حاوية الصفحات الديناميكية -->
+      <div id="main-content" class="p-6">
+        <!-- سيتم حقن المحتوى هنا تلقائياً بواسطة JavaScript -->
       </div>
-
-      <!-- صفحة الطلاب -->
-      <div id="students" class="page p-6 hidden">
-        <div class="bg-white rounded-xl shadow-sm p-6">
-          <div class="flex justify-between items-center mb-6">
-            <h3 class="text-xl font-bold">👥 إدارة الطلاب</h3>
-            <button onclick="openModal('students')" class="btn-add">+ إضافة طالب</button>
-          </div>
-          <div class="overflow-x-auto">
-            <table class="w-full text-sm">
-              <thead class="bg-gray-50"><tr><th class="px-4 py-3 text-right">الاسم</th><th class="px-4 py-3 text-right">الصف</th><th class="px-4 py-3 text-right">الشعبة</th><th class="px-4 py-3 text-right">الحالة</th><th class="px-4 py-3 text-right">الإجراءات</th></tr></thead>
-              <tbody id="students-table"></tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-
-      <!-- صفحة المعلمين -->
-      <div id="teachers" class="page p-6 hidden">
-        <div class="bg-white rounded-xl shadow-sm p-6">
-          <div class="flex justify-between items-center mb-6">
-            <h3 class="text-xl font-bold">👨‍🏫 المعلمون</h3>
-            <button onclick="openModal('teachers')" class="btn-add">+ إضافة معلم</button>
-          </div>
-          <div id="teachers-list" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div>
-        </div>
-      </div>
-
-      <!-- صفحة الرسوم -->
-      <div id="fees" class="page p-6 hidden">
-        <div class="bg-white rounded-xl shadow-sm p-6">
-          <div class="flex justify-between items-center mb-6">
-            <h3 class="text-xl font-bold">💰 الرسوم</h3>
-            <button onclick="openModal('fees')" class="btn-add">+ إضافة رسم</button>
-          </div>
-          <div id="fees-list" class="space-y-3"></div>
-        </div>
-      </div>
-
-      <!-- صفحة التقارير -->
-      <div id="reports" class="page p-6 hidden">
-        <div class="bg-white rounded-xl shadow-sm p-6">
-          <h3 class="text-xl font-bold mb-6">📄 التقارير</h3>
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            <a href="/api/reports/students" target="_blank" class="bg-gradient-to-br from-blue-500 to-blue-600 text-white p-6 rounded-xl hover:shadow-lg transition flex items-center gap-4">
-              <span class="text-4xl">👥</span>
-              <div><h4 class="font-bold text-lg">تقرير الطلاب</h4><p class="text-sm opacity-90">عرض وطباعة بيانات الطلاب</p></div>
-            </a>
-          </div>
-        </div>
-      </div>
-
     </div>
   </div>
 
   <script>
-    // 1. التحقق من تسجيل الدخول فوراً (أهم سطر)
+    // 1. التحقق الأمني من الدخول
     const currentUser = JSON.parse(localStorage.getItem('user') || 'null');
     if (!currentUser || !currentUser.role) {
-      window.location.href = '/login'; // إرجاع لصفحة الدخول إذا لم يكن مسجلاً
+      window.location.href = '/login';
     }
-    
     const userRole = currentUser.role;
     document.getElementById('current-date').textContent = new Date().toLocaleDateString('ar-EG', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
-    // 2. تعريف الصلاحيات والقوائم
+    // 2. تعريف القوائم والصلاحيات
     const menuItems = {
       'مدير': [
         {id:'dashboard', icon:'📊', label:'لوحة التحكم'}, 
         {id:'students', icon:'👥', label:'الطلاب'}, 
         {id:'teachers', icon:'👨‍🏫', label:'المعلمون'}, 
-        {id:'fees', icon:'💰', label:'الرسوم'}, 
+        {id:'parents', icon:'👨‍👩‍👧', label:'أولياء الأمور'},
+        {id:'attendance', icon:'📅', label:'الحضور والغياب'},
+        {id:'fees', icon:'💰', label:'الرسوم الدراسية'},
+        {id:'revenue', icon:'💵', label:'الإيرادات'},
+        {id:'expenses', icon:'💸', label:'المصروفات'},
         {id:'reports', icon:'📄', label:'التقارير'}
       ],
-      'تسجيل الطلاب': [
-        {id:'dashboard', icon:'📊', label:'لوحة التحكم'}, 
-        {id:'students', icon:'👥', label:'الطلاب'}
-      ],
-      'الشؤون المالية': [
-        {id:'dashboard', icon:'📊', label:'لوحة التحكم'}, 
-        {id:'fees', icon:'💰', label:'الرسوم'}
-      ],
-      'التقارير': [
-        {id:'dashboard', icon:'📊', label:'لوحة التحكم'}, 
-        {id:'reports', icon:'📄', label:'التقارير'}
-      ]
+      'تسجيل الطلاب': [{id:'dashboard', icon:'📊', label:'لوحة التحكم'}, {id:'students', icon:'👥', label:'الطلاب'}, {id:'parents', icon:'👨‍👩‍👧', label:'أولياء الأمور'}, {id:'attendance', icon:'📅', label:'الحضور'}],
+      'الشؤون المالية': [{id:'dashboard', icon:'📊', label:'لوحة التحكم'}, {id:'fees', icon:'💰', label:'الرسوم'}, {id:'revenue', icon:'💵', label:'الإيرادات'}, {id:'expenses', icon:'💸', label:'المصروفات'}],
+      'التقارير': [{id:'dashboard', icon:'📊', label:'لوحة التحكم'}, {id:'reports', icon:'📄', label:'التقارير'}]
     };
 
-    const formConfigs = {
-      students: { title: 'إضافة طالب جديد', fields: [{name:'name', label:'الاسم الرباعي', type:'text'}, {name:'grade', label:'الصف', type:'text'}, {name:'section', label:'الشعبة', type:'text'}, {name:'status', label:'الحالة', type:'select', options:['نشط','متوقف']}] },
-      teachers: { title: 'إضافة معلم جديد', fields: [{name:'name', label:'الاسم', type:'text'}, {name:'email', label:'البريد', type:'email'}, {name:'phone', label:'الهاتف', type:'text'}, {name:'salary', label:'الراتب', type:'number'}] },
-      fees: { title: 'إضافة رسم دراسي', fields: [{name:'student_name', label:'اسم الطالب', type:'text'}, {name:'amount', label:'المبلغ', type:'number'}, {name:'status', label:'الحالة', type:'select', options:['paid','unpaid']}] }
+    // 3. المحرك الديناميكي: إعدادات كل جدول (الأعمدة والنموذج)
+    const tableConfigs = {
+      students: { 
+        title: 'الطلاب', 
+        columns: [{key:'name', label:'الاسم'}, {key:'grade', label:'الصف'}, {key:'section', label:'الشعبة'}, {key:'status', label:'الحالة'}],
+        form: [{name:'name', label:'اسم الطالب', type:'text'}, {name:'grade', label:'الصف', type:'text'}, {name:'section', label:'الشعبة', type:'text'}, {name:'status', label:'الحالة', type:'select', options:['نشط','متوقف']}]
+      },
+      teachers: { 
+        title: 'المعلمون', 
+        columns: [{key:'name', label:'الاسم'}, {key:'subject', label:'المادة'}, {key:'phone', label:'الهاتف'}, {key:'salary', label:'الراتب'}],
+        form: [{name:'name', label:'اسم المعلم', type:'text'}, {name:'subject', label:'المادة', type:'text'}, {name:'phone', label:'الهاتف', type:'text'}, {name:'salary', label:'الراتب', type:'number'}]
+      },
+      parents: { 
+        title: 'أولياء الأمور', 
+        columns: [{key:'name', label:'الاسم'}, {key:'phone', label:'الهاتف'}, {key:'email', label:'البريد'}],
+        form: [{name:'name', label:'اسم ولي الأمر', type:'text'}, {name:'phone', label:'الهاتف', type:'text'}, {name:'email', label:'البريد الإلكتروني', type:'email'}]
+      },
+      attendance: { 
+        title: 'الحضور والغياب', 
+        columns: [{key:'student_name', label:'اسم الطالب'}, {key:'date', label:'التاريخ'}, {key:'status', label:'الحالة'}],
+        form: [{name:'student_name', label:'اسم الطالب', type:'text'}, {name:'date', label:'التاريخ', type:'date'}, {name:'status', label:'الحالة', type:'select', options:['present','absent','late']}]
+      },
+      fees: { 
+        title: 'الرسوم الدراسية', 
+        columns: [{key:'student_name', label:'اسم الطالب'}, {key:'amount', label:'المبلغ'}, {key:'status', label:'الحالة'}, {key:'date', label:'التاريخ'}],
+        form: [{name:'student_name', label:'اسم الطالب', type:'text'}, {name:'amount', label:'المبلغ', type:'number'}, {name:'status', label:'الحالة', type:'select', options:['paid','unpaid']}, {name:'date', label:'التاريخ', type:'date'}]
+      },
+      revenue: { 
+        title: 'الإيرادات', 
+        columns: [{key:'source', label:'المصدر'}, {key:'amount', label:'المبلغ'}, {key:'date', label:'التاريخ'}],
+        form: [{name:'source', label:'مصدر الإيراد', type:'text'}, {name:'amount', label:'المبلغ', type:'number'}, {name:'date', label:'التاريخ', type:'date'}]
+      },
+      expenses: { 
+        title: 'المصروفات', 
+        columns: [{key:'category', label:'البند'}, {key:'amount', label:'المبلغ'}, {key:'date', label:'التاريخ'}],
+        form: [{name:'category', label:'بند الصرف', type:'text'}, {name:'amount', label:'المبلغ', type:'number'}, {name:'date', label:'التاريخ', type:'date'}]
+      }
     };
 
-    let currentTable = null, currentEditId = null;
+    let currentTable = null;
 
-    // 3. بناء الواجهة
+    // 4. بناء الواجهة
     function buildSidebar() {
       document.getElementById('user-name').textContent = currentUser.name;
       document.getElementById('user-role').textContent = userRole;
@@ -202,84 +156,121 @@
     }
 
     function showPage(pageId) {
-      document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
-      document.getElementById(pageId).classList.remove('hidden');
-      
       document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-      // تحديد العنصر النشط في القائمة
       const activeLink = Array.from(document.querySelectorAll('.nav-item')).find(a => a.textContent.includes(
         (menuItems[userRole] || menuItems['مدير']).find(m => m.id === pageId)?.label || ''
       ));
       if (activeLink) activeLink.classList.add('active');
-      
-      const titles = {dashboard:'لوحة التحكم', students:'إدارة الطلاب', teachers:'شؤون المعلمين', fees:'الشؤون المالية', reports:'التقارير'};
-      document.getElementById('page-title').textContent = titles[pageId] || '';
-      
-      // تحميل البيانات عند فتح الصفحة
-      if (pageId === 'students') loadData('students');
-      if (pageId === 'teachers') loadData('teachers');
-      if (pageId === 'fees') loadData('fees');
-      if (pageId === 'dashboard') loadDashboard();
+
+      const contentDiv = document.getElementById('main-content');
+      const titles = {dashboard:'لوحة التحكم', reports:'التقارير'};
+      document.getElementById('page-title').textContent = titles[pageId] || tableConfigs[pageId]?.title || '';
+
+      if (pageId === 'dashboard') {
+        contentDiv.innerHTML = `
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="bg-white rounded-xl shadow-sm p-6 border-r-4 border-blue-500"><p class="text-gray-500 text-sm">إجمالي الطلاب</p><p class="text-3xl font-bold mt-2 text-gray-800" id="dash-students">...</p></div>
+            <div class="bg-white rounded-xl shadow-sm p-6 border-r-4 border-green-500"><p class="text-gray-500 text-sm">المعلمون</p><p class="text-3xl font-bold mt-2 text-gray-800" id="dash-teachers">...</p></div>
+            <div class="bg-white rounded-xl shadow-sm p-6 border-r-4 border-yellow-500"><p class="text-gray-500 text-sm">الإيرادات</p><p class="text-3xl font-bold mt-2 text-gray-800" id="dash-revenue">...</p></div>
+            <div class="bg-white rounded-xl shadow-sm p-6 border-r-4 border-purple-500"><p class="text-gray-500 text-sm">المصروفات</p><p class="text-3xl font-bold mt-2 text-gray-800" id="dash-expenses">...</p></div>
+          </div>`;
+        loadDashboard();
+      } 
+      else if (pageId === 'reports') {
+        contentDiv.innerHTML = `
+          <div class="bg-white rounded-xl shadow-sm p-6">
+            <h3 class="text-xl font-bold mb-6">📄 التقارير المتاحة</h3>
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              <a href="/api/reports/students" target="_blank" class="bg-gradient-to-br from-blue-500 to-blue-600 text-white p-6 rounded-xl hover:shadow-lg transition flex items-center gap-4">
+                <span class="text-4xl">👥</span>
+                <div><h4 class="font-bold text-lg">تقرير الطلاب</h4><p class="text-sm opacity-90">عرض وطباعة بيانات الطلاب</p></div>
+              </a>
+            </div>
+          </div>`;
+      }
+      else if (tableConfigs[pageId]) {
+        currentTable = pageId;
+        const config = tableConfigs[pageId];
+        contentDiv.innerHTML = `
+          <div class="bg-white rounded-xl shadow-sm p-6">
+            <div class="flex justify-between items-center mb-6">
+              <h3 class="text-xl font-bold">إدارة ${config.title}</h3>
+              <button onclick="openModal()" class="btn-add">+ إضافة جديد</button>
+            </div>
+            <div class="overflow-x-auto">
+              <table class="w-full text-sm">
+                <thead class="bg-gray-50"><tr>
+                  ${config.columns.map(c => `<th class="px-4 py-3 text-right">${c.label}</th>`).join('')}
+                  <th class="px-4 py-3 text-right">الإجراءات</th>
+                </tr></thead>
+                <tbody id="dynamic-table-body">
+                  <tr><td colspan="100" class="text-center py-8 text-gray-500">جاري تحميل البيانات...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>`;
+        loadData(pageId);
+      }
     }
 
-    // 4. دوال جلب البيانات (مع إرسال دور المستخدم في الـ Headers)
+    // 5. دالة جلب البيانات (مع إرسال الصلاحية)
     async function loadData(table) {
       try {
         const res = await fetch(`/api/${table}`, { headers: { 'x-user-role': userRole } });
         const data = await res.json();
         
         if (!data.success) {
-          showToast('⛔ ' + (data.message || 'خطأ في الصلاحيات'), 'error');
+          document.getElementById('dynamic-table-body').innerHTML = `<tr><td colspan="100" class="text-center py-8 text-red-500 font-bold">⛔ ${data.message}</td></tr>`;
           return;
         }
 
-        if (table === 'students') {
-          document.getElementById('students-table').innerHTML = data.data.length ? data.data.map(s => 
-            `<tr class="border-b hover:bg-gray-50 transition">
-              <td class="px-4 py-3 font-semibold">${s.name}</td>
-              <td class="px-4 py-3">${s.grade}</td>
-              <td class="px-4 py-3">${s.section}</td>
-              <td class="px-4 py-3"><span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs font-bold">${s.status}</span></td>
-              <td class="px-4 py-3"><button onclick="deleteItem('students', ${s.id}, '${s.name}')" class="btn-action btn-delete">🗑️ حذف</button></td>
-            </tr>`
-          ).join('') : '<tr><td colspan="5" class="text-center py-8 text-gray-500">لا توجد بيانات</td></tr>';
-          document.getElementById('total-students').textContent = data.count;
-          
-        } else if (table === 'teachers') {
-          document.getElementById('teachers-list').innerHTML = data.data.length ? data.data.map(t => 
-            `<div class="bg-blue-50 p-5 rounded-xl border border-blue-100 shadow-sm">
-              <div class="flex items-center gap-3 mb-3"><div class="w-10 h-10 bg-blue-500 text-white rounded-full flex items-center justify-center font-bold">${t.name.charAt(0)}</div><h4 class="font-bold text-gray-800">${t.name}</h4></div>
-              <p class="text-sm text-gray-600 mb-1">📱 ${t.phone || 'غير محدد'}</p>
-              <p class="text-sm font-semibold text-blue-700 mt-3">💰 ${t.salary || 0} جنيه</p>
-            </div>`
-          ).join('') : '<p class="text-center text-gray-500 col-span-3">لا توجد بيانات</p>';
-          document.getElementById('total-teachers').textContent = data.count;
-          
-        } else if (table === 'fees') {
-          document.getElementById('fees-list').innerHTML = data.data.length ? data.data.map(f => 
-            `<div class="flex justify-between items-center p-4 bg-gray-50 rounded-lg border border-gray-100">
-              <div><p class="font-bold text-gray-800">${f.student_name}</p><p class="text-xs text-gray-500 mt-1">${f.status === 'paid' ? '✅ مدفوع' : '⏳ غير مدفوع'}</p></div>
-              <p class="font-bold text-lg text-green-600">${f.amount} جنيه</p>
-            </div>`
-          ).join('') : '<p class="text-center text-gray-500">لا توجد بيانات</p>';
+        const config = tableConfigs[table];
+        if (data.data.length === 0) {
+          document.getElementById('dynamic-table-body').innerHTML = `<tr><td colspan="100" class="text-center py-8 text-gray-500">لا توجد بيانات لعرضها</td></tr>`;
+          return;
         }
+
+        document.getElementById('dynamic-table-body').innerHTML = data.data.map(row => `
+          <tr class="border-b hover:bg-gray-50 transition">
+            ${config.columns.map(c => `<td class="px-4 py-3">${row[c.key] || '-'}</td>`).join('')}
+            <td class="px-4 py-3">
+              <button onclick="deleteItem('${table}', ${row.id})" class="btn-action btn-delete">🗑️ حذف</button>
+            </td>
+          </tr>
+        `).join('');
       } catch (err) {
-        showToast('❌ خطأ في الاتصال', 'error');
+        document.getElementById('dynamic-table-body').innerHTML = `<tr><td colspan="100" class="text-center py-8 text-red-500">❌ خطأ في الاتصال</td></tr>`;
       }
     }
 
     async function loadDashboard() {
-      loadData('students');
-      loadData('teachers');
+      // جلب أرقام سريعة للوحة التحكم
+      const tablesToCheck = ['students', 'teachers', 'revenue', 'expenses'];
+      for (const t of tablesToCheck) {
+        try {
+          const res = await fetch(`/api/${t}`, { headers: { 'x-user-role': userRole } });
+          const data = await res.json();
+          if (data.success) {
+            const el = document.getElementById(`dash-${t}`);
+            if (el) {
+              if (t === 'revenue' || t === 'expenses') {
+                const total = data.data.reduce((sum, item) => sum + (Number(item.amount) || 0), 0);
+                el.textContent = total.toLocaleString() + ' جنيه';
+              } else {
+                el.textContent = data.count;
+              }
+            }
+          }
+        } catch(e) {}
+      }
     }
 
-    // 5. دوال النافذة المنبثقة (Modal)
-    function openModal(table) {
-      currentTable = table; currentEditId = null;
-      const config = formConfigs[table];
-      document.getElementById('modal-title').textContent = config.title;
+    // 6. إدارة النافذة المنبثقة (Modal)
+    function openModal() {
+      const config = tableConfigs[currentTable];
+      document.getElementById('modal-title').textContent = `إضافة ${config.title.replace('إدارة ', '')}`;
       
-      document.getElementById('modal-form').innerHTML = config.fields.map(f => {
+      document.getElementById('modal-form').innerHTML = config.form.map(f => {
         if (f.type === 'select') {
           return `<label class="block text-sm font-semibold text-gray-700 mb-1">${f.label} *</label>
                   <select name="${f.name}" class="form-input" required>${f.options.map(o => `<option value="${o}">${o}</option>`).join('')}</select>`;
@@ -296,38 +287,34 @@
 
     function closeModal() { document.getElementById('modal').classList.remove('show'); }
 
-    // 6. معالجة إرسال النموذج
+    // 7. معالجة الإرسال والحذف
     document.getElementById('modal-form').addEventListener('submit', async (e) => {
       e.preventDefault();
       const formData = new FormData(e.target);
       const data = {}; formData.forEach((v, k) => data[k] = v);
       
-      const method = currentEditId ? 'PUT' : 'POST';
-      const url = currentEditId ? `/api/${currentTable}/${currentEditId}` : `/api/${currentTable}`;
-      
       try {
-        const res = await fetch(url, { 
-          method, 
+        const res = await fetch(`/api/${currentTable}`, { 
+          method: 'POST', 
           headers: { 'Content-Type': 'application/json', 'x-user-role': userRole }, 
           body: JSON.stringify(data) 
         });
         const result = await res.json();
         
         if (result.success) {
-          showToast(currentEditId ? '✅ تم التعديل بنجاح' : '✅ تمت الإضافة بنجاح');
+          showToast('✅ تمت الإضافة بنجاح');
           closeModal();
           loadData(currentTable);
         } else {
-          showToast('❌ ' + (result.message || 'فشل العملية'), 'error');
+          showToast('❌ ' + result.message, 'error');
         }
       } catch (err) {
         showToast('❌ خطأ في الاتصال بالخادم', 'error');
       }
     });
 
-    // 7. دالة الحذف
-    async function deleteItem(table, id, name) {
-      if (!confirm(`هل أنت متأكد من حذف "${name}"؟ لا يمكن التراجع عن هذا الإجراء.`)) return;
+    async function deleteItem(table, id) {
+      if (!confirm('هل أنت متأكد من الحذف؟ لا يمكن التراجع عن هذا الإجراء.')) return;
       try {
         const res = await fetch(`/api/${table}/${id}`, { method: 'DELETE', headers: { 'x-user-role': userRole } });
         const result = await res.json();
@@ -342,7 +329,6 @@
       }
     }
 
-    // 8. أدوات مساعدة
     function showToast(msg, type = 'success') {
       const t = document.getElementById('toast');
       t.textContent = msg; 
@@ -360,7 +346,7 @@
 
     // التشغيل الأولي
     buildSidebar();
-    loadDashboard();
+    showPage('dashboard');
   </script>
 </body>
 </html>
