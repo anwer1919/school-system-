@@ -6,14 +6,15 @@
   <title>تسجيل الدخول - مدرسة النور</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
-  <style>body { font-family: 'Cairo', sans-serif; } .gradient-bg { background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%); }</style>
+  <style>body { font-family: 'Cairo', sans-serif; }</style>
 </head>
-<body class="gradient-bg min-h-screen flex items-center justify-center p-4">
-  <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl p-8">
+<body class="bg-gradient-to-br from-blue-900 via-blue-800 to-indigo-900 min-h-screen flex items-center justify-center p-4">
+  
+  <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl p-8 transform transition-all hover:scale-[1.01]">
     <div class="text-center mb-8">
-      <div class="w-20 h-20 bg-blue-100 rounded-full mx-auto flex items-center justify-center text-4xl mb-4">🏫</div>
+      <div class="w-20 h-20 bg-blue-100 rounded-full mx-auto flex items-center justify-center text-4xl mb-4 shadow-inner">🏫</div>
       <h1 class="text-3xl font-bold text-gray-800">مدرسة النور</h1>
-      <p class="text-gray-500 mt-2">نظام الإدارة المتكامل</p>
+      <p class="text-gray-500 mt-2">نظام الإدارة المدرسي المتكامل</p>
     </div>
 
     <form id="loginForm" class="space-y-6">
@@ -25,60 +26,62 @@
         <label class="block text-gray-700 font-semibold mb-2">كلمة المرور</label>
         <input type="password" id="password" required class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none transition" placeholder="••••••••">
       </div>
-      <button type="submit" id="loginBtn" class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 transition transform hover:scale-[1.02]">تسجيل الدخول</button>
+      <button type="submit" id="loginBtn" class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 transition shadow-lg hover:shadow-xl">تسجيل الدخول</button>
     </form>
 
-    <div id="errorMessage" class="hidden mt-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg text-center">❌ البريد الإلكتروني أو كلمة المرور غير صحيحة</div>
+    <div id="errorMessage" class="hidden mt-4 p-4 bg-red-50 border border-red-200 text-red-700 rounded-lg text-center font-semibold"></div>
 
-    <div class="mt-8 p-4 bg-blue-50 rounded-lg border border-blue-100">
-      <p class="text-sm font-bold text-blue-900 mb-2">🔑 بيانات الدخول:</p>
-      <p class="text-xs text-blue-700 mb-1">👑 المدير: <code class="bg-white px-2 py-1 rounded border">admin@school.com</code></p>
-      <p class="text-xs text-blue-700 mb-1">📝 تسجيل الطلاب: <code class="bg-white px-2 py-1 rounded border">students@school.com</code></p>
-      <p class="text-xs text-blue-700 mb-1">📊 التقارير: <code class="bg-white px-2 py-1 rounded border">reports@school.com</code></p>
-      <p class="text-xs text-blue-700">💰 الشؤون المالية: <code class="bg-white px-2 py-1 rounded border">finance@school.com</code></p>
-      <p class="text-xs text-blue-700 mt-2">كلمة المرور للجميع: <code class="bg-white px-2 py-1 rounded border">123456</code></p>
+    <div class="mt-8 p-4 bg-blue-50 rounded-lg border border-blue-100 text-sm">
+      <p class="font-bold text-blue-900 mb-3 text-center">🔑 بيانات الدخول التجريبية (كلمة المرور: 123456)</p>
+      <div class="space-y-2">
+        <div class="flex justify-between"><span>👑 المدير:</span> <code class="bg-white px-2 py-0.5 rounded border text-blue-700">admin@school.com</code></div>
+        <div class="flex justify-between"><span>📝 تسجيل الطلاب:</span> <code class="bg-white px-2 py-0.5 rounded border text-blue-700">students@school.com</code></div>
+        <div class="flex justify-between"><span>💰 الشؤون المالية:</span> <code class="bg-white px-2 py-0.5 rounded border text-blue-700">finance@school.com</code></div>
+      </div>
     </div>
   </div>
 
   <script>
+    // إذا كان المستخدم مسجلاً دخوله بالفعل، حوّله مباشرة للوحة التحكم
     if (localStorage.getItem('user')) {
       window.location.href = '/';
     }
 
     document.getElementById('loginForm').addEventListener('submit', async (e) => {
       e.preventDefault();
-      const email = document.getElementById('email').value;
-      const password = document.getElementById('password').value;
-      const loginBtn = document.getElementById('loginBtn');
+      const btn = document.getElementById('loginBtn');
       const errorMsg = document.getElementById('errorMessage');
       
-      loginBtn.disabled = true;
-      loginBtn.textContent = 'جاري التحقق...';
+      btn.disabled = true; 
+      btn.innerHTML = '<span class="animate-pulse">جاري التحقق...</span>'; 
       errorMsg.classList.add('hidden');
       
       try {
-        const response = await fetch('/api/login', {
+        const res = await fetch('/api/login', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email, password })
+          body: JSON.stringify({ 
+            email: document.getElementById('email').value, 
+            password: document.getElementById('password').value 
+          })
         });
-        
-        const data = await response.json();
+        const data = await res.json();
         
         if (data.success) {
+          // حفظ بيانات المستخدم ودوره في المتصفح
           localStorage.setItem('user', JSON.stringify(data.user));
-          window.location.href = '/';
+          window.location.href = '/'; // التوجيه للوحة التحكم
         } else {
-          errorMsg.textContent = '❌ ' + (data.message || 'بيانات الدخول غير صحيحة');
+          errorMsg.textContent = '❌ ' + data.message;
           errorMsg.classList.remove('hidden');
-          loginBtn.disabled = false;
-          loginBtn.textContent = 'تسجيل الدخول';
+          btn.disabled = false; 
+          btn.textContent = 'تسجيل الدخول';
         }
-      } catch (error) {
+      } catch (err) {
         errorMsg.textContent = '❌ حدث خطأ في الاتصال بالخادم';
         errorMsg.classList.remove('hidden');
-        loginBtn.disabled = false;
-        loginBtn.textContent = 'تسجيل الدخول';
+        btn.disabled = false; 
+        btn.textContent = 'تسجيل الدخول';
       }
     });
   </script>
