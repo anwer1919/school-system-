@@ -1,105 +1,70 @@
 <!DOCTYPE html>
-<html dir="rtl" lang="ar">
+<html dir="rtl">
 <head>
   <meta charset="UTF-8">
   <title>اختبار قاعدة البيانات</title>
   <style>
-    body { font-family: Arial; padding: 40px; background: #f5f5f5; }
-    .box { background: white; padding: 20px; border-radius: 10px; margin: 20px 0; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-    button { padding: 15px 30px; font-size: 18px; background: #3b82f6; color: white; border: none; border-radius: 8px; cursor: pointer; margin: 10px; }
+    body { font-family: Arial; padding: 50px; text-align: center; background: #f5f5f5; }
+    button { padding: 20px 40px; font-size: 24px; background: #3b82f6; color: white; border: none; border-radius: 10px; cursor: pointer; margin: 20px; }
     button:hover { background: #2563eb; }
-    table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-    th, td { padding: 12px; border: 1px solid #ddd; text-align: right; }
-    th { background: #1e40af; color: white; }
-    tr:nth-child(even) { background: #f9f9f9; }
-    .success { color: green; font-weight: bold; }
-    .error { color: red; font-weight: bold; }
-    pre { background: #f0f0f0; padding: 15px; border-radius: 5px; overflow-x: auto; }
+    pre { background: white; padding: 20px; margin: 20px auto; max-width: 800px; text-align: right; direction: ltr; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
+    .status { font-size: 18px; margin: 20px; padding: 15px; border-radius: 8px; }
+    .success { background: #d1fae5; color: #065f46; }
+    .error { background: #fee2e2; color: #991b1b; }
   </style>
 </head>
 <body>
-  <h1>🧪 اختبار قاعدة البيانات - مدرسة النور</h1>
+  <h1>🧪 اختبار قاعدة البيانات</h1>
+  <button onclick="test()">📥 جلب بيانات الطلاب</button>
   
-  <div class="box">
-    <h2>1️⃣ جلب بيانات الطلاب</h2>
-    <button onclick="fetchStudents()">📥 جلب الطلاب</button>
-    <div id="students-result"></div>
-  </div>
-
-  <div class="box">
-    <h2>2️⃣ إضافة طالب جديد</h2>
-    <input type="text" id="new-student-name" placeholder="اسم الطالب" style="padding: 10px; width: 200px;">
-    <button onclick="addStudent()">➕ إضافة</button>
-    <div id="add-result"></div>
-  </div>
-
-  <div class="box">
-    <h2>3️⃣ عرض التقرير (للمقارنة)</h2>
-    <a href="/api/reports/students" target="_blank"><button>📄 فتح تقرير الطلاب</button></a>
-  </div>
+  <div id="status"></div>
+  <pre id="result"></pre>
 
   <script>
-    async function fetchStudents() {
-      const resultDiv = document.getElementById('students-result');
-      resultDiv.innerHTML = '⏳ جاري التحميل...';
+    async function test() {
+      const statusDiv = document.getElementById('status');
+      const resultPre = document.getElementById('result');
+      
+      statusDiv.className = 'status';
+      statusDiv.innerText = '⏳ جاري الاتصال بالخادم...';
+      resultPre.innerText = '';
       
       try {
         const response = await fetch('/api/students');
-        const data = await response.json();
         
-        if (data.success && data.data && data.data.length > 0) {
-          let html = '<p class="success">✅ تم جلب ' + data.count + ' طالب بنجاح!</p>';
-          html += '<table><tr><th>الرقم</th><th>الاسم</th><th>الصف</th><th>الشعبة</th><th>الحالة</th></tr>';
-          data.data.forEach(s => {
-            html += '<tr>';
-            html += '<td>' + s.id + '</td>';
-            html += '<td>' + s.name + '</td>';
-            html += '<td>' + (s.grade || '-') + '</td>';
-            html += '<td>' + (s.section || '-') + '</td>';
-            html += '<td>' + (s.status || '-') + '</td>';
-            html += '</tr>';
-          });
-          html += '</table>';
-          resultDiv.innerHTML = html;
-        } else {
-          resultDiv.innerHTML = '<p class="error">⚠️ لا توجد بيانات في الجدول</p>';
-          resultDiv.innerHTML += '<pre>' + JSON.stringify(data, null, 2) + '</pre>';
-        }
-      } catch (err) {
-        resultDiv.innerHTML = '<p class="error">❌ خطأ: ' + err.message + '</p>';
-      }
-    }
-
-    async function addStudent() {
-      const name = document.getElementById('new-student-name').value;
-      if (!name) { alert('اكتب اسم الطالب'); return; }
-      
-      const resultDiv = document.getElementById('add-result');
-      resultDiv.innerHTML = '⏳ جاري الإضافة...';
-      
-      try {
-        const response = await fetch('/api/students', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            name: name,
-            grade: 'الصف الأول',
-            section: 'أ',
-            status: 'نشط'
-          })
-        });
-        const data = await response.json();
+        // التحقق من نوع الاستجابة
+        const contentType = response.headers.get('content-type');
+        console.log('Content-Type:', contentType);
+        console.log('Status:', response.status);
         
-        if (data.success) {
-          resultDiv.innerHTML = '<p class="success">✅ تم إضافة الطالب بنجاح!</p>';
-          resultDiv.innerHTML += '<pre>' + JSON.stringify(data.data, null, 2) + '</pre>';
-          // إعادة جلب البيانات
-          fetchStudents();
-        } else {
-          resultDiv.innerHTML = '<p class="error">❌ فشل الإضافة: ' + data.message + '</p>';
+        if (!contentType || !contentType.includes('application/json')) {
+          statusDiv.className = 'status error';
+          statusDiv.innerText = '❌ الخادم لم يرجع JSON! Content-Type: ' + contentType;
+          const text = await response.text();
+          resultPre.innerText = 'الاستجابة كانت:\n' + text.substring(0, 500);
+          return;
         }
+        
+        const json = await response.json();
+        
+        if (json.success && json.data && json.data.length > 0) {
+          statusDiv.className = 'status success';
+          statusDiv.innerText = '✅ نجح! تم جلب ' + json.count + ' طالب';
+          resultPre.innerText = JSON.stringify(json, null, 2);
+        } else if (json.success && json.data.length === 0) {
+          statusDiv.className = 'status error';
+          statusDiv.innerText = '⚠️ الاتصال ناجح لكن لا توجد بيانات في الجدول';
+          resultPre.innerText = JSON.stringify(json, null, 2);
+        } else {
+          statusDiv.className = 'status error';
+          statusDiv.innerText = '❌ فشل: ' + (json.error || 'خطأ غير معروف');
+          resultPre.innerText = JSON.stringify(json, null, 2);
+        }
+        
       } catch (err) {
-        resultDiv.innerHTML = '<p class="error">❌ خطأ: ' + err.message + '</p>';
+        statusDiv.className = 'status error';
+        statusDiv.innerText = '❌ خطأ في الاتصال: ' + err.message;
+        resultPre.innerText = err.stack;
       }
     }
   </script>
