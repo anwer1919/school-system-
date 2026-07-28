@@ -1,72 +1,74 @@
 <!DOCTYPE html>
-<html dir="rtl">
+<html dir="rtl" lang="ar">
 <head>
   <meta charset="UTF-8">
-  <title>اختبار قاعدة البيانات</title>
-  <style>
-    body { font-family: Arial; padding: 50px; text-align: center; background: #f5f5f5; }
-    button { padding: 20px 40px; font-size: 24px; background: #3b82f6; color: white; border: none; border-radius: 10px; cursor: pointer; margin: 20px; }
-    button:hover { background: #2563eb; }
-    pre { background: white; padding: 20px; margin: 20px auto; max-width: 800px; text-align: right; direction: ltr; border-radius: 10px; box-shadow: 0 2px 4px rgba(0,0,0,0.1); }
-    .status { font-size: 18px; margin: 20px; padding: 15px; border-radius: 8px; }
-    .success { background: #d1fae5; color: #065f46; }
-    .error { background: #fee2e2; color: #991b1b; }
-  </style>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>تسجيل الدخول - مدرسة النور</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>body { font-family: 'Cairo', sans-serif; }</style>
 </head>
-<body>
-  <h1>🧪 اختبار قاعدة البيانات</h1>
-  <button onclick="test()">📥 جلب بيانات الطلاب</button>
-  
-  <div id="status"></div>
-  <pre id="result"></pre>
+<body class="bg-gradient-to-br from-blue-900 to-blue-700 min-h-screen flex items-center justify-center p-4">
+  <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl p-8">
+    <div class="text-center mb-8">
+      <div class="w-20 h-20 bg-blue-100 rounded-full mx-auto flex items-center justify-center text-4xl mb-4">🏫</div>
+      <h1 class="text-3xl font-bold text-gray-800">مدرسة النور</h1>
+      <p class="text-gray-500 mt-2">نظام الإدارة المتكامل</p>
+    </div>
+
+    <form id="loginForm" class="space-y-6">
+      <div>
+        <label class="block text-gray-700 font-semibold mb-2">البريد الإلكتروني</label>
+        <input type="email" id="email" required class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none" placeholder="admin@school.com">
+      </div>
+      <div>
+        <label class="block text-gray-700 font-semibold mb-2">كلمة المرور</label>
+        <input type="password" id="password" required class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none" placeholder="••••••••">
+      </div>
+      <button type="submit" id="loginBtn" class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 transition">تسجيل الدخول</button>
+    </form>
+
+    <div id="errorMessage" class="hidden mt-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg text-center"></div>
+
+    <div class="mt-8 p-4 bg-blue-50 rounded-lg border border-blue-100 text-sm">
+      <p class="font-bold text-blue-900 mb-2">🔑 بيانات تجريبية (كلمة المرور: 123456):</p>
+      <p>👑 مدير: <code class="bg-white px-2 rounded">admin@school.com</code></p>
+      <p>📝 تسجيل: <code class="bg-white px-2 rounded">students@school.com</code></p>
+      <p>💰 مالية: <code class="bg-white px-2 rounded">finance@school.com</code></p>
+    </div>
+  </div>
 
   <script>
-    async function test() {
-      const statusDiv = document.getElementById('status');
-      const resultPre = document.getElementById('result');
-      
-      statusDiv.className = 'status';
-      statusDiv.innerText = '⏳ جاري الاتصال بالخادم...';
-      resultPre.innerText = '';
+    if (localStorage.getItem('user')) window.location.href = '/';
+
+    document.getElementById('loginForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const btn = document.getElementById('loginBtn');
+      const errorMsg = document.getElementById('errorMessage');
+      btn.disabled = true; btn.textContent = 'جاري التحقق...'; errorMsg.classList.add('hidden');
       
       try {
-        const response = await fetch('/api/students');
+        const res = await fetch('/api/login', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: document.getElementById('email').value, password: document.getElementById('password').value })
+        });
+        const data = await res.json();
         
-        // التحقق من نوع الاستجابة
-        const contentType = response.headers.get('content-type');
-        console.log('Content-Type:', contentType);
-        console.log('Status:', response.status);
-        
-        if (!contentType || !contentType.includes('application/json')) {
-          statusDiv.className = 'status error';
-          statusDiv.innerText = '❌ الخادم لم يرجع JSON! Content-Type: ' + contentType;
-          const text = await response.text();
-          resultPre.innerText = 'الاستجابة كانت:\n' + text.substring(0, 500);
-          return;
-        }
-        
-        const json = await response.json();
-        
-        if (json.success && json.data && json.data.length > 0) {
-          statusDiv.className = 'status success';
-          statusDiv.innerText = '✅ نجح! تم جلب ' + json.count + ' طالب';
-          resultPre.innerText = JSON.stringify(json, null, 2);
-        } else if (json.success && json.data.length === 0) {
-          statusDiv.className = 'status error';
-          statusDiv.innerText = '⚠️ الاتصال ناجح لكن لا توجد بيانات في الجدول';
-          resultPre.innerText = JSON.stringify(json, null, 2);
+        if (data.success) {
+          localStorage.setItem('user', JSON.stringify(data.user));
+          window.location.href = '/';
         } else {
-          statusDiv.className = 'status error';
-          statusDiv.innerText = '❌ فشل: ' + (json.error || 'خطأ غير معروف');
-          resultPre.innerText = JSON.stringify(json, null, 2);
+          errorMsg.textContent = '❌ ' + data.message;
+          errorMsg.classList.remove('hidden');
+          btn.disabled = false; btn.textContent = 'تسجيل الدخول';
         }
-        
       } catch (err) {
-        statusDiv.className = 'status error';
-        statusDiv.innerText = '❌ خطأ في الاتصال: ' + err.message;
-        resultPre.innerText = err.stack;
+        errorMsg.textContent = '❌ خطأ في الاتصال';
+        errorMsg.classList.remove('hidden');
+        btn.disabled = false; btn.textContent = 'تسجيل الدخول';
       }
-    }
+    });
   </script>
 </body>
 </html>
