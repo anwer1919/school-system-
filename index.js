@@ -11,6 +11,15 @@ app.use(express.static('public'));
 
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
 
+// ======== الصفحات ========
+app.get('/', (req, res) => {
+  res.sendFile(__dirname + '/public/index.html');
+});
+
+app.get('/login', (req, res) => {
+  res.sendFile(__dirname + '/public/login.html');
+});
+
 // ======== نظام الصلاحيات ========
 const rolePermissions = {
   'مدير': ['*'],
@@ -26,12 +35,12 @@ function checkPermission(table) {
     if (permissions.includes('*') || permissions.includes(table)) {
       next();
     } else {
-      res.status(403).json({ success: false, message: '⛔ ليس لديك صلاحية للوصول' });
+      res.status(403).json({ success: false, message: '⛔ ليس لديك صلاحية' });
     }
   };
 }
 
-// ======== المصادقة ========
+// ======== تسجيل الدخول ========
 app.post('/api/login', async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -51,7 +60,7 @@ app.post('/api/login', async (req, res) => {
   }
 });
 
-// ======== إدارة البيانات (CRUD) ========
+// ======== إدارة البيانات ========
 const tables = ['students', 'teachers', 'employees', 'parents', 'attendance', 'fees', 'grades', 'exams', 'schedules', 'revenue', 'expenses', 'clinic', 'transport', 'library', 'inventory', 'calendar_events', 'audit_log', 'school_info'];
 
 // GET
@@ -65,56 +74,4 @@ tables.forEach(table => {
       res.status(500).json({ success: false, message: 'خطأ في الخادم' });
     }
   });
-});
-app.get('/login', (req, res) => {
-  res.sendFile(__dirname + '/public/login.html');
-});
-// POST
-tables.forEach(table => {
-  app.post(`/api/${table}`, checkPermission(table), async (req, res) => {
-    try {
-      const { data, error } = await supabase.from(table).insert([req.body]).select();
-      if (error) return res.status(500).json({ success: false, message: error.message });
-      res.json({ success: true, data: data[0], message: '✅ تمت الإضافة بنجاح' });
-    } catch (err) {
-      res.status(500).json({ success: false, message: 'خطأ في الخادم' });
-    }
-  });
-});
-
-// PUT
-tables.forEach(table => {
-  app.put(`/api/${table}/:id`, checkPermission(table), async (req, res) => {
-    try {
-      const { data, error } = await supabase.from(table).update(req.body).eq('id', req.params.id).select();
-      if (error) return res.status(500).json({ success: false, message: error.message });
-      res.json({ success: true, message: '✅ تم التعديل بنجاح' });
-    } catch (err) {
-      res.status(500).json({ success: false, message: 'خطأ في الخادم' });
-    }
-  });
-});
-
-// DELETE
-tables.forEach(table => {
-  app.delete(`/api/${table}/:id`, checkPermission(table), async (req, res) => {
-    try {
-      const { error } = await supabase.from(table).delete().eq('id', req.params.id);
-      if (error) return res.status(500).json({ success: false, message: error.message });
-      res.json({ success: true, message: '🗑️ تم الحذف بنجاح' });
-    } catch (err) {
-      res.status(500).json({ success: false, message: 'خطأ في الخادم' });
-    }
-  });
-});
-
-// ======== التقارير ========
-app.get('/api/reports/students', async (req, res) => {
-  const { data } = await supabase.from('students').select('*');
-  const rows = (data || []).map(s => `<tr><td>${s.id}</td><td>${s.name}</td><td>${s.grade}</td><td>${s.section}</td><td>${s.status}</td></tr>`).join('');
-  res.send(`<h1 style="text-align:center">تقرير الطلاب</h1><table border="1" style="width:100%;text-align:center"><tr><th>م</th><th>الاسم</th><th>الصف</th><th>الشعبة</th><th>الحالة</th></tr>${rows}</table>`);
-});
-
-app.listen(process.env.PORT || 3000, () => {
-  console.log(`🚀 النظام يعمل على المنفذ ${process.env.PORT || 3000}`);
 });
