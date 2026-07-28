@@ -7,7 +7,8 @@ const { createClient } = require('@supabase/supabase-js');
 const app = express();
 app.use(cors());
 app.use(express.json());
-app.use(express.static('public', { maxAge: 0, etag: false }));
+app.use(express.static('public'));
+
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
 
 // الصفحات
@@ -36,7 +37,7 @@ app.post('/api/login', async (req, res) => {
 // كل الجداول
 const tables = ['students', 'teachers', 'employees', 'parents', 'subjects', 'exams', 'grades', 'schedules', 'attendance', 'fees', 'revenue', 'expenses', 'transport', 'clinic', 'library', 'inventory', 'calendar_events', 'audit_log', 'school_info'];
 
-// GET - بدون صلاحيات (للعرض فقط)
+// GET
 tables.forEach(table => {
   app.get(`/api/${table}`, async (req, res) => {
     try {
@@ -57,7 +58,7 @@ tables.forEach(table => {
   });
 });
 
-// POST - إضافة
+// POST
 tables.forEach(table => {
   app.post(`/api/${table}`, async (req, res) => {
     try {
@@ -75,7 +76,7 @@ tables.forEach(table => {
   });
 });
 
-// PUT - تعديل
+// PUT
 tables.forEach(table => {
   app.put(`/api/${table}/:id`, async (req, res) => {
     try {
@@ -88,7 +89,7 @@ tables.forEach(table => {
   });
 });
 
-// DELETE - حذف
+// DELETE
 tables.forEach(table => {
   app.delete(`/api/${table}/:id`, async (req, res) => {
     try {
@@ -101,32 +102,22 @@ tables.forEach(table => {
   });
 });
 
-// الشهادات
-// الشهادات - بدون تحقق من الصلاحيات (صفحة عرض عامة)
+// الشهادات - نسخة مبسطة ومضمونة
 app.get('/certificate/:id', async (req, res) => {
   try {
-    console.log(`🎓 طلب شهادة للطالب ID: ${req.params.id}`);
-    // عرض أسماء الطلاب في الدرجات للتشخيص
-if (gradesData && gradesData.length > 0) {
-  console.log('📋 أسماء الطلاب في الدرجات:', gradesData.map(g => g.student_name));
-  console.log('📋 اسم الطالب المطلوب:', student.name);
-}
+    const studentId = parseInt(req.params.id);
+    console.log(`🎓 طلب شهادة للطالب ID: ${studentId}`);
+    
+    if (isNaN(studentId)) {
+      return res.status(400).send('معرف الطالب غير صحيح');
+    }
     
     // جلب بيانات المدرسة
     const { data: schoolData } = await supabase.from('school_info').select('*').limit(1);
     const school = schoolData?.[0] || { name: 'مدرسة النور', logo: '🏫', academic_year: '2026-2027' };
 
     // جلب بيانات الطالب
-    const { data: students, error: studentError } = await supabase
-      .from('students')
-      .select('*')
-      .eq('id', req.params.id)
-      .limit(1);
-    
-    if (studentError) {
-      console.error('❌ خطأ في جلب الطالب:', studentError.message);
-      return res.status(500).send('خطأ في جلب بيانات الطالب');
-    }
+    const { data: students } = await supabase.from('students').select('*').eq('id', studentId).limit(1);
     
     if (!students || students.length === 0) {
       return res.status(404).send('الطالب غير موجود');
@@ -136,15 +127,7 @@ if (gradesData && gradesData.length > 0) {
     console.log(`✅ الطالب: ${student.name}`);
 
     // جلب الدرجات باسم الطالب
-    const { data: gradesData, error: gradesError } = await supabase
-      .from('grades')
-      .select('*')
-      .eq('student_name', student.name);
-    
-    if (gradesError) {
-      console.error('❌ خطأ في جلب الدرجات:', gradesError.message);
-    }
-
+    const { data: gradesData } = await supabase.from('grades').select('*').eq('student_name', student.name);
     console.log(`📊 عدد الدرجات: ${gradesData?.length || 0}`);
     
     // حساب المجموع
@@ -159,104 +142,7 @@ if (gradesData && gradesData.length > 0) {
     const gColor = p >= 90 ? '#10b981' : p >= 80 ? '#3b82f6' : p >= 70 ? '#f59e0b' : '#ef4444';
     const today = new Date().toLocaleDateString('ar-EG', { year: 'numeric', month: 'long', day: 'numeric' });
 
-    res.send(`<!DOCTYPE html>
-<html dir="rtl" lang="ar">
-<head>
-  <meta charset="UTF-8">
-  <title>شهادة تقدير - ${student.name}</title>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
-  <style>
-    body { font-family: 'Cairo', sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 40px 20px; min-height: 100vh; }
-    .cert { max-width: 850px; margin: auto; background: #fffef5; padding: 50px; border: 20px double #d4af37; border-radius: 15px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
-    .header { text-align: center; border-bottom: 3px double #d4af37; padding-bottom: 20px; margin-bottom: 30px; }
-    .header h1 { color: #1e40af; font-size: 38px; font-weight: 700; }
-    .title { text-align: center; font-size: 42px; color: #d4af37; margin: 30px 0; font-weight: 700; }
-    .student-name { display: inline-block; font-size: 34px; color: #1e40af; font-weight: 700; border-bottom: 3px solid #d4af37; padding: 5px 40px 10px; }
-    table { width: 100%; border-collapse: collapse; margin: 30px 0; }
-    th { background: #1e40af; color: white; padding: 14px; }
-    td { padding: 12px; border: 1px solid #ddd; text-align: center; }
-    .total-row { background: #fef3c7; font-weight: 700; border-top: 3px solid #d4af37; }
-    .grade-badge { display: inline-block; padding: 8px 25px; background: ${gColor}; color: white; font-size: 22px; font-weight: 700; border-radius: 30px; }
-    .print-btn { display: block; margin: 25px auto; padding: 15px 50px; background: #1e40af; color: white; border: none; border-radius: 30px; font-size: 18px; cursor: pointer; }
-    @media print { body { background: white; padding: 0; } .cert { box-shadow: none; } .print-btn { display: none; } }
-  </style>
-</head>
-<body>
-  <div class="cert">
-    <div class="header">
-      <div style="font-size: 70px;">${school.logo || '🏫'}</div>
-      <h1>${school.name}</h1>
-      <div style="color: #d4af37; font-size: 18px; margin-top: 10px;">العام الدراسي: ${school.academic_year}</div>
-    </div>
-    
-    <div class="title">✨ شهادة تقدير ✨</div>
-    
-    <div style="text-align: center;">
-      <p style="font-size: 20px;">تشهد إدارة المدرسة بأن الطالب/ة</p>
-      <div class="student-name">${student.name}</div>
-      <p style="font-size: 18px; margin-top: 15px;">
-        بالصف <strong>${student.grade}</strong> - شعبة <strong>${student.section}</strong>
-      </p>
-    </div>
-    
-    ${gradesData && gradesData.length > 0 ? `
-      <table>
-        <thead>
-          <tr>
-            <th>م</th>
-            <th>المادة</th>
-            <th>درجة الطالب/ة</th>
-            <th>المجموع الكلي</th>
-            <th>النسبة</th>
-          </tr>
-        </thead>
-        <tbody>
-          ${gradesData.map((g, i) => `
-            <tr>
-              <td>${i + 1}</td>
-              <td style="font-weight: 600;">${g.subject}</td>
-              <td>${g.score}</td>
-              <td>${g.max_score}</td>
-              <td>${((g.score / g.max_score) * 100).toFixed(1)}%</td>
-            </tr>
-          `).join('')}
-          <tr class="total-row">
-            <td colspan="2" style="text-align: right; padding-right: 20px;">المجموع الكلي</td>
-            <td>${ts}</td>
-            <td>${tm}</td>
-            <td>${p}%</td>
-          </tr>
-        </tbody>
-      </table>
-      
-      <div style="background: #fef3c7; padding: 20px; border-radius: 15px; margin: 20px 0; border: 2px solid #d4af37; display: flex; justify-content: space-around;">
-        <div style="text-align: center;">
-          <div style="font-size: 16px; color: #92400e;">النسبة المئوية</div>
-          <div style="font-size: 32px; color: #1e40af; font-weight: 700;">${p}%</div>
-        </div>
-        <div style="text-align: center;">
-          <div style="font-size: 16px; color: #92400e;">التقدير النهائي</div>
-          <div class="grade-badge">${g}</div>
-        </div>
-      </div>
-    ` : '<p style="text-align: center; color: #999; padding: 20px;">لا توجد درجات مسجلة لهذا الطالب</p>'}
-    
-    <div style="display: flex; justify-content: space-between; margin-top: 60px; padding-top: 20px; border-top: 2px solid #d4af37;">
-      <div style="text-align: center; flex: 1;">
-        <div style="color: #666; margin-bottom: 40px;">التاريخ</div>
-        <div style="border-top: 2px solid #333; width: 180px; margin: 0 auto;"></div>
-        <div style="margin-top: 8px;">${today}</div>
-      </div>
-      <div style="text-align: center; flex: 1;">
-        <div style="color: #666; margin-bottom: 40px;">توقيع مدير المدرسة</div>
-        <div style="border-top: 2px solid #333; width: 180px; margin: 0 auto;"></div>
-      </div>
-    </div>
-  </div>
-  
-  <button class="print-btn" onclick="window.print()">🖨️ طباعة الشهادة</button>
-</body>
-</html>`);
+    res.send(`<!DOCTYPE html><html dir="rtl"><head><meta charset="UTF-8"><title>شهادة - ${student.name}</title><link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet"><style>body{font-family:'Cairo',sans-serif;background:linear-gradient(135deg,#667eea,#764ba2);padding:40px 20px}.cert{max-width:850px;margin:auto;background:#fffef5;padding:50px;border:20px double #d4af37;border-radius:15px}.header{text-align:center;border-bottom:3px double #d4af37;padding-bottom:20px;margin-bottom:30px}.header h1{color:#1e40af;font-size:38px}.title{text-align:center;font-size:42px;color:#d4af37;margin:30px 0;font-weight:700}.student-name{display:inline-block;font-size:34px;color:#1e40af;font-weight:700;border-bottom:3px solid #d4af37;padding:5px 40px 10px}table{width:100%;border-collapse:collapse;margin:30px 0}th{background:#1e40af;color:white;padding:14px}td{padding:12px;border:1px solid #ddd;text-align:center}.total-row{background:#fef3c7;font-weight:700;border-top:3px solid #d4af37}.grade-badge{padding:8px 25px;background:${gColor};color:white;font-size:22px;font-weight:700;border-radius:30px}.print-btn{display:block;margin:25px auto;padding:15px 50px;background:#1e40af;color:white;border:none;border-radius:30px;font-size:18px;cursor:pointer}@media print{body{background:white;padding:0}.cert{box-shadow:none}.print-btn{display:none}}</style></head><body><div class="cert"><div class="header"><div style="font-size:70px">${school.logo||'🏫'}</div><h1>${school.name}</h1><div style="color:#d4af37;font-size:18px">العام الدراسي: ${school.academic_year}</div></div><div class="title">✨ شهادة تقدير ✨</div><div style="text-align:center"><p style="font-size:20px">تشهد إدارة المدرسة بأن الطالب/ة</p><div class="student-name">${student.name}</div><p style="font-size:18px;margin-top:15px">بالصف <strong>${student.grade}</strong> - شعبة <strong>${student.section}</strong></p></div>${gradesData&&gradesData.length>0?`<table><thead><tr><th>م</th><th>المادة</th><th>درجة الطالب/ة</th><th>المجموع الكلي</th><th>النسبة</th></tr></thead><tbody>${gradesData.map((g,i)=>`<tr><td>${i+1}</td><td>${g.subject}</td><td>${g.score}</td><td>${g.max_score}</td><td>${((g.score/g.max_score)*100).toFixed(1)}%</td></tr>`).join('')}<tr class="total-row"><td colspan="2" style="text-align:right;padding-right:20px">المجموع الكلي</td><td>${ts}</td><td>${tm}</td><td>${p}%</td></tr></tbody></table><div style="background:#fef3c7;padding:20px;border-radius:15px;margin:20px 0;border:2px solid #d4af37;display:flex;justify-content:space-around"><div style="text-align:center"><div style="font-size:16px;color:#92400e">النسبة</div><div style="font-size:32px;color:#1e40af;font-weight:700">${p}%</div></div><div style="text-align:center"><div style="font-size:16px;color:#92400e">التقدير</div><div class="grade-badge">${g}</div></div></div>`:'<p style="text-align:center;color:#999;padding:20px">لا توجد درجات مسجلة</p>'}<div style="display:flex;justify-content:space-between;margin-top:60px;padding-top:20px;border-top:2px solid #d4af37"><div style="text-align:center;flex:1"><div style="color:#666;margin-bottom:40px">التاريخ</div><div style="border-top:2px solid #333;width:180px;margin:0 auto"></div><div style="margin-top:8px">${today}</div></div><div style="text-align:center;flex:1"><div style="color:#666;margin-bottom:40px">توقيع المدير</div><div style="border-top:2px solid #333;width:180px;margin:0 auto"></div></div></div></div><button class="print-btn" onclick="window.print()">🖨️ طباعة</button></body></html>`);
   } catch (err) {
     console.error('❌ خطأ في الشهادة:', err);
     res.status(500).send('خطأ في الخادم: ' + err.message);
