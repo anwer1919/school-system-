@@ -3,72 +3,248 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>تسجيل الدخول - مدرسة النور</title>
+  <title>نظام إدارة مدرسة النور</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
-  <style>body { font-family: 'Cairo', sans-serif; }</style>
+  <style>
+    body { font-family: 'Cairo', sans-serif; }
+    .nav-item { transition: all 0.2s; cursor: pointer; }
+    .nav-item:hover { background: rgba(255,255,255,0.1); }
+    .nav-item.active { background: rgba(255,255,255,0.2); border-right: 4px solid white; }
+    .modal { display: none; position: fixed; z-index: 1000; left: 0; top: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); backdrop-filter: blur(4px); }
+    .modal.show { display: flex; align-items: center; justify-content: center; }
+    .modal-content { background: white; padding: 30px; border-radius: 15px; max-width: 500px; width: 90%; max-height: 90vh; overflow-y: auto; }
+    .btn-add { background: linear-gradient(135deg, #10b981, #059669); color: white; padding: 10px 20px; border-radius: 8px; border: none; cursor: pointer; font-weight: 600; }
+    .btn-action { padding: 6px 12px; border-radius: 6px; font-size: 12px; margin: 0 2px; cursor: pointer; border: none; }
+    .btn-edit { background: #3b82f6; color: white; }
+    .btn-delete { background: #ef4444; color: white; }
+    .form-input { width: 100%; padding: 10px; border: 2px solid #e5e7eb; border-radius: 8px; margin-bottom: 15px; }
+    .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #10b981; color: white; padding: 15px 30px; border-radius: 10px; z-index: 2000; display: none; font-weight: bold; }
+    .toast.show { display: block; animation: slideDown 0.3s; }
+    @keyframes slideDown { from { top: -50px; opacity: 0; } to { top: 20px; opacity: 1; } }
+  </style>
 </head>
-<body class="bg-gradient-to-br from-blue-900 to-blue-700 min-h-screen flex items-center justify-center p-4">
-  <div class="bg-white w-full max-w-md rounded-2xl shadow-2xl p-8">
-    <div class="text-center mb-8">
-      <div class="w-20 h-20 bg-blue-100 rounded-full mx-auto flex items-center justify-center text-4xl mb-4">🏫</div>
-      <h1 class="text-3xl font-bold text-gray-800">مدرسة النور</h1>
-      <p class="text-gray-500 mt-2">نظام الإدارة المتكامل</p>
+<body class="bg-gray-100">
+  <div id="toast" class="toast"></div>
+  
+  <div id="modal" class="modal">
+    <div class="modal-content">
+      <div class="flex justify-between items-center mb-4 border-b pb-2">
+        <h3 id="modal-title" class="text-xl font-bold"></h3>
+        <button onclick="closeModal()" class="text-gray-500 hover:text-red-500 text-2xl">&times;</button>
+      </div>
+      <form id="modal-form"></form>
+    </div>
+  </div>
+
+  <div class="flex h-screen">
+    <div class="w-64 bg-gradient-to-b from-blue-900 to-blue-800 text-white flex flex-col flex-shrink-0">
+      <div class="p-6 border-b border-blue-700">
+        <h1 class="text-2xl font-bold">🏫 مدرسة النور</h1>
+      </div>
+      <nav class="mt-4 flex-1 text-sm overflow-y-auto" id="sidebar-nav"></nav>
+      <div class="p-4 border-t border-blue-700">
+        <div class="flex items-center mb-3">
+          <div class="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">👤</div>
+          <div class="mr-3 flex-1 overflow-hidden">
+            <p class="text-sm font-semibold truncate" id="user-name">المستخدم</p>
+            <span class="text-xs bg-yellow-500 text-black px-2 py-0.5 rounded-full" id="user-role">مدير</span>
+          </div>
+        </div>
+        <button onclick="logout()" class="w-full bg-red-500 hover:bg-red-600 text-white py-2 rounded-lg text-sm">🚪 خروج</button>
+      </div>
     </div>
 
-    <form id="loginForm" class="space-y-6">
-      <div>
-        <label class="block text-gray-700 font-semibold mb-2">البريد الإلكتروني</label>
-        <input type="email" id="email" required class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none" placeholder="admin@school.com">
+    <div class="flex-1 overflow-auto bg-gray-50">
+      <div class="bg-white shadow-sm px-6 py-4 sticky top-0 z-10 flex justify-between">
+        <h2 id="page-title" class="text-2xl font-bold text-gray-800">لوحة التحكم</h2>
       </div>
-      <div>
-        <label class="block text-gray-700 font-semibold mb-2">كلمة المرور</label>
-        <input type="password" id="password" required class="w-full px-4 py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none" placeholder="••••••••">
+
+      <!-- الأقسام سيتم توليدها ديناميكياً أو إظهارها -->
+      <div id="dashboard" class="page p-6">
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+          <div class="bg-white rounded-xl shadow-sm p-6 border-r-4 border-blue-500">
+            <p class="text-gray-500 text-sm">إجمالي الطلاب</p>
+            <p class="text-3xl font-bold mt-2" id="total-students">0</p>
+          </div>
+          <div class="bg-white rounded-xl shadow-sm p-6 border-r-4 border-green-500">
+            <p class="text-gray-500 text-sm">المعلمون</p>
+            <p class="text-3xl font-bold mt-2" id="total-teachers">0</p>
+          </div>
+        </div>
       </div>
-      <button type="submit" id="loginBtn" class="w-full bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 transition">تسجيل الدخول</button>
-    </form>
 
-    <div id="errorMessage" class="hidden mt-4 p-4 bg-red-100 border border-red-400 text-red-700 rounded-lg text-center"></div>
+      <div id="students" class="page p-6 hidden">
+        <div class="bg-white rounded-xl shadow-sm p-6">
+          <div class="flex justify-between items-center mb-6">
+            <h3 class="text-xl font-bold">👥 إدارة الطلاب</h3>
+            <button onclick="openModal('students')" class="btn-add">+ إضافة طالب</button>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full text-sm">
+              <thead class="bg-gray-50"><tr><th class="px-4 py-3 text-right">الاسم</th><th class="px-4 py-3 text-right">الصف</th><th class="px-4 py-3 text-right">الشعبة</th><th class="px-4 py-3 text-right">الحالة</th><th class="px-4 py-3 text-right">الإجراءات</th></tr></thead>
+              <tbody id="students-table"></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
 
-    <div class="mt-8 p-4 bg-blue-50 rounded-lg border border-blue-100 text-sm">
-      <p class="font-bold text-blue-900 mb-2">🔑 بيانات تجريبية (كلمة المرور: 123456):</p>
-      <p>👑 مدير: <code class="bg-white px-2 rounded">admin@school.com</code></p>
-      <p>📝 تسجيل: <code class="bg-white px-2 rounded">students@school.com</code></p>
-      <p>💰 مالية: <code class="bg-white px-2 rounded">finance@school.com</code></p>
+      <div id="teachers" class="page p-6 hidden">
+        <div class="bg-white rounded-xl shadow-sm p-6">
+          <div class="flex justify-between items-center mb-6">
+            <h3 class="text-xl font-bold">👨‍🏫 المعلمون</h3>
+            <button onclick="openModal('teachers')" class="btn-add">+ إضافة معلم</button>
+          </div>
+          <div id="teachers-list" class="grid grid-cols-1 md:grid-cols-3 gap-4"></div>
+        </div>
+      </div>
+
+      <div id="fees" class="page p-6 hidden">
+        <div class="bg-white rounded-xl shadow-sm p-6">
+          <div class="flex justify-between items-center mb-6">
+            <h3 class="text-xl font-bold">💰 الرسوم</h3>
+            <button onclick="openModal('fees')" class="btn-add">+ إضافة رسم</button>
+          </div>
+          <div id="fees-list" class="space-y-3"></div>
+        </div>
+      </div>
+
+      <div id="reports" class="page p-6 hidden">
+        <div class="bg-white rounded-xl shadow-sm p-6">
+          <h3 class="text-xl font-bold mb-6">📄 التقارير</h3>
+          <a href="/api/reports/students" target="_blank" class="inline-block bg-blue-500 text-white px-6 py-3 rounded-lg">👥 تقرير الطلاب</a>
+        </div>
+      </div>
     </div>
   </div>
 
   <script>
-    if (localStorage.getItem('user')) window.location.href = '/';
+    const currentUser = JSON.parse(localStorage.getItem('user') || 'null');
+    if (!currentUser) window.location.href = '/login';
+    const userRole = currentUser.role || 'مدير';
 
-    document.getElementById('loginForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const btn = document.getElementById('loginBtn');
-      const errorMsg = document.getElementById('errorMessage');
-      btn.disabled = true; btn.textContent = 'جاري التحقق...'; errorMsg.classList.add('hidden');
+    const menuItems = {
+      'مدير': [{id:'dashboard', icon:'📊', label:'لوحة التحكم'}, {id:'students', icon:'👥', label:'الطلاب'}, {id:'teachers', icon:'👨‍🏫', label:'المعلمون'}, {id:'fees', icon:'💰', label:'الرسوم'}, {id:'reports', icon:'📄', label:'التقارير'}],
+      'تسجيل الطلاب': [{id:'dashboard', icon:'📊', label:'لوحة التحكم'}, {id:'students', icon:'👥', label:'الطلاب'}],
+      'الشؤون المالية': [{id:'dashboard', icon:'📊', label:'لوحة التحكم'}, {id:'fees', icon:'💰', label:'الرسوم'}]
+    };
+
+    const formConfigs = {
+      students: { title: 'إضافة طالب', fields: [{name:'name', label:'الاسم', type:'text'}, {name:'grade', label:'الصف', type:'text'}, {name:'section', label:'الشعبة', type:'text'}, {name:'status', label:'الحالة', type:'select', options:['نشط','متوقف']}] },
+      teachers: { title: 'إضافة معلم', fields: [{name:'name', label:'الاسم', type:'text'}, {name:'email', label:'البريد', type:'email'}, {name:'phone', label:'الهاتف', type:'text'}, {name:'salary', label:'الراتب', type:'number'}] },
+      fees: { title: 'إضافة رسم', fields: [{name:'student_name', label:'اسم الطالب', type:'text'}, {name:'amount', label:'المبلغ', type:'number'}, {name:'status', label:'الحالة', type:'select', options:['paid','unpaid']}] }
+    };
+
+    let currentTable = null, currentEditId = null;
+
+    function buildSidebar() {
+      document.getElementById('user-name').textContent = currentUser.name;
+      document.getElementById('user-role').textContent = userRole;
+      const nav = document.getElementById('sidebar-nav');
+      nav.innerHTML = (menuItems[userRole] || menuItems['مدير']).map((item, i) => 
+        `<a onclick="showPage('${item.id}')" class="nav-item ${i===0?'active':''} flex items-center px-6 py-3 text-blue-100"><span class="ml-3 text-lg">${item.icon}</span> ${item.label}</a>`
+      ).join('');
+    }
+
+    function showPage(pageId) {
+      document.querySelectorAll('.page').forEach(p => p.classList.add('hidden'));
+      document.getElementById(pageId).classList.remove('hidden');
+      document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+      event.target.closest('.nav-item').classList.add('active');
       
-      try {
-        const res = await fetch('/api/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: document.getElementById('email').value, password: document.getElementById('password').value })
-        });
-        const data = await res.json();
-        
-        if (data.success) {
-          localStorage.setItem('user', JSON.stringify(data.user));
-          window.location.href = '/';
-        } else {
-          errorMsg.textContent = '❌ ' + data.message;
-          errorMsg.classList.remove('hidden');
-          btn.disabled = false; btn.textContent = 'تسجيل الدخول';
+      const titles = {dashboard:'لوحة التحكم', students:'الطلاب', teachers:'المعلمون', fees:'الرسوم', reports:'التقارير'};
+      document.getElementById('page-title').textContent = titles[pageId] || '';
+      
+      if (pageId === 'students') loadData('students');
+      if (pageId === 'teachers') loadData('teachers');
+      if (pageId === 'fees') loadData('fees');
+      if (pageId === 'dashboard') loadDashboard();
+    }
+
+    async function loadData(table) {
+      const res = await fetch(`/api/${table}`, { headers: { 'x-user-role': userRole } });
+      const data = await res.json();
+      if (!data.success) return showToast('⛔ خطأ في الصلاحيات', 'error');
+
+      if (table === 'students') {
+        document.getElementById('students-table').innerHTML = data.data.map(s => 
+          `<tr class="border-b hover:bg-gray-50"><td class="px-4 py-3 font-semibold">${s.name}</td><td class="px-4 py-3">${s.grade}</td><td class="px-4 py-3">${s.section}</td><td class="px-4 py-3"><span class="bg-green-100 text-green-800 px-2 py-1 rounded text-xs">${s.status}</span></td><td class="px-4 py-3"><button onclick="deleteItem('students', ${s.id})" class="btn-action btn-delete">🗑️</button></td></tr>`
+        ).join('');
+        document.getElementById('total-students').textContent = data.count;
+      } else if (table === 'teachers') {
+        document.getElementById('teachers-list').innerHTML = data.data.map(t => 
+          `<div class="bg-blue-50 p-4 rounded-lg border border-blue-100"><h4 class="font-bold">${t.name}</h4><p class="text-sm text-gray-600">${t.phone}</p><p class="text-sm font-semibold mt-2">${t.salary} جنيه</p></div>`
+        ).join('');
+        document.getElementById('total-teachers').textContent = data.count;
+      } else if (table === 'fees') {
+        document.getElementById('fees-list').innerHTML = data.data.map(f => 
+          `<div class="flex justify-between items-center p-4 bg-gray-50 rounded-lg"><div><p class="font-semibold">${f.student_name}</p><p class="text-sm text-gray-500">${f.status === 'paid' ? 'مدفوع' : 'غير مدفوع'}</p></div><p class="font-bold text-lg">${f.amount} جنيه</p></div>`
+        ).join('');
+      }
+    }
+
+    async function loadDashboard() {
+      loadData('students');
+      loadData('teachers');
+    }
+
+    function openModal(table, id = null, data = null) {
+      currentTable = table; currentEditId = id;
+      const config = formConfigs[table];
+      document.getElementById('modal-title').textContent = id ? 'تعديل' : config.title;
+      
+      document.getElementById('modal-form').innerHTML = config.fields.map(f => {
+        const val = data ? data[f.name] : '';
+        if (f.type === 'select') {
+          return `<label class="block text-sm font-semibold mb-1">${f.label}</label><select name="${f.name}" class="form-input">${f.options.map(o => `<option value="${o}" ${val===o?'selected':''}>${o}</option>`).join('')}</select>`;
         }
-      } catch (err) {
-        errorMsg.textContent = '❌ خطأ في الاتصال';
-        errorMsg.classList.remove('hidden');
-        btn.disabled = false; btn.textContent = 'تسجيل الدخول';
+        return `<label class="block text-sm font-semibold mb-1">${f.label}</label><input type="${f.type}" name="${f.name}" value="${val}" class="form-input" required>`;
+      }).join('') + `<div class="flex gap-2 mt-4"><button type="submit" class="flex-1 bg-blue-600 text-white py-3 rounded-lg font-semibold">💾 حفظ</button><button type="button" onclick="closeModal()" class="flex-1 bg-gray-200 py-3 rounded-lg">إلغاء</button></div>`;
+      
+      document.getElementById('modal').classList.add('show');
+    }
+
+    function closeModal() { document.getElementById('modal').classList.remove('show'); }
+
+    document.getElementById('modal-form').addEventListener('submit', async (e) => {
+      e.preventDefault();
+      const formData = new FormData(e.target);
+      const data = {}; formData.forEach((v, k) => data[k] = v);
+      
+      const method = currentEditId ? 'PUT' : 'POST';
+      const url = currentEditId ? `/api/${currentTable}/${currentEditId}` : `/api/${currentTable}`;
+      
+      const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json', 'x-user-role': userRole }, body: JSON.stringify(data) });
+      const result = await res.json();
+      
+      if (result.success) {
+        showToast(currentEditId ? '✅ تم التعديل' : '✅ تمت الإضافة');
+        closeModal();
+        loadData(currentTable);
+      } else {
+        showToast('❌ ' + result.message, 'error');
       }
     });
+
+    async function deleteItem(table, id) {
+      if (!confirm('هل أنت متأكد من الحذف؟')) return;
+      const res = await fetch(`/api/${table}/${id}`, { method: 'DELETE', headers: { 'x-user-role': userRole } });
+      const result = await res.json();
+      if (result.success) { showToast('🗑️ تم الحذف'); loadData(table); }
+      else showToast('❌ فشل الحذف', 'error');
+    }
+
+    function showToast(msg, type = 'success') {
+      const t = document.getElementById('toast');
+      t.textContent = msg; t.style.background = type === 'success' ? '#10b981' : '#ef4444';
+      t.classList.add('show'); setTimeout(() => t.classList.remove('show'), 3000);
+    }
+
+    function logout() { localStorage.removeItem('user'); window.location.href = '/login'; }
+
+    // التشغيل الأولي
+    buildSidebar();
+    loadDashboard();
   </script>
 </body>
 </html>
