@@ -7,8 +7,7 @@ const { createClient } = require('@supabase/supabase-js');
 const app = express();
 app.use(cors());
 app.use(express.json());
-app.use(express.static('public'));
-
+app.use(express.static('public', { maxAge: 0, etag: false }));
 const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY);
 
 // الصفحات
