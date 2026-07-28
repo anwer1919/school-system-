@@ -66,7 +66,9 @@ tables.forEach(table => {
     }
   });
 });
-
+app.get('/login', (req, res) => {
+  res.sendFile(__dirname + '/public/login.html');
+});
 // POST
 tables.forEach(table => {
   app.post(`/api/${table}`, checkPermission(table), async (req, res) => {
