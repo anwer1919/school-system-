@@ -106,6 +106,11 @@ tables.forEach(table => {
 app.get('/certificate/:id', async (req, res) => {
   try {
     console.log(`🎓 طلب شهادة للطالب ID: ${req.params.id}`);
+    // عرض أسماء الطلاب في الدرجات للتشخيص
+if (gradesData && gradesData.length > 0) {
+  console.log('📋 أسماء الطلاب في الدرجات:', gradesData.map(g => g.student_name));
+  console.log('📋 اسم الطالب المطلوب:', student.name);
+}
     
     // جلب بيانات المدرسة
     const { data: schoolData } = await supabase.from('school_info').select('*').limit(1);
