@@ -22,8 +22,6 @@
     .toast { position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: #10b981; color: white; padding: 15px 30px; border-radius: 10px; z-index: 2000; display: none; font-weight: bold; }
     .toast.show { display: block; animation: slideDown 0.3s; }
     @keyframes slideDown { from { top: -50px; opacity: 0; } to { top: 20px; opacity: 1; } }
-    .status-paid { background: #d1fae5; color: #065f46; padding: 2px 8px; border-radius: 12px; font-size: 11px; }
-    .status-unpaid { background: #fee2e2; color: #991b1b; padding: 2px 8px; border-radius: 12px; font-size: 11px; }
   </style>
 </head>
 <body class="bg-gray-100">
@@ -73,7 +71,6 @@
     const userRole = currentUser.role;
     document.getElementById('current-date').textContent = new Date().toLocaleDateString('ar-EG', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
-    // القوائم حسب الدور
     const menuItems = {
       'مدير': [
         {id:'dashboard', icon:'📊', label:'لوحة التحكم'},
@@ -98,220 +95,30 @@
         {id:'audit', icon:'📋', label:'سجل النشاط'},
         {id:'reports', icon:'📄', label:'التقارير'}
       ],
-      'تسجيل الطلاب': [
-        {id:'dashboard', icon:'📊', label:'لوحة التحكم'},
-        {id:'students', icon:'👥', label:'الطلاب'},
-        {id:'parents', icon:'👨‍👩‍👧', label:'أولياء الأمور'},
-        {id:'attendance', icon:'📅', label:'الحضور'}
-      ],
-      'التقارير': [
-        {id:'dashboard', icon:'📊', label:'لوحة التحكم'},
-        {id:'reports', icon:'📄', label:'التقارير'},
-        {id:'certificates', icon:'🎓', label:'الشهادات'}
-      ],
-      'الشؤون المالية': [
-        {id:'dashboard', icon:'📊', label:'لوحة التحكم'},
-        {id:'fees', icon:'💰', label:'الرسوم'},
-        {id:'revenue', icon:'💵', label:'الإيرادات'},
-        {id:'expenses', icon:'💸', label:'المصروفات'}
-      ]
+      'تسجيل الطلاب': [{id:'dashboard', icon:'📊', label:'لوحة التحكم'},{id:'students', icon:'👥', label:'الطلاب'},{id:'parents', icon:'👨‍👩‍👧', label:'أولياء الأمور'},{id:'attendance', icon:'📅', label:'الحضور'}],
+      'التقارير': [{id:'dashboard', icon:'📊', label:'لوحة التحكم'},{id:'reports', icon:'📄', label:'التقارير'},{id:'certificates', icon:'🎓', label:'الشهادات'}],
+      'الشؤون المالية': [{id:'dashboard', icon:'📊', label:'لوحة التحكم'},{id:'fees', icon:'💰', label:'الرسوم'},{id:'revenue', icon:'💵', label:'الإيرادات'},{id:'expenses', icon:'💸', label:'المصروفات'}]
     };
 
-    // إعدادات كل جدول
     const tableConfigs = {
-      students: {
-        title: 'الطلاب',
-        columns: [{key:'name', label:'الاسم'}, {key:'grade', label:'الصف'}, {key:'section', label:'الشعبة'}, {key:'phone', label:'الهاتف'}, {key:'status', label:'الحالة'}],
-        form: [
-          {name:'name', label:'اسم الطالب', type:'text'},
-          {name:'grade', label:'الصف', type:'text'},
-          {name:'section', label:'الشعبة', type:'text'},
-          {name:'phone', label:'الهاتف', type:'text'},
-          {name:'gender', label:'النوع', type:'select', options:['ذكر','أنثى']},
-          {name:'birth_date', label:'تاريخ الميلاد', type:'date'},
-          {name:'status', label:'الحالة', type:'select', options:['نشط','متوقف','متخرج']}
-        ]
-      },
-      teachers: {
-        title: 'المعلمون',
-        columns: [{key:'name', label:'الاسم'}, {key:'subject', label:'المادة'}, {key:'phone', label:'الهاتف'}, {key:'salary', label:'الراتب'}],
-        form: [
-          {name:'name', label:'اسم المعلم', type:'text'},
-          {name:'subject', label:'المادة', type:'text'},
-          {name:'phone', label:'الهاتف', type:'text'},
-          {name:'email', label:'البريد', type:'email'},
-          {name:'salary', label:'الراتب', type:'number'}
-        ]
-      },
-      employees: {
-        title: 'الموظفون',
-        columns: [{key:'name', label:'الاسم'}, {key:'role', label:'الوظيفة'}, {key:'phone', label:'الهاتف'}, {key:'salary', label:'الراتب'}],
-        form: [
-          {name:'name', label:'الاسم', type:'text'},
-          {name:'role', label:'الوظيفة', type:'text'},
-          {name:'phone', label:'الهاتف', type:'text'},
-          {name:'email', label:'البريد', type:'email'},
-          {name:'salary', label:'الراتب', type:'number'}
-        ]
-      },
-      parents: {
-        title: 'أولياء الأمور',
-        columns: [{key:'name', label:'الاسم'}, {key:'phone', label:'الهاتف'}, {key:'email', label:'البريد'}, {key:'job', label:'الوظيفة'}],
-        form: [
-          {name:'name', label:'الاسم', type:'text'},
-          {name:'phone', label:'الهاتف', type:'text'},
-          {name:'email', label:'البريد', type:'email'},
-          {name:'job', label:'الوظيفة', type:'text'},
-          {name:'address', label:'العنوان', type:'text'}
-        ]
-      },
-      subjects: {
-        title: 'المواد الدراسية',
-        columns: [{key:'name', label:'اسم المادة'}, {key:'code', label:'الكود'}, {key:'grade', label:'الصف'}],
-        form: [
-          {name:'name', label:'اسم المادة', type:'text'},
-          {name:'code', label:'الكود', type:'text'},
-          {name:'grade', label:'الصف', type:'text'}
-        ]
-      },
-      schedules: {
-        title: 'جدول الحصص',
-        columns: [{key:'day', label:'اليوم'}, {key:'period', label:'الحصة'}, {key:'subject', label:'المادة'}, {key:'teacher', label:'المعلم'}, {key:'room', label:'القاعة'}],
-        form: [
-          {name:'day', label:'اليوم', type:'select', options:['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس']},
-          {name:'period', label:'رقم الحصة', type:'number'},
-          {name:'subject', label:'المادة', type:'text'},
-          {name:'teacher', label:'المعلم', type:'text'},
-          {name:'section', label:'الشعبة', type:'text'},
-          {name:'room', label:'القاعة', type:'text'}
-        ]
-      },
-      attendance: {
-        title: 'الحضور والغياب',
-        columns: [{key:'student_name', label:'الطالب'}, {key:'date', label:'التاريخ'}, {key:'status', label:'الحالة'}],
-        form: [
-          {name:'student_name', label:'اسم الطالب', type:'text'},
-          {name:'date', label:'التاريخ', type:'date'},
-          {name:'status', label:'الحالة', type:'select', options:['present','absent','late']}
-        ]
-      },
-      exams: {
-        title: 'الامتحانات',
-        columns: [{key:'name', label:'الامتحان'}, {key:'subject', label:'المادة'}, {key:'date', label:'التاريخ'}, {key:'max_score', label:'الدرجة'}, {key:'status', label:'الحالة'}],
-        form: [
-          {name:'name', label:'اسم الامتحان', type:'text'},
-          {name:'subject', label:'المادة', type:'text'},
-          {name:'grade', label:'الصف', type:'text'},
-          {name:'date', label:'التاريخ', type:'date'},
-          {name:'max_score', label:'الدرجة الكاملة', type:'number'},
-          {name:'status', label:'الحالة', type:'select', options:['قادم','مكتمل','ملغي']}
-        ]
-      },
-      grades: {
-        title: 'الدرجات',
-        columns: [{key:'student_name', label:'الطالب'}, {key:'subject', label:'المادة'}, {key:'score', label:'الدرجة'}, {key:'max_score', label:'من'}, {key:'exam_type', label:'النوع'}],
-        form: [
-          {name:'student_name', label:'اسم الطالب', type:'text'},
-          {name:'subject', label:'المادة', type:'text'},
-          {name:'score', label:'الدرجة', type:'number'},
-          {name:'max_score', label:'من', type:'number'},
-          {name:'exam_type', label:'نوع الامتحان', type:'text'},
-          {name:'term', label:'الترم', type:'select', options:['الأول','الثاني']}
-        ]
-      },
-      fees: {
-        title: 'الرسوم الدراسية',
-        columns: [{key:'student_name', label:'الطالب'}, {key:'amount', label:'المبلغ'}, {key:'type', label:'النوع'}, {key:'status', label:'الحالة'}],
-        form: [
-          {name:'student_name', label:'اسم الطالب', type:'text'},
-          {name:'amount', label:'المبلغ', type:'number'},
-          {name:'type', label:'النوع', type:'text'},
-          {name:'due_date', label:'تاريخ الاستحقاق', type:'date'},
-          {name:'status', label:'الحالة', type:'select', options:['paid','unpaid','partial']}
-        ]
-      },
-      revenue: {
-        title: 'الإيرادات',
-        columns: [{key:'source', label:'المصدر'}, {key:'amount', label:'المبلغ'}, {key:'date', label:'التاريخ'}],
-        form: [
-          {name:'source', label:'المصدر', type:'text'},
-          {name:'amount', label:'المبلغ', type:'number'},
-          {name:'date', label:'التاريخ', type:'date'},
-          {name:'notes', label:'ملاحظات', type:'text'}
-        ]
-      },
-      expenses: {
-        title: 'المصروفات',
-        columns: [{key:'category', label:'البند'}, {key:'amount', label:'المبلغ'}, {key:'date', label:'التاريخ'}],
-        form: [
-          {name:'category', label:'البند', type:'text'},
-          {name:'amount', label:'المبلغ', type:'number'},
-          {name:'date', label:'التاريخ', type:'date'},
-          {name:'notes', label:'ملاحظات', type:'text'}
-        ]
-      },
-      transport: {
-        title: 'النقل المدرسي',
-        columns: [{key:'bus_name', label:'الباص'}, {key:'route', label:'المسار'}, {key:'driver', label:'السائق'}, {key:'students_count', label:'الطلاب'}],
-        form: [
-          {name:'bus_name', label:'اسم الباص', type:'text'},
-          {name:'route', label:'المسار', type:'text'},
-          {name:'driver', label:'السائق', type:'text'},
-          {name:'driver_phone', label:'هاتف السائق', type:'text'},
-          {name:'capacity', label:'السعة', type:'number'},
-          {name:'students_count', label:'عدد الطلاب', type:'number'}
-        ]
-      },
-      clinic: {
-        title: 'العيادة المدرسية',
-        columns: [{key:'student_name', label:'الطالب'}, {key:'date', label:'التاريخ'}, {key:'complaint', label:'الشكوى'}, {key:'treatment', label:'العلاج'}],
-        form: [
-          {name:'student_name', label:'اسم الطالب', type:'text'},
-          {name:'date', label:'التاريخ', type:'date'},
-          {name:'complaint', label:'الشكوى', type:'text'},
-          {name:'treatment', label:'العلاج', type:'text'},
-          {name:'notes', label:'ملاحظات', type:'text'}
-        ]
-      },
-      library: {
-        title: 'المكتبة',
-        columns: [{key:'book_title', label:'العنوان'}, {key:'author', label:'المؤلف'}, {key:'category', label:'الفئة'}, {key:'status', label:'الحالة'}],
-        form: [
-          {name:'book_title', label:'عنوان الكتاب', type:'text'},
-          {name:'author', label:'المؤلف', type:'text'},
-          {name:'isbn', label:'ISBN', type:'text'},
-          {name:'category', label:'الفئة', type:'text'},
-          {name:'status', label:'الحالة', type:'select', options:['متاح','معار','تالف']}
-        ]
-      },
-      inventory: {
-        title: 'المخازن',
-        columns: [{key:'item_name', label:'الصنف'}, {key:'category', label:'الفئة'}, {key:'quantity', label:'الكمية'}, {key:'location', label:'الموقع'}],
-        form: [
-          {name:'item_name', label:'اسم الصنف', type:'text'},
-          {name:'category', label:'الفئة', type:'text'},
-          {name:'quantity', label:'الكمية', type:'number'},
-          {name:'unit', label:'الوحدة', type:'text'},
-          {name:'location', label:'الموقع', type:'text'}
-        ]
-      },
-      calendar: {
-        title: 'التقويم',
-        table: 'calendar_events',
-        columns: [{key:'title', label:'العنوان'}, {key:'date', label:'التاريخ'}, {key:'type', label:'النوع'}],
-        form: [
-          {name:'title', label:'العنوان', type:'text'},
-          {name:'date', label:'التاريخ', type:'date'},
-          {name:'type', label:'النوع', type:'select', options:['أكاديمي','امتحان','عطلة','فعالية']},
-          {name:'description', label:'الوصف', type:'text'}
-        ]
-      },
-      audit: {
-        title: 'سجل النشاط',
-        columns: [{key:'user_name', label:'المستخدم'}, {key:'action', label:'العملية'}, {key:'details', label:'التفاصيل'}, {key:'date', label:'التاريخ'}],
-        form: [],
-        noAdd: true
-      }
+      students: { title: 'الطلاب', columns: [{key:'name', label:'الاسم'}, {key:'grade', label:'الصف'}, {key:'section', label:'الشعبة'}, {key:'phone', label:'الهاتف'}, {key:'status', label:'الحالة'}], form: [{name:'name', label:'الاسم', type:'text'}, {name:'grade', label:'الصف', type:'text'}, {name:'section', label:'الشعبة', type:'text'}, {name:'phone', label:'الهاتف', type:'text'}, {name:'gender', label:'النوع', type:'select', options:['ذكر','أنثى']}, {name:'birth_date', label:'تاريخ الميلاد', type:'date'}, {name:'status', label:'الحالة', type:'select', options:['نشط','متوقف','متخرج']}] },
+      teachers: { title: 'المعلمون', columns: [{key:'name', label:'الاسم'}, {key:'subject', label:'المادة'}, {key:'phone', label:'الهاتف'}, {key:'salary', label:'الراتب'}], form: [{name:'name', label:'الاسم', type:'text'}, {name:'subject', label:'المادة', type:'text'}, {name:'phone', label:'الهاتف', type:'text'}, {name:'email', label:'البريد', type:'email'}, {name:'salary', label:'الراتب', type:'number'}] },
+      employees: { title: 'الموظفون', columns: [{key:'name', label:'الاسم'}, {key:'role', label:'الوظيفة'}, {key:'phone', label:'الهاتف'}, {key:'salary', label:'الراتب'}], form: [{name:'name', label:'الاسم', type:'text'}, {name:'role', label:'الوظيفة', type:'text'}, {name:'phone', label:'الهاتف', type:'text'}, {name:'email', label:'البريد', type:'email'}, {name:'salary', label:'الراتب', type:'number'}] },
+      parents: { title: 'أولياء الأمور', columns: [{key:'name', label:'الاسم'}, {key:'phone', label:'الهاتف'}, {key:'email', label:'البريد'}, {key:'job', label:'الوظيفة'}], form: [{name:'name', label:'الاسم', type:'text'}, {name:'phone', label:'الهاتف', type:'text'}, {name:'email', label:'البريد', type:'email'}, {name:'job', label:'الوظيفة', type:'text'}, {name:'address', label:'العنوان', type:'text'}] },
+      subjects: { title: 'المواد', columns: [{key:'name', label:'المادة'}, {key:'code', label:'الكود'}, {key:'grade', label:'الصف'}], form: [{name:'name', label:'المادة', type:'text'}, {name:'code', label:'الكود', type:'text'}, {name:'grade', label:'الصف', type:'text'}] },
+      schedules: { title: 'جدول الحصص', columns: [{key:'day', label:'اليوم'}, {key:'period', label:'الحصة'}, {key:'subject', label:'المادة'}, {key:'teacher', label:'المعلم'}, {key:'room', label:'القاعة'}], form: [{name:'day', label:'اليوم', type:'select', options:['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس']}, {name:'period', label:'رقم الحصة', type:'number'}, {name:'subject', label:'المادة', type:'text'}, {name:'teacher', label:'المعلم', type:'text'}, {name:'section', label:'الشعبة', type:'text'}, {name:'room', label:'القاعة', type:'text'}] },
+      attendance: { title: 'الحضور', columns: [{key:'student_name', label:'الطالب'}, {key:'date', label:'التاريخ'}, {key:'status', label:'الحالة'}], form: [{name:'student_name', label:'الطالب', type:'text'}, {name:'date', label:'التاريخ', type:'date'}, {name:'status', label:'الحالة', type:'select', options:['present','absent','late']}] },
+      exams: { title: 'الامتحانات', columns: [{key:'name', label:'الامتحان'}, {key:'subject', label:'المادة'}, {key:'date', label:'التاريخ'}, {key:'max_score', label:'الدرجة'}, {key:'status', label:'الحالة'}], form: [{name:'name', label:'الامتحان', type:'text'}, {name:'subject', label:'المادة', type:'text'}, {name:'grade', label:'الصف', type:'text'}, {name:'date', label:'التاريخ', type:'date'}, {name:'max_score', label:'الدرجة الكاملة', type:'number'}, {name:'status', label:'الحالة', type:'select', options:['قادم','مكتمل','ملغي']}] },
+      grades: { title: 'الدرجات', columns: [{key:'student_name', label:'الطالب'}, {key:'subject', label:'المادة'}, {key:'score', label:'الدرجة'}, {key:'max_score', label:'من'}, {key:'exam_type', label:'النوع'}], form: [{name:'student_name', label:'الطالب', type:'text'}, {name:'subject', label:'المادة', type:'text'}, {name:'score', label:'الدرجة', type:'number'}, {name:'max_score', label:'من', type:'number'}, {name:'exam_type', label:'نوع الامتحان', type:'text'}, {name:'term', label:'الترم', type:'select', options:['الأول','الثاني']}] },
+      fees: { title: 'الرسوم', columns: [{key:'student_name', label:'الطالب'}, {key:'amount', label:'المبلغ'}, {key:'type', label:'النوع'}, {key:'status', label:'الحالة'}], form: [{name:'student_name', label:'الطالب', type:'text'}, {name:'amount', label:'المبلغ', type:'number'}, {name:'type', label:'النوع', type:'text'}, {name:'due_date', label:'تاريخ الاستحقاق', type:'date'}, {name:'status', label:'الحالة', type:'select', options:['paid','unpaid','partial']}] },
+      revenue: { title: 'الإيرادات', columns: [{key:'source', label:'المصدر'}, {key:'amount', label:'المبلغ'}, {key:'date', label:'التاريخ'}], form: [{name:'source', label:'المصدر', type:'text'}, {name:'amount', label:'المبلغ', type:'number'}, {name:'date', label:'التاريخ', type:'date'}, {name:'notes', label:'ملاحظات', type:'text'}] },
+      expenses: { title: 'المصروفات', columns: [{key:'category', label:'البند'}, {key:'amount', label:'المبلغ'}, {key:'date', label:'التاريخ'}], form: [{name:'category', label:'البند', type:'text'}, {name:'amount', label:'المبلغ', type:'number'}, {name:'date', label:'التاريخ', type:'date'}, {name:'notes', label:'ملاحظات', type:'text'}] },
+      transport: { title: 'النقل', columns: [{key:'bus_name', label:'الباص'}, {key:'route', label:'المسار'}, {key:'driver', label:'السائق'}, {key:'students_count', label:'الطلاب'}], form: [{name:'bus_name', label:'الباص', type:'text'}, {name:'route', label:'المسار', type:'text'}, {name:'driver', label:'السائق', type:'text'}, {name:'driver_phone', label:'هاتف السائق', type:'text'}, {name:'capacity', label:'السعة', type:'number'}, {name:'students_count', label:'عدد الطلاب', type:'number'}] },
+      clinic: { title: 'العيادة', columns: [{key:'student_name', label:'الطالب'}, {key:'date', label:'التاريخ'}, {key:'complaint', label:'الشكوى'}, {key:'treatment', label:'العلاج'}], form: [{name:'student_name', label:'الطالب', type:'text'}, {name:'date', label:'التاريخ', type:'date'}, {name:'complaint', label:'الشكوى', type:'text'}, {name:'treatment', label:'العلاج', type:'text'}, {name:'notes', label:'ملاحظات', type:'text'}] },
+      library: { title: 'المكتبة', columns: [{key:'book_title', label:'العنوان'}, {key:'author', label:'المؤلف'}, {key:'category', label:'الفئة'}, {key:'status', label:'الحالة'}], form: [{name:'book_title', label:'العنوان', type:'text'}, {name:'author', label:'المؤلف', type:'text'}, {name:'isbn', label:'ISBN', type:'text'}, {name:'category', label:'الفئة', type:'text'}, {name:'status', label:'الحالة', type:'select', options:['متاح','معار','تالف']}] },
+      inventory: { title: 'المخازن', columns: [{key:'item_name', label:'الصنف'}, {key:'category', label:'الفئة'}, {key:'quantity', label:'الكمية'}, {key:'location', label:'الموقع'}], form: [{name:'item_name', label:'الصنف', type:'text'}, {name:'category', label:'الفئة', type:'text'}, {name:'quantity', label:'الكمية', type:'number'}, {name:'unit', label:'الوحدة', type:'text'}, {name:'location', label:'الموقع', type:'text'}] },
+      calendar: { title: 'التقويم', table: 'calendar_events', columns: [{key:'title', label:'العنوان'}, {key:'date', label:'التاريخ'}, {key:'type', label:'النوع'}], form: [{name:'title', label:'العنوان', type:'text'}, {name:'date', label:'التاريخ', type:'date'}, {name:'type', label:'النوع', type:'select', options:['أكاديمي','امتحان','عطلة','فعالية']}, {name:'description', label:'الوصف', type:'text'}] },
+      audit: { title: 'سجل النشاط', columns: [{key:'user_name', label:'المستخدم'}, {key:'action', label:'العملية'}, {key:'details', label:'التفاصيل'}, {key:'date', label:'التاريخ'}], form: [], noAdd: true }
     };
 
     let currentTable = null, currentEditId = null;
@@ -339,13 +146,10 @@
       const titles = {dashboard:'لوحة التحكم', reports:'التقارير', certificates:'الشهادات'};
       document.getElementById('page-title').textContent = titles[pageId] || tableConfigs[pageId]?.title || '';
 
-      if (pageId === 'dashboard') {
-        renderDashboard();
-      } else if (pageId === 'reports') {
-        renderReports();
-      } else if (pageId === 'certificates') {
-        renderCertificates();
-      } else if (tableConfigs[pageId]) {
+      if (pageId === 'dashboard') renderDashboard();
+      else if (pageId === 'reports') renderReports();
+      else if (pageId === 'certificates') renderCertificates();
+      else if (tableConfigs[pageId]) {
         currentTable = pageId;
         const config = tableConfigs[pageId];
         const actualTable = config.table || pageId;
@@ -378,7 +182,7 @@
           <div class="bg-white rounded-xl shadow-sm p-6 border-r-4 border-blue-500"><p class="text-gray-500 text-sm">الطلاب</p><p class="text-3xl font-bold mt-2" id="dash-students">...</p></div>
           <div class="bg-white rounded-xl shadow-sm p-6 border-r-4 border-green-500"><p class="text-gray-500 text-sm">المعلمون</p><p class="text-3xl font-bold mt-2" id="dash-teachers">...</p></div>
           <div class="bg-white rounded-xl shadow-sm p-6 border-r-4 border-yellow-500"><p class="text-gray-500 text-sm">الإيرادات</p><p class="text-3xl font-bold mt-2" id="dash-revenue">...</p></div>
-          <div class="bg-white rounded-xl shadow-sm p-6 border-r-4 border-purple-500"><p class="text-gray-500 text-sm">الحضور اليوم</p><p class="text-3xl font-bold mt-2" id="dash-attendance">...</p></div>
+          <div class="bg-white rounded-xl shadow-sm p-6 border-r-4 border-purple-500"><p class="text-gray-500 text-sm">الحضور</p><p class="text-3xl font-bold mt-2" id="dash-attendance">...</p></div>
         </div>
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           <div class="bg-white rounded-xl shadow-sm p-6 border-r-4 border-pink-500"><p class="text-gray-500 text-sm">الموظفون</p><p class="text-3xl font-bold mt-2" id="dash-employees">...</p></div>
@@ -400,7 +204,7 @@
       
       for (const s of stats) {
         try {
-          const res = await fetch(`/api/${s.table}`, { headers: { 'x-user-role': userRole } });
+          const res = await fetch(`/api/${s.table}`);
           const data = await res.json();
           const el = document.getElementById(s.id);
           if (el && data.success) {
@@ -416,7 +220,6 @@
     }
 
     function renderReports() {
-      const contentDiv = document.getElementById('main-content');
       const reports = [
         {url:'/api/reports/students', icon:'👥', title:'تقرير الطلاب', color:'from-blue-500 to-blue-600'},
         {url:'/api/reports/teachers', icon:'👨‍🏫', title:'تقرير المعلمين', color:'from-green-500 to-green-600'},
@@ -425,17 +228,17 @@
         {url:'/api/reports/grades', icon:'🎯', title:'كشوف الدرجات', color:'from-indigo-500 to-indigo-600'},
         {url:'/api/reports/fees', icon:'💰', title:'التقرير المالي', color:'from-yellow-500 to-yellow-600'},
         {url:'/api/reports/financial', icon:'💵', title:'التقرير الشامل', color:'from-orange-500 to-orange-600'},
-        {url:'/api/reports/transport', icon:'🚌', title:'تقرير النقل', color:'from-teal-500 to-teal-600'}
+        {url:'/api/reports/transport', icon:'🚌', title:'تقرير النقل', color:'from-teal-500 to-teal-600'},
+        {url:'/api/reports/schedules', icon:'🕐', title:'جدول الحصص', color:'from-red-500 to-red-600'}
       ];
-      contentDiv.innerHTML = `
+      document.getElementById('main-content').innerHTML = `
         <div class="bg-white rounded-xl shadow-sm p-6">
           <h3 class="text-xl font-bold mb-6">📄 التقارير المتاحة</h3>
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
             ${reports.map(r => `
               <a href="${r.url}" target="_blank" class="bg-gradient-to-br ${r.color} text-white p-6 rounded-xl hover:shadow-lg transition flex flex-col items-center text-center">
                 <span class="text-5xl mb-3">${r.icon}</span>
                 <h4 class="font-bold text-lg">${r.title}</h4>
-                <p class="text-sm opacity-90 mt-1">عرض وطباعة</p>
               </a>
             `).join('')}
           </div>
@@ -443,15 +246,14 @@
     }
 
     async function renderCertificates() {
-      const contentDiv = document.getElementById('main-content');
       try {
-        const res = await fetch('/api/students', { headers: { 'x-user-role': userRole } });
+        const res = await fetch('/api/students');
         const data = await res.json();
         if (!data.success) {
-          contentDiv.innerHTML = '<div class="bg-red-50 p-6 rounded-xl text-red-700">⛔ ' + data.message + '</div>';
+          document.getElementById('main-content').innerHTML = '<div class="bg-red-50 p-6 rounded-xl text-red-700">⛔ ' + data.message + '</div>';
           return;
         }
-        contentDiv.innerHTML = `
+        document.getElementById('main-content').innerHTML = `
           <div class="bg-white rounded-xl shadow-sm p-6">
             <h3 class="text-xl font-bold mb-6">🎓 شهادات الطلاب</h3>
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -466,13 +268,13 @@
             </div>
           </div>`;
       } catch(e) {
-        contentDiv.innerHTML = '<div class="bg-red-50 p-6 rounded-xl text-red-700">❌ خطأ في الاتصال</div>';
+        document.getElementById('main-content').innerHTML = '<div class="bg-red-50 p-6 rounded-xl text-red-700">❌ خطأ</div>';
       }
     }
 
     async function loadData(table) {
       try {
-        const res = await fetch(`/api/${table}`, { headers: { 'x-user-role': userRole } });
+        const res = await fetch(`/api/${table}`);
         const data = await res.json();
         const tbody = document.getElementById('dynamic-table-body');
         if (!tbody) return;
@@ -490,14 +292,7 @@
 
         tbody.innerHTML = data.data.map(row => `
           <tr class="border-b hover:bg-gray-50 transition">
-            ${config.columns.map(c => {
-              let val = row[c.key] || '-';
-              if (c.key === 'status' && (table === 'fees' || table === 'attendance')) {
-                if (row[c.key] === 'paid' || row[c.key] === 'present') val = `<span class="status-paid">${val === 'paid' ? 'مدفوع' : 'حاضر'}</span>`;
-                else if (row[c.key] === 'unpaid' || row[c.key] === 'absent') val = `<span class="status-unpaid">${val === 'unpaid' ? 'غير مدفوع' : 'غائب'}</span>`;
-              }
-              return `<td class="px-4 py-3">${val}</td>`;
-            }).join('')}
+            ${config.columns.map(c => `<td class="px-4 py-3">${row[c.key] || '-'}</td>`).join('')}
             <td class="px-4 py-3">
               ${!config.noAdd ? `
                 <button onclick="editItem('${table}', ${row.id})" class="btn-action btn-edit">✏️</button>
@@ -524,7 +319,7 @@
                   <select name="${f.name}" class="form-input">${f.options.map(o => `<option value="${o}" ${val===o?'selected':''}>${o}</option>`).join('')}</select>`;
         }
         return `<label class="block text-sm font-semibold text-gray-700 mb-1">${f.label}</label>
-                <input type="${f.type}" name="${f.name}" value="${val}" class="form-input" ${f.required?'required':''}>`;
+                <input type="${f.type}" name="${f.name}" value="${val}" class="form-input">`;
       }).join('') + `<div class="flex gap-3 mt-6">
         <button type="submit" class="flex-1 bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700">💾 حفظ</button>
         <button type="button" onclick="closeModal()" class="flex-1 bg-gray-200 text-gray-700 py-3 rounded-lg font-bold hover:bg-gray-300">إلغاء</button>
@@ -536,12 +331,12 @@
     async function editItem(table, id) {
       try {
         const actualTable = tableConfigs[table].table || table;
-        const res = await fetch(`/api/${actualTable}`, { headers: { 'x-user-role': userRole } });
+        const res = await fetch(`/api/${actualTable}`);
         const data = await res.json();
         const item = data.data.find(r => r.id === id);
         if (item) openModal(item);
       } catch(e) {
-        showToast('❌ خطأ في التحميل', 'error');
+        showToast('❌ خطأ', 'error');
       }
     }
 
@@ -559,7 +354,7 @@
       try {
         const res = await fetch(url, { 
           method, 
-          headers: { 'Content-Type': 'application/json', 'x-user-role': userRole }, 
+          headers: { 'Content-Type': 'application/json' }, 
           body: JSON.stringify(data) 
         });
         const result = await res.json();
@@ -580,7 +375,7 @@
       if (!confirm(`هل أنت متأكد من حذف "${name}"؟`)) return;
       const actualTable = tableConfigs[table].table || table;
       try {
-        const res = await fetch(`/api/${actualTable}/${id}`, { method: 'DELETE', headers: { 'x-user-role': userRole } });
+        const res = await fetch(`/api/${actualTable}/${id}`, { method: 'DELETE' });
         const result = await res.json();
         if (result.success) { 
           showToast('🗑️ تم الحذف'); 
@@ -589,7 +384,7 @@
           showToast('❌ ' + result.message, 'error');
         }
       } catch (err) {
-        showToast('❌ خطأ في الحذف', 'error');
+        showToast('❌ خطأ', 'error');
       }
     }
 
