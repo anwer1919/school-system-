@@ -109,7 +109,11 @@ app.get('/certificate/:id', async (req, res) => {
     const { data: students } = await supabase.from('students').select('*').eq('id', req.params.id).limit(1);
     if (!students || students.length === 0) return res.status(404).send('الطالب غير موجود');
     const student = students[0];
-    const { data: gradesData } = await supabase.from('grades').select('*').eq('student_id', req.params.id);
+   // البحث عن الدرجات باسم الطالب (لأن قاعدة البيانات تستخدم student_name)
+const { data: gradesData } = await supabase
+  .from('grades')
+  .select('*')
+  .eq('student_name', student.name);
     let ts = 0, tm = 0;
     (gradesData || []).forEach(g => { ts += Number(g.score) || 0; tm += Number(g.max_score) || 0; });
     const p = tm > 0 ? ((ts / tm) * 100).toFixed(2) : 0;
