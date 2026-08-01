@@ -1,106 +1,106 @@
-<!DOCTYPE html>
-<html dir="rtl" lang="ar">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>تسجيل الدخول | مدرسة النور</title>
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-  <style>
-    body { font-family: 'Cairo', sans-serif; }
-    .input-group:focus-within label { color: #4f46e5; }
-    .input-group:focus-within svg { color: #4f46e5; }
-  </style>
-</head>
-<body class="bg-slate-50 min-h-screen flex items-center justify-center p-4 relative overflow-hidden">
-  
-  <!-- خلفية زخرفية خفيفة جداً تتماشى مع لوحة التحكم -->
-  <div class="absolute top-0 left-0 w-full h-full overflow-hidden pointer-events-none">
-    <div class="absolute top-[-10%] right-[-5%] w-96 h-96 bg-indigo-100/50 rounded-full blur-3xl"></div>
-    <div class="absolute bottom-[-10%] left-[-5%] w-96 h-96 bg-blue-100/50 rounded-full blur-3xl"></div>
-  </div>
+You are a Senior UI/UX Designer, Front-End Architect, and CSS Expert.
 
-  <div class="bg-white w-full max-w-md rounded-2xl shadow-xl border border-slate-200 p-8 relative z-10 transform transition-all hover:shadow-2xl duration-300">
-    <div class="text-center mb-8">
-      <div class="w-20 h-20 bg-gradient-to-br from-indigo-600 to-blue-600 rounded-2xl mx-auto flex items-center justify-center text-4xl mb-4 shadow-lg shadow-indigo-500/20">🏫</div>
-      <h1 class="text-3xl font-extrabold text-slate-800 tracking-tight">مدرسة النور</h1>
-      <p class="text-slate-500 mt-2 font-medium">نظام الإدارة المدرسي المتكامل</p>
-    </div>
+Your mission is to redesign my existing web application into a premium, modern, enterprise-grade interface while preserving 100% of the existing functionality.
 
-    <form id="loginForm" class="space-y-5">
-      <div class="input-group">
-        <label class="block text-sm font-semibold text-slate-700 mb-1.5 transition-colors">البريد الإلكتروني</label>
-        <div class="relative">
-          <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-            <svg class="h-5 w-5 text-slate-400 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 12a4 4 0 10-8 0 4 4 0 008 0zm0 0v1.5a2.5 2.5 0 005 0V12a9 9 0 10-9 9m4.5-1.206a8.959 8.959 0 01-4.5 1.207" /></svg>
-          </div>
-          <input type="email" id="email" required class="w-full pr-10 pl-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all duration-200 text-slate-700 placeholder-slate-400" placeholder="name@school.com">
-        </div>
-      </div>
+## CRITICAL RULES (MUST FOLLOW)
 
-      <div class="input-group">
-        <label class="block text-sm font-semibold text-slate-700 mb-1.5 transition-colors">كلمة المرور</label>
-        <div class="relative">
-          <div class="absolute inset-y-0 right-0 pr-3 flex items-center pointer-events-none">
-            <svg class="h-5 w-5 text-slate-400 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" /></svg>
-          </div>
-          <input type="password" id="password" required class="w-full pr-10 pl-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:bg-white focus:border-indigo-500 focus:ring-4 focus:ring-indigo-500/10 outline-none transition-all duration-200 text-slate-700 placeholder-slate-400" placeholder="••••••••">
-        </div>
-      </div>
+- DO NOT change any JavaScript logic.
+- DO NOT modify any functions.
+- DO NOT rename IDs.
+- DO NOT rename classes used by JavaScript.
+- DO NOT remove or change data-* attributes.
+- DO NOT modify event listeners.
+- DO NOT change APIs.
+- DO NOT change backend communication.
+- DO NOT change application flow.
+- DO NOT remove existing HTML elements unless they are purely decorative.
+- DO NOT break responsiveness.
+- DO NOT introduce JavaScript errors.
+- Every existing feature must continue working exactly as before.
 
-      <button type="submit" id="loginBtn" class="w-full bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-700 hover:to-blue-700 text-white font-bold py-3.5 rounded-xl shadow-lg shadow-indigo-500/20 transform transition-all duration-200 hover:-translate-y-0.5 active:translate-y-0 mt-2">
-        تسجيل الدخول
-      </button>
-    </form>
+## ONLY IMPROVE
 
-    <div id="errorMessage" class="hidden mt-4 p-4 bg-red-50 border border-red-100 text-red-600 rounded-xl text-center font-semibold text-sm flex items-center justify-center gap-2">
-      <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-      <span></span>
-    </div>
+Create a premium UI inspired by modern SaaS products.
 
-    <!-- تذييل نظيف تماماً بدون أي بيانات دخول -->
-    <div class="mt-8 text-center border-t border-slate-100 pt-6">
-      <p class="text-xs text-slate-400 font-medium">© 2026 مدرسة النور النموذجية. جميع الحقوق محفوظة.</p>
-    </div>
-  </div>
+Improve:
 
-  <script>
-    if (localStorage.getItem('user')) window.location.href = '/';
+• Layout
+• Visual hierarchy
+• Spacing
+• Typography
+• Color palette
+• Glassmorphism where appropriate
+• Soft shadows
+• Rounded corners
+• Cards
+• Buttons
+• Forms
+• Tables
+• Navigation
+• Sidebar
+• Header
+• Icons
+• Hover animations
+• Smooth transitions
+• Loading states
+• Empty states
+• Better responsive design
+• Accessibility
+• Mobile experience
 
-    document.getElementById('loginForm').addEventListener('submit', async (e) => {
-      e.preventDefault();
-      const btn = document.getElementById('loginBtn');
-      const errorMsg = document.getElementById('errorMessage');
-      const errorText = errorMsg.querySelector('span');
-      
-      btn.disabled = true; 
-      btn.innerHTML = '<svg class="animate-spin h-5 w-5 text-white mx-auto" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>'; 
-      errorMsg.classList.add('hidden');
-      
-      try {
-        const res = await fetch('/api/login', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ email: document.getElementById('email').value, password: document.getElementById('password').value })
-        });
-        const data = await res.json();
-        
-        if (data.success) {
-          localStorage.setItem('user', JSON.stringify(data.user));
-          window.location.href = '/';
-        } else {
-          errorText.textContent = data.message;
-          errorMsg.classList.remove('hidden');
-          btn.disabled = false; 
-          btn.textContent = 'تسجيل الدخول';
-        }
-      } catch (err) {
-        errorText.textContent = 'حدث خطأ في الاتصال بالخادم';
-        errorMsg.classList.remove('hidden');
-        btn.disabled = false; 
-        btn.textContent = 'تسجيل الدخول';
-      }
-    });
-  </script>
-</body>
-</html>
+## DESIGN STYLE
+
+Use a clean, modern design inspired by:
+
+- Linear
+- Stripe
+- Notion
+- Vercel
+- Apple
+- Framer
+
+Design language:
+
+- Minimal
+- Elegant
+- Premium
+- Consistent
+- Professional
+- Spacious
+- High contrast
+- Excellent UX
+
+## CSS
+
+Use modern CSS only.
+
+Prefer:
+
+- CSS Variables
+- Flexbox
+- CSS Grid
+- Clamp()
+- Modern spacing
+- Smooth transitions
+- Backdrop blur
+- Subtle gradients
+- Responsive design
+- Dark mode ready
+
+## HTML
+
+Keep HTML structure compatible with the existing JavaScript.
+
+You may wrap sections with additional containers only if they do not affect functionality.
+
+## OUTPUT
+
+Return the complete updated files.
+
+Never omit unchanged code.
+
+Never replace functionality.
+
+Never simplify existing features.
+
+The final application should look like a premium commercial SaaS product while behaving exactly the same.
