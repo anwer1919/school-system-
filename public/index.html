@@ -2,88 +2,340 @@
 <html dir="rtl" lang="ar">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>لوحة التحكم | مدرسة النور</title>
   <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
   <style>
-    body { font-family: 'Cairo', sans-serif; }
-    .nav-item { transition: all 0.2s ease; }
-    .nav-item:hover { background: rgba(255,255,255,0.08); }
-    .nav-item.active { background: rgba(255,255,255,0.12); border-right: 3px solid #818cf8; }
-    .modal { display: none; position: fixed; z-index: 1000; inset: 0; background: rgba(15, 23, 42, 0.6); backdrop-filter: blur(4px); }
-    .modal.show { display: flex; align-items: center; justify-content: center; animation: fadeIn 0.2s ease-out; }
-    .modal-content { background: white; padding: 32px; border-radius: 20px; max-width: 500px; width: 90%; max-height: 90vh; overflow-y: auto; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25); }
-    @keyframes fadeIn { from { opacity: 0; transform: scale(0.95); } to { opacity: 1; transform: scale(1); } }
-    .btn-primary { background: linear-gradient(135deg, #4f46e5 0%, #3b82f6 100%); color: white; padding: 10px 20px; border-radius: 10px; border: none; cursor: pointer; font-weight: 600; transition: all 0.2s; box-shadow: 0 4px 6px -1px rgba(79, 70, 229, 0.2); }
-    .btn-primary:hover { transform: translateY(-1px); box-shadow: 0 6px 8px -1px rgba(79, 70, 229, 0.3); }
-    .btn-action { padding: 6px 10px; border-radius: 8px; font-size: 12px; margin: 0 2px; cursor: pointer; border: none; transition: 0.2s; }
-    .btn-edit { background: #eff6ff; color: #2563eb; }
-    .btn-edit:hover { background: #dbeafe; }
-    .btn-delete { background: #fef2f2; color: #dc2626; }
-    .btn-delete:hover { background: #fee2e2; }
-    .form-input { width: 100%; padding: 10px 14px; border: 1.5px solid #e2e8f0; border-radius: 10px; margin-bottom: 16px; background: #f8fafc; transition: all 0.2s; }
-    .form-input:focus { outline: none; border-color: #4f46e5; background: white; box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1); }
-    .toast { position: fixed; top: 24px; left: 50%; transform: translateX(-50%); background: #10b981; color: white; padding: 12px 24px; border-radius: 12px; z-index: 2000; display: none; font-weight: 600; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1); }
-    .toast.show { display: block; animation: slideDown 0.3s ease-out; }
-    .toast.error { background: #ef4444; }
-    @keyframes slideDown { from { top: -50px; opacity: 0; } to { top: 24px; opacity: 1; } }
-    .status-badge { padding: 4px 12px; border-radius: 20px; font-size: 11px; font-weight: 700; }
-    .status-active { background: #ecfdf5; color: #059669; }
-    .status-inactive { background: #fef2f2; color: #dc2626; }
-    .status-paid { background: #ecfdf5; color: #059669; }
-    .status-unpaid { background: #fff7ed; color: #ea580c; }
+    :root {
+      --primary: #6366f1;
+      --primary-dark: #4f46e5;
+      --primary-light: #818cf8;
+      --secondary: #8b5cf6;
+      --success: #10b981;
+      --danger: #ef4444;
+      --warning: #f59e0b;
+      --info: #3b82f6;
+      --dark: #0f172a;
+      --gray-50: #f8fafc;
+      --gray-100: #f1f5f9;
+      --gray-200: #e2e8f0;
+      --gray-300: #cbd5e1;
+      --gray-400: #94a3b8;
+      --gray-500: #64748b;
+      --gray-600: #475569;
+      --gray-700: #334155;
+      --gray-800: #1e293b;
+      --gray-900: #0f172a;
+      --white: #ffffff;
+      --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+      --shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px -1px rgba(0, 0, 0, 0.1);
+      --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -2px rgba(0, 0, 0, 0.1);
+      --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -4px rgba(0, 0, 0, 0.1);
+      --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+      --shadow-2xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+      --radius-sm: 0.375rem;
+      --radius: 0.5rem;
+      --radius-md: 0.625rem;
+      --radius-lg: 0.75rem;
+      --radius-xl: 1rem;
+      --radius-2xl: 1.25rem;
+      --radius-3xl: 1.5rem;
+      --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Cairo', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+      background: var(--gray-50);
+      color: var(--gray-900);
+      line-height: 1.6;
+    }
+
+    .nav-item {
+      transition: var(--transition);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .nav-item::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      right: 0;
+      width: 0;
+      height: 100%;
+      background: linear-gradient(90deg, rgba(99, 102, 241, 0.1), transparent);
+      transition: width 0.3s;
+    }
+
+    .nav-item:hover::before { width: 100%; }
+    .nav-item:hover { background: rgba(255, 255, 255, 0.05); transform: translateX(-4px); }
+    .nav-item.active { background: linear-gradient(90deg, rgba(99, 102, 241, 0.2), transparent); border-right: 3px solid var(--primary); font-weight: 600; }
+
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1000;
+      inset: 0;
+      background: rgba(15, 23, 42, 0.7);
+      backdrop-filter: blur(8px);
+      animation: fadeIn 0.2s ease-out;
+    }
+
+    .modal.show { display: flex; align-items: center; justify-content: center; }
+
+    .modal-content {
+      background: var(--white);
+      padding: 2rem;
+      border-radius: var(--radius-3xl);
+      width: 95%;
+      max-width: 550px;
+      max-height: 90vh;
+      overflow-y: auto;
+      box-shadow: var(--shadow-2xl);
+      animation: slideUp 0.3s ease-out;
+    }
+
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(30px) scale(0.95); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%);
+      color: var(--white);
+      padding: 0.75rem 1.5rem;
+      border-radius: var(--radius-xl);
+      border: none;
+      cursor: pointer;
+      font-weight: 700;
+      font-family: 'Cairo', sans-serif;
+      transition: var(--transition);
+      box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-primary::before {
+      content: '';
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      width: 0;
+      height: 0;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.2);
+      transform: translate(-50%, -50%);
+      transition: width 0.6s, height 0.6s;
+    }
+
+    .btn-primary:hover::before { width: 300px; height: 300px; }
+    .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4); }
+    .btn-primary:active { transform: translateY(0); }
+
+    .btn-success {
+      background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
+      color: var(--white);
+      padding: 0.75rem 1.5rem;
+      border-radius: var(--radius-xl);
+      border: none;
+      cursor: pointer;
+      font-weight: 700;
+      font-family: 'Cairo', sans-serif;
+      transition: var(--transition);
+      box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3);
+    }
+
+    .btn-success:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(16, 185, 129, 0.4); }
+
+    .btn-action {
+      padding: 0.5rem 0.75rem;
+      border-radius: var(--radius-lg);
+      font-size: 0.875rem;
+      margin: 0 0.125rem;
+      cursor: pointer;
+      border: none;
+      transition: var(--transition);
+      font-weight: 600;
+    }
+
+    .btn-edit { background: rgba(59, 130, 246, 0.1); color: var(--info); }
+    .btn-edit:hover { background: rgba(59, 130, 246, 0.2); transform: scale(1.05); }
+    .btn-delete { background: rgba(239, 68, 68, 0.1); color: var(--danger); }
+    .btn-delete:hover { background: rgba(239, 68, 68, 0.2); transform: scale(1.05); }
+
+    .form-input {
+      width: 100%;
+      padding: 0.875rem 1rem;
+      border: 2px solid var(--gray-200);
+      border-radius: var(--radius-xl);
+      margin-bottom: 1rem;
+      background: var(--white);
+      font-size: 1rem;
+      font-family: 'Cairo', sans-serif;
+      color: var(--gray-900);
+      transition: var(--transition);
+    }
+
+    .form-input:focus {
+      outline: none;
+      border-color: var(--primary);
+      box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.1);
+    }
+
+    .form-input::placeholder { color: var(--gray-400); }
+
+    .toast {
+      position: fixed;
+      top: 1.5rem;
+      left: 50%;
+      transform: translateX(-50%);
+      background: linear-gradient(135deg, var(--success) 0%, #059669 100%);
+      color: var(--white);
+      padding: 1rem 2rem;
+      border-radius: var(--radius-2xl);
+      z-index: 2000;
+      display: none;
+      font-weight: 700;
+      box-shadow: 0 10px 30px rgba(16, 185, 129, 0.4);
+      width: 90%;
+      max-width: 400px;
+      text-align: center;
+      animation: slideDown 0.3s ease-out;
+    }
+
+    .toast.show { display: block; }
+    .toast.error { background: linear-gradient(135deg, var(--danger) 0%, #dc2626 100%); box-shadow: 0 10px 30px rgba(239, 68, 68, 0.4); }
+
+    @keyframes slideDown {
+      from { top: -50px; opacity: 0; }
+      to { top: 1.5rem; opacity: 1; }
+    }
+
+    .status-badge {
+      padding: 0.375rem 0.875rem;
+      border-radius: 20px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      white-space: nowrap;
+      display: inline-block;
+    }
+
+    .status-active { background: rgba(16, 185, 129, 0.1); color: var(--success); border: 1px solid rgba(16, 185, 129, 0.2); }
+    .status-inactive { background: rgba(239, 68, 68, 0.1); color: var(--danger); border: 1px solid rgba(239, 68, 68, 0.2); }
+
+    .stat-card {
+      background: var(--white);
+      border-radius: var(--radius-2xl);
+      padding: 1.5rem;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--gray-100);
+      transition: var(--transition);
+    }
+
+    .stat-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-xl); }
+
+    .photo-preview {
+      width: 120px;
+      height: 120px;
+      border-radius: var(--radius-2xl);
+      object-fit: cover;
+      border: 3px solid var(--gray-200);
+      margin-bottom: 0.75rem;
+      box-shadow: var(--shadow-md);
+    }
+
+    .photo-upload-area {
+      border: 2px dashed var(--gray-300);
+      border-radius: var(--radius-2xl);
+      padding: 1.5rem;
+      text-align: center;
+      cursor: pointer;
+      transition: var(--transition);
+      background: var(--gray-50);
+    }
+
+    .photo-upload-area:hover {
+      border-color: var(--primary);
+      background: rgba(99, 102, 241, 0.05);
+      transform: scale(1.02);
+    }
+
+    table { border-collapse: separate; border-spacing: 0; }
+    thead { background: linear-gradient(135deg, var(--gray-50) 0%, var(--gray-100) 100%); }
+    th { font-weight: 700; color: var(--gray-700); text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.05em; }
+    tbody tr { transition: var(--transition); }
+    tbody tr:hover { background: var(--gray-50); }
+
+    ::-webkit-scrollbar { width: 8px; height: 8px; }
+    ::-webkit-scrollbar-track { background: var(--gray-100); border-radius: 10px; }
+    ::-webkit-scrollbar-thumb { background: var(--gray-300); border-radius: 10px; }
+    ::-webkit-scrollbar-thumb:hover { background: var(--gray-400); }
+
+    @media (max-width: 768px) {
+      .modal-content { padding: 1.5rem; max-width: 95%; }
+      .form-input { font-size: 0.9375rem; }
+    }
   </style>
 </head>
-<body class="bg-slate-50 text-slate-800">
+<body class="text-slate-800">
   <div id="toast" class="toast"></div>
-  
   <div id="modal" class="modal">
     <div class="modal-content">
-      <div class="flex justify-between items-center mb-6 border-b border-slate-100 pb-4">
+      <div class="flex justify-between items-center mb-6 pb-4 border-b border-slate-100">
         <h3 id="modal-title" class="text-xl font-bold text-slate-800"></h3>
-        <button onclick="closeModal()" class="text-slate-400 hover:text-red-500 transition-colors text-2xl leading-none">&times;</button>
+        <button onclick="closeModal()" class="text-slate-400 hover:text-red-500 text-3xl leading-none p-2 transition rounded-lg hover:bg-slate-100">&times;</button>
       </div>
-      <form id="modal-form"></form>
+      <form id="modal-form" enctype="multipart/form-data"></form>
     </div>
   </div>
-
-  <div class="flex h-screen overflow-hidden">
-    <!-- Sidebar -->
-    <div class="w-64 bg-slate-900 text-slate-300 flex flex-col flex-shrink-0 shadow-xl z-20">
-      <div class="p-6 border-b border-slate-800">
-        <h1 class="text-xl font-extrabold text-white tracking-tight flex items-center gap-2">
-          <span class="text-2xl">🏫</span> مدرسة النور
-        </h1>
-        <p class="text-xs text-slate-500 mt-1 font-medium">نظام الإدارة المتكامل v2.0</p>
+  <div id="sidebar-overlay" onclick="toggleSidebar()" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-40 hidden md:hidden"></div>
+  <div class="flex min-h-screen">
+    <aside id="sidebar" class="fixed inset-y-0 right-0 z-50 w-72 bg-gradient-to-b from-slate-900 to-slate-950 text-slate-300 flex flex-col transform translate-x-full md:translate-x-0 md:static transition-transform duration-300 ease-in-out shadow-2xl">
+      <div class="p-6 border-b border-slate-800/50">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center text-2xl shadow-lg shadow-indigo-500/30">🏫</div>
+          <div>
+            <h1 class="text-lg font-extrabold text-white">مدرسة النور</h1>
+            <p class="text-[10px] text-slate-400">نظام الإدارة المتكامل v3.0</p>
+          </div>
+        </div>
       </div>
-      <nav class="mt-4 flex-1 text-sm overflow-y-auto px-3 space-y-1" id="sidebar-nav"></nav>
-      <div class="p-4 border-t border-slate-800 bg-slate-900/50">
-        <div class="flex items-center mb-4 bg-slate-800/50 p-3 rounded-xl border border-slate-700/50">
-          <div class="w-10 h-10 bg-indigo-600 rounded-full flex items-center justify-center text-white font-bold shadow-lg shadow-indigo-500/20">👤</div>
+      <nav class="mt-4 flex-1 overflow-y-auto px-3 space-y-1" id="sidebar-nav"></nav>
+      <div class="p-4 border-t border-slate-800/50 bg-slate-900/50">
+        <div class="flex items-center mb-3 bg-gradient-to-r from-slate-800 to-slate-800/50 p-3 rounded-2xl border border-slate-700/50">
+          <div class="w-11 h-11 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-full flex items-center justify-center text-white font-bold flex-shrink-0 shadow-lg">👤</div>
           <div class="mr-3 flex-1 overflow-hidden">
             <p class="text-sm font-bold text-white truncate" id="user-name">المستخدم</p>
             <span class="text-[10px] bg-indigo-500/20 text-indigo-300 px-2 py-0.5 rounded-md font-bold border border-indigo-500/30" id="user-role">مدير</span>
           </div>
         </div>
-        <button onclick="logout()" class="w-full bg-red-500/10 hover:bg-red-500/20 text-red-400 hover:text-red-300 py-2.5 rounded-xl text-sm font-semibold transition flex items-center justify-center gap-2 border border-red-500/20">
+        <button onclick="logout()" class="w-full bg-red-500/10 hover:bg-red-500/20 text-red-400 hover:text-red-300 py-2.5 rounded-2xl text-sm font-semibold transition flex items-center justify-center gap-2 border border-red-500/20">
           <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
           تسجيل الخروج
         </button>
       </div>
-    </div>
-
-    <!-- Main Content -->
-    <div class="flex-1 overflow-auto bg-slate-50">
-      <div class="bg-white/80 backdrop-blur-md shadow-sm border-b border-slate-200 px-8 py-4 sticky top-0 z-10 flex justify-between items-center">
-        <h2 id="page-title" class="text-2xl font-bold text-slate-800">لوحة التحكم</h2>
-        <span class="text-xs font-semibold text-slate-500 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200 flex items-center gap-2" id="current-date">
+    </aside>
+    <main class="flex-1 flex flex-col min-h-screen w-full">
+      <header class="bg-white/80 backdrop-blur-xl shadow-sm border-b border-slate-200 px-4 py-3 sticky top-0 z-30 flex justify-between items-center">
+        <div class="flex items-center gap-3">
+          <button onclick="toggleSidebar()" class="md:hidden text-slate-600 hover:text-indigo-600 p-2 rounded-lg hover:bg-slate-100 transition">
+            <svg class="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" /></svg>
+          </button>
+          <h2 id="page-title" class="text-lg md:text-xl font-extrabold text-slate-800">لوحة التحكم</h2>
+        </div>
+        <span class="text-xs font-semibold text-slate-500 bg-slate-100 px-3 py-1.5 rounded-lg border border-slate-200 hidden sm:flex items-center gap-2" id="current-date">
           <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
           <span></span>
         </span>
-      </div>
-      <div id="main-content" class="p-8 max-w-7xl mx-auto"></div>
-    </div>
+      </header>
+      <div id="main-content" class="p-4 md:p-8 max-w-7xl mx-auto w-full flex-1"></div>
+    </main>
   </div>
 
   <script>
@@ -92,28 +344,55 @@
     const userRole = currentUser.role;
     document.querySelector('#current-date span').textContent = new Date().toLocaleDateString('ar-EG', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' });
 
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('translate-x-full');
+      document.getElementById('sidebar-overlay').classList.toggle('hidden');
+    }
+
+    const allMenus = [
+      {id:'dashboard', icon:'📊', label:'لوحة التحكم'},
+      {id:'student-records', icon:'📋', label:'سجلات الطلاب'},
+      {id:'teacher-records', icon:'👨‍🏫', label:'سجلات المعلمين'},
+      {id:'employee-records', icon:'👔', label:'سجلات الموظفين'},
+      {id:'manage-schedules', icon:'➕', label:'إدارة الحصص'},
+      {id:'schedules', icon:'🕐', label:'جدول الحصص'},
+      {id:'cards', icon:'🎫', label:'البطاقات'},
+      {id:'students', icon:'👥', label:'الطلاب'},
+      {id:'teachers', icon:'👨‍🏫', label:'المعلمون'},
+      {id:'employees', icon:'👔', label:'الموظفون'},
+      {id:'parents', icon:'👨‍👩‍👧', label:'أولياء الأمور'},
+      {id:'subjects', icon:'📚', label:'المواد'},
+      {id:'attendance', icon:'📅', label:'الحضور'},
+      {id:'exams', icon:'📝', label:'الامتحانات'},
+      {id:'grades', icon:'🎯', label:'الدرجات'},
+      {id:'certificates', icon:'🎓', label:'الشهادات'},
+      {id:'fees', icon:'💰', label:'الرسوم'},
+      {id:'revenue', icon:'💵', label:'الإيرادات'},
+      {id:'expenses', icon:'💸', label:'المصروفات'},
+      {id:'transport', icon:'🚌', label:'النقل'},
+      {id:'clinic', icon:'🏥', label:'العيادة'},
+      {id:'library', icon:'📖', label:'المكتبة'},
+      {id:'inventory', icon:'🏪', label:'المخازن'},
+      {id:'calendar', icon:'📆', label:'التقويم'},
+      {id:'audit', icon:'📋', label:'سجل النشاط'},
+      {id:'reports', icon:'📄', label:'التقارير'},
+      {id:'users', icon:'👥', label:'إدارة المستخدمين'}
+    ];
+
     const menuItems = {
-      'مدير': [
-        {id:'dashboard', icon:'📊', label:'لوحة التحكم'}, {id:'students', icon:'👥', label:'الطلاب'}, {id:'teachers', icon:'👨‍🏫', label:'المعلمون'},
-        {id:'employees', icon:'👔', label:'الموظفون'}, {id:'parents', icon:'👨‍👩‍👧', label:'أولياء الأمور'}, {id:'subjects', icon:'📚', label:'المواد'},
-        {id:'schedules', icon:'🕐', label:'جدول الحصص'}, {id:'attendance', icon:'📅', label:'الحضور'}, {id:'exams', icon:'📝', label:'الامتحانات'},
-        {id:'grades', icon:'🎯', label:'الدرجات'}, {id:'certificates', icon:'🎓', label:'الشهادات'}, {id:'fees', icon:'💰', label:'الرسوم'},
-        {id:'revenue', icon:'💵', label:'الإيرادات'}, {id:'expenses', icon:'💸', label:'المصروفات'}, {id:'transport', icon:'🚌', label:'النقل'},
-        {id:'clinic', icon:'🏥', label:'العيادة'}, {id:'library', icon:'📖', label:'المكتبة'}, {id:'inventory', icon:'🏪', label:'المخازن'},
-        {id:'calendar', icon:'📆', label:'التقويم'}, {id:'audit', icon:'📋', label:'سجل النشاط'}, {id:'reports', icon:'📄', label:'التقارير'}
-      ],
-      'تسجيل الطلاب': [{id:'dashboard', icon:'📊', label:'لوحة التحكم'},{id:'students', icon:'👥', label:'الطلاب'},{id:'parents', icon:'👨‍👩‍👧', label:'أولياء الأمور'},{id:'attendance', icon:'📅', label:'الحضور'}],
-      'التقارير': [{id:'dashboard', icon:'📊', label:'لوحة التحكم'},{id:'reports', icon:'📄', label:'التقارير'},{id:'certificates', icon:'🎓', label:'الشهادات'}],
-      'الشؤون المالية': [{id:'dashboard', icon:'📊', label:'لوحة التحكم'},{id:'fees', icon:'💰', label:'الرسوم'},{id:'revenue', icon:'💵', label:'الإيرادات'},{id:'expenses', icon:'💸', label:'المصروفات'}]
+      'مدير': allMenus,
+      'تسجيل الطلاب': allMenus.filter(m => ['dashboard','student-records','students','parents','attendance'].includes(m.id)),
+      'التقارير': allMenus.filter(m => ['dashboard','reports','certificates','cards'].includes(m.id)),
+      'الشؤون المالية': allMenus.filter(m => ['dashboard','fees','revenue','expenses'].includes(m.id))
     };
 
     const tableConfigs = {
-      students: { title: 'الطلاب', columns: [{key:'name', label:'اسم الطالب'}, {key:'grade', label:'الصف'}, {key:'section', label:'الشعبة'}, {key:'phone', label:'الهاتف'}, {key:'status', label:'الحالة'}], form: [{name:'name', label:'اسم الطالب', type:'text'}, {name:'grade', label:'الصف', type:'text'}, {name:'section', label:'الشعبة', type:'text'}, {name:'phone', label:'الهاتف', type:'text'}, {name:'gender', label:'النوع', type:'select', options:['ذكر','أنثى']}, {name:'birth_date', label:'تاريخ الميلاد', type:'date'}, {name:'status', label:'الحالة', type:'select', options:['نشط','متوقف','متخرج']}] },
-      teachers: { title: 'المعلمون', columns: [{key:'name', label:'اسم المعلم'}, {key:'subject', label:'المادة'}, {key:'phone', label:'الهاتف'}, {key:'salary', label:'الراتب'}], form: [{name:'name', label:'اسم المعلم', type:'text'}, {name:'subject', label:'المادة', type:'text'}, {name:'phone', label:'الهاتف', type:'text'}, {name:'email', label:'البريد', type:'email'}, {name:'salary', label:'الراتب', type:'number'}] },
-      employees: { title: 'الموظفون', columns: [{key:'name', label:'الاسم'}, {key:'role', label:'الوظيفة'}, {key:'phone', label:'الهاتف'}, {key:'salary', label:'الراتب'}], form: [{name:'name', label:'الاسم', type:'text'}, {name:'role', label:'الوظيفة', type:'text'}, {name:'phone', label:'الهاتف', type:'text'}, {name:'email', label:'البريد', type:'email'}, {name:'salary', label:'الراتب', type:'number'}] },
+      students: { title: 'الطلاب', hasPhoto: true, columns: [{key:'name', label:'الاسم'}, {key:'student_number', label:'الرقم'}, {key:'grade', label:'الصف'}, {key:'section', label:'الشعبة'}, {key:'status', label:'الحالة'}], form: [{name:'name', label:'اسم الطالب', type:'text'}, {name:'student_number', label:'رقم الطالب', type:'text'}, {name:'grade', label:'الصف', type:'text'}, {name:'section', label:'الشعبة', type:'text'}, {name:'phone', label:'الهاتف', type:'text'}, {name:'gender', label:'النوع', type:'select', options:['ذكر','أنثى']}, {name:'birth_date', label:'تاريخ الميلاد', type:'date'}, {name:'address', label:'العنوان', type:'text'}, {name:'photo', label:'الصورة الشخصية', type:'file'}, {name:'parent_id', label:'رقم ولي الأمر', type:'number'}, {name:'status', label:'الحالة', type:'select', options:['نشط','متوقف','متخرج']}] },
+      teachers: { title: 'المعلمون', hasPhoto: true, columns: [{key:'name', label:'الاسم'}, {key:'subject', label:'المادة'}, {key:'phone', label:'الهاتف'}, {key:'salary', label:'الراتب'}], form: [{name:'name', label:'اسم المعلم', type:'text'}, {name:'subject', label:'المادة', type:'text'}, {name:'phone', label:'الهاتف', type:'text'}, {name:'email', label:'البريد', type:'email'}, {name:'salary', label:'الراتب', type:'number'}, {name:'photo', label:'الصورة الشخصية', type:'file'}] },
+      employees: { title: 'الموظفون', hasPhoto: true, columns: [{key:'name', label:'الاسم'}, {key:'role', label:'الوظيفة'}, {key:'phone', label:'الهاتف'}, {key:'salary', label:'الراتب'}], form: [{name:'name', label:'الاسم', type:'text'}, {name:'role', label:'الوظيفة', type:'text'}, {name:'phone', label:'الهاتف', type:'text'}, {name:'email', label:'البريد', type:'email'}, {name:'salary', label:'الراتب', type:'number'}, {name:'photo', label:'الصورة الشخصية', type:'file'}] },
       parents: { title: 'أولياء الأمور', columns: [{key:'name', label:'الاسم'}, {key:'phone', label:'الهاتف'}, {key:'email', label:'البريد'}, {key:'job', label:'الوظيفة'}], form: [{name:'name', label:'الاسم', type:'text'}, {name:'phone', label:'الهاتف', type:'text'}, {name:'email', label:'البريد', type:'email'}, {name:'job', label:'الوظيفة', type:'text'}, {name:'address', label:'العنوان', type:'text'}] },
       subjects: { title: 'المواد', columns: [{key:'name', label:'المادة'}, {key:'code', label:'الكود'}, {key:'grade', label:'الصف'}], form: [{name:'name', label:'المادة', type:'text'}, {name:'code', label:'الكود', type:'text'}, {name:'grade', label:'الصف', type:'text'}] },
-      schedules: { title: 'جدول الحصص', columns: [{key:'day', label:'اليوم'}, {key:'period', label:'الحصة'}, {key:'subject', label:'المادة'}, {key:'teacher', label:'المعلم'}, {key:'room', label:'القاعة'}], form: [{name:'day', label:'اليوم', type:'select', options:['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس']}, {name:'period', label:'رقم الحصة', type:'number'}, {name:'subject', label:'المادة', type:'text'}, {name:'teacher', label:'المعلم', type:'text'}, {name:'section', label:'الشعبة', type:'text'}, {name:'room', label:'القاعة', type:'text'}] },
+      schedules: { title: 'جدول الحصص', columns: [{key:'day', label:'اليوم'}, {key:'period', label:'الحصة'}, {key:'subject', label:'المادة'}, {key:'teacher', label:'المعلم'}, {key:'section', label:'الفصل'}, {key:'room', label:'القاعة'}], form: [{name:'day', label:'اليوم', type:'select', options:['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس']}, {name:'period', label:'رقم الحصة', type:'number'}, {name:'subject', label:'المادة', type:'text'}, {name:'teacher', label:'المعلم', type:'text'}, {name:'section', label:'الفصل', type:'text'}, {name:'room', label:'القاعة', type:'text'}] },
       attendance: { title: 'الحضور', columns: [{key:'student_name', label:'الطالب'}, {key:'date', label:'التاريخ'}, {key:'status', label:'الحالة'}], form: [{name:'student_name', label:'الطالب', type:'text'}, {name:'date', label:'التاريخ', type:'date'}, {name:'status', label:'الحالة', type:'select', options:['present','absent','late']}] },
       exams: { title: 'الامتحانات', columns: [{key:'name', label:'الامتحان'}, {key:'subject', label:'المادة'}, {key:'date', label:'التاريخ'}, {key:'max_score', label:'الدرجة'}, {key:'status', label:'الحالة'}], form: [{name:'name', label:'الامتحان', type:'text'}, {name:'subject', label:'المادة', type:'text'}, {name:'grade', label:'الصف', type:'text'}, {name:'date', label:'التاريخ', type:'date'}, {name:'max_score', label:'الدرجة الكاملة', type:'number'}, {name:'status', label:'الحالة', type:'select', options:['قادم','مكتمل','ملغي']}] },
       grades: { title: 'الدرجات', columns: [{key:'student_name', label:'الطالب'}, {key:'subject', label:'المادة'}, {key:'score', label:'الدرجة'}, {key:'max_score', label:'من'}, {key:'exam_type', label:'النوع'}], form: [{name:'student_name', label:'الطالب', type:'text'}, {name:'subject', label:'المادة', type:'text'}, {name:'score', label:'الدرجة', type:'number'}, {name:'max_score', label:'من', type:'number'}, {name:'exam_type', label:'نوع الامتحان', type:'text'}, {name:'term', label:'الترم', type:'select', options:['الأول','الثاني']}] },
@@ -128,15 +407,24 @@
       audit: { title: 'سجل النشاط', columns: [{key:'user_name', label:'المستخدم'}, {key:'action', label:'العملية'}, {key:'details', label:'التفاصيل'}, {key:'date', label:'التاريخ'}], form: [], noAdd: true }
     };
 
-    let currentTable = null, currentEditId = null;
+    let currentTable = null, currentEditId = null, currentPhotoUrl = null;
 
     function buildSidebar() {
       document.getElementById('user-name').textContent = currentUser.name;
-      document.getElementById('user-role').textContent = userRole;
+      document.getElementById('user-role').textContent = currentUser.role;
       const nav = document.getElementById('sidebar-nav');
-      const items = menuItems[userRole] || menuItems['مدير'];
+      let items = [];
+      if (currentUser.role === 'مدير') items = allMenus;
+      else if (menuItems[currentUser.role]) items = menuItems[currentUser.role];
+      else if (currentUser.role === 'مخصص') {
+        let allowedMenus = currentUser.allowed_menus || [];
+        if (typeof allowedMenus === 'string') { try { allowedMenus = JSON.parse(allowedMenus); } catch (e) { allowedMenus = []; } }
+        if (!Array.isArray(allowedMenus)) allowedMenus = [];
+        items = allowedMenus.length > 0 ? allMenus.filter(m => allowedMenus.includes(m.id)) : [{id:'dashboard', icon:'📊', label:'لوحة التحكم'}];
+      }
+      if (!items.find(m => m.id === 'dashboard')) items.unshift({id:'dashboard', icon:'📊', label:'لوحة التحكم'});
       nav.innerHTML = items.map((item, i) => 
-        `<a onclick="showPage('${item.id}')" class="nav-item ${i===0?'active':''} flex items-center px-4 py-3 rounded-xl text-slate-300 hover:text-white">
+        `<a onclick="showPage('${item.id}'); if(window.innerWidth < 768) toggleSidebar();" class="nav-item ${i===0?'active':''} flex items-center px-4 py-3 rounded-xl text-slate-300 hover:text-white">
           <span class="ml-3 text-lg">${item.icon}</span> <span class="font-medium">${item.label}</span>
         </a>`
       ).join('');
@@ -144,36 +432,44 @@
 
     function showPage(pageId) {
       document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-      const activeLink = Array.from(document.querySelectorAll('.nav-item')).find(a => a.textContent.includes(
-        (menuItems[userRole] || menuItems['مدير']).find(m => m.id === pageId)?.label || ''
-      ));
+      const activeLink = Array.from(document.querySelectorAll('.nav-item')).find(a => a.textContent.includes(allMenus.find(m => m.id === pageId)?.label || ''));
       if (activeLink) activeLink.classList.add('active');
-
       const contentDiv = document.getElementById('main-content');
-      const titles = {dashboard:'لوحة التحكم', reports:'التقارير', certificates:'الشهادات'};
+      const titles = {dashboard:'لوحة التحكم', reports:'التقارير', certificates:'الشهادات', users:'إدارة المستخدمين', schedules:'جدول الحصص', 'manage-schedules':'إدارة الحصص', 'student-records':'سجلات الطلاب', 'teacher-records':'سجلات المعلمين', 'employee-records':'سجلات الموظفين', cards:'البطاقات'};
       document.getElementById('page-title').textContent = titles[pageId] || tableConfigs[pageId]?.title || '';
-
       if (pageId === 'dashboard') renderDashboard();
       else if (pageId === 'reports') renderReports();
+      else if (pageId === 'schedules') renderSchedules();
+      else if (pageId === 'manage-schedules') renderManageSchedules();
+      else if (pageId === 'student-records') renderStudentRecords();
+      else if (pageId === 'teacher-records') renderTeacherRecords();
+      else if (pageId === 'employee-records') renderEmployeeRecords();
+      else if (pageId === 'cards') renderCards();
       else if (pageId === 'certificates') renderCertificates();
+      else if (pageId === 'users') {
+        if (currentUser.role === 'مدير') renderUsers();
+        else contentDiv.innerHTML = '<div class="bg-red-50 border border-red-100 p-6 rounded-2xl text-red-600 font-semibold">⛔ ليس لديك صلاحية</div>';
+      }
       else if (tableConfigs[pageId]) {
         currentTable = pageId;
         const config = tableConfigs[pageId];
         const actualTable = config.table || pageId;
         contentDiv.innerHTML = `
-          <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
-            <div class="flex justify-between items-center mb-6">
+          <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 md:p-6">
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4">
               <h3 class="text-lg font-bold text-slate-800">إدارة ${config.title}</h3>
-              ${!config.noAdd ? `<button onclick="openModal()" class="btn-primary flex items-center gap-2"><svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg> إضافة جديد</button>` : ''}
+              ${!config.noAdd ? `<button onclick="openModal()" class="btn-primary flex items-center justify-center gap-2 text-sm w-full sm:w-auto">
+                <svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" /></svg> إضافة جديد
+              </button>` : ''}
             </div>
-            <div class="overflow-x-auto rounded-xl border border-slate-100">
-              <table class="w-full text-sm">
+            <div class="overflow-x-auto -mx-4 md:mx-0">
+              <table class="w-full text-sm min-w-[600px]">
                 <thead class="bg-slate-50 border-b border-slate-100"><tr>
-                  ${config.columns.map(c => `<th class="px-6 py-4 text-right font-semibold text-slate-600">${c.label}</th>`).join('')}
-                  <th class="px-6 py-4 text-right font-semibold text-slate-600">الإجراءات</th>
+                  ${config.columns.map(c => `<th class="px-4 md:px-6 py-3 text-right font-semibold text-slate-600 whitespace-nowrap">${c.label}</th>`).join('')}
+                  <th class="px-4 md:px-6 py-3 text-right font-semibold text-slate-600 whitespace-nowrap">الإجراءات</th>
                 </tr></thead>
                 <tbody id="dynamic-table-body" class="divide-y divide-slate-100">
-                  <tr><td colspan="100" class="text-center py-12 text-slate-400">جاري تحميل البيانات...</td></tr>
+                  <tr><td colspan="100" class="text-center py-12 text-slate-400">جاري التحميل...</td></tr>
                 </tbody>
               </table>
             </div>
@@ -185,221 +481,588 @@
     async function renderDashboard() {
       const contentDiv = document.getElementById('main-content');
       contentDiv.innerHTML = `
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-          <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 flex items-center gap-4 hover:shadow-md transition-shadow">
-            <div class="w-14 h-14 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-2xl">👥</div>
-            <div><p class="text-slate-500 text-sm font-medium">إجمالي الطلاب</p><p class="text-3xl font-extrabold text-slate-800 mt-1" id="dash-students">...</p></div>
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6 mb-6">
+          <div class="stat-card flex items-center gap-4">
+            <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-indigo-500 to-blue-600 flex items-center justify-center text-2xl flex-shrink-0 shadow-lg shadow-indigo-500/20">👥</div>
+            <div><p class="text-slate-500 text-xs font-semibold">الطلاب</p><p class="text-2xl font-extrabold text-slate-800 mt-1" id="dash-students">...</p></div>
           </div>
-          <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 flex items-center gap-4 hover:shadow-md transition-shadow">
-            <div class="w-14 h-14 rounded-2xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-2xl">👨‍🏫</div>
-            <div><p class="text-slate-500 text-sm font-medium">المعلمون</p><p class="text-3xl font-extrabold text-slate-800 mt-1" id="dash-teachers">...</p></div>
+          <div class="stat-card flex items-center gap-4">
+            <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-500 to-teal-600 flex items-center justify-center text-2xl flex-shrink-0 shadow-lg shadow-emerald-500/20">👨‍🏫</div>
+            <div><p class="text-slate-500 text-xs font-semibold">المعلمون</p><p class="text-2xl font-extrabold text-slate-800 mt-1" id="dash-teachers">...</p></div>
           </div>
-          <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 flex items-center gap-4 hover:shadow-md transition-shadow">
-            <div class="w-14 h-14 rounded-2xl bg-amber-50 text-amber-600 flex items-center justify-center text-2xl">💵</div>
-            <div><p class="text-slate-500 text-sm font-medium">الإيرادات</p><p class="text-3xl font-extrabold text-slate-800 mt-1" id="dash-revenue">...</p></div>
+          <div class="stat-card flex items-center gap-4">
+            <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-500 to-orange-600 flex items-center justify-center text-2xl flex-shrink-0 shadow-lg shadow-amber-500/20">💵</div>
+            <div><p class="text-slate-500 text-xs font-semibold">الإيرادات</p><p class="text-2xl font-extrabold text-slate-800 mt-1" id="dash-revenue">...</p></div>
           </div>
-          <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 flex items-center gap-4 hover:shadow-md transition-shadow">
-            <div class="w-14 h-14 rounded-2xl bg-rose-50 text-rose-600 flex items-center justify-center text-2xl">📅</div>
-            <div><p class="text-slate-500 text-sm font-medium">الحضور اليوم</p><p class="text-3xl font-extrabold text-slate-800 mt-1" id="dash-attendance">...</p></div>
+          <div class="stat-card flex items-center gap-4">
+            <div class="w-14 h-14 rounded-2xl bg-gradient-to-br from-rose-500 to-pink-600 flex items-center justify-center text-2xl flex-shrink-0 shadow-lg shadow-rose-500/20">📅</div>
+            <div><p class="text-slate-500 text-xs font-semibold">الحضور</p><p class="text-2xl font-extrabold text-slate-800 mt-1" id="dash-attendance">...</p></div>
+          </div>
+        </div>
+        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6">
+          <h3 class="text-lg font-bold text-slate-800 mb-4">⚡ الوصول السريع</h3>
+          <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
+            <button onclick="showPage('student-records')" class="p-4 rounded-xl bg-gradient-to-br from-indigo-50 to-blue-50 hover:from-indigo-100 hover:to-blue-100 transition text-center">
+              <div class="text-3xl mb-2">📋</div><div class="text-sm font-bold text-slate-700">سجلات الطلاب</div>
+            </button>
+            <button onclick="showPage('teacher-records')" class="p-4 rounded-xl bg-gradient-to-br from-emerald-50 to-teal-50 hover:from-emerald-100 hover:to-teal-100 transition text-center">
+              <div class="text-3xl mb-2">👨‍🏫</div><div class="text-sm font-bold text-slate-700">سجلات المعلمين</div>
+            </button>
+            <button onclick="showPage('employee-records')" class="p-4 rounded-xl bg-gradient-to-br from-amber-50 to-orange-50 hover:from-amber-100 hover:to-orange-100 transition text-center">
+              <div class="text-3xl mb-2">👔</div><div class="text-sm font-bold text-slate-700">سجلات الموظفين</div>
+            </button>
+            <button onclick="showPage('cards')" class="p-4 rounded-xl bg-gradient-to-br from-purple-50 to-pink-50 hover:from-purple-100 hover:to-pink-100 transition text-center">
+              <div class="text-3xl mb-2">🎫</div><div class="text-sm font-bold text-slate-700">البطاقات</div>
+            </button>
           </div>
         </div>`;
-      
       const stats = [
-        {table:'students', id:'dash-students', type:'count'}, {table:'teachers', id:'dash-teachers', type:'count'},
-        {table:'revenue', id:'dash-revenue', type:'sum', key:'amount'}, {table:'attendance', id:'dash-attendance', type:'count'}
+        {table:'students', id:'dash-students', type:'count'},
+        {table:'teachers', id:'dash-teachers', type:'count'},
+        {table:'revenue', id:'dash-revenue', type:'sum', key:'amount'},
+        {table:'attendance', id:'dash-attendance', type:'count'}
       ];
       for (const s of stats) {
         try {
-          const res = await fetch(`/api/${s.table}`);
+          const res = await fetch('/api/' + s.table);
           const data = await res.json();
           const el = document.getElementById(s.id);
           if (el && data.success) {
-            el.textContent = s.type === 'sum' ? data.data.reduce((sum, item) => sum + (Number(item[s.key]) || 0), 0).toLocaleString() + ' ج' : data.count;
+            if (s.type === 'sum') {
+              const total = data.data.reduce((sum, item) => sum + (Number(item[s.key]) || 0), 0);
+              el.textContent = total.toLocaleString() + ' ج';
+            } else el.textContent = data.count;
           }
         } catch(e) {}
       }
     }
 
-    function renderReports() {
-      const reports = [
-        {url:'/api/reports/students', icon:'👥', title:'تقرير الطلاب', color:'from-indigo-500 to-blue-600'},
-        {url:'/api/reports/teachers', icon:'👨‍🏫', title:'تقرير المعلمين', color:'from-emerald-500 to-teal-600'},
-        {url:'/api/reports/employees', icon:'👔', title:'تقرير الموظفين', color:'from-violet-500 to-purple-600'},
-        {url:'/api/reports/attendance', icon:'📅', title:'تقرير الحضور', color:'from-rose-500 to-pink-600'},
-        {url:'/api/reports/grades', icon:'🎯', title:'كشوف الدرجات', color:'from-amber-500 to-orange-600'},
-        {url:'/api/reports/fees', icon:'💰', title:'التقرير المالي', color:'from-cyan-500 to-blue-600'}
-      ];
-      document.getElementById('main-content').innerHTML = `
-        <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-8">
-          <h3 class="text-xl font-bold text-slate-800 mb-6">📄 التقارير المتاحة للطباعة</h3>
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-            ${reports.map(r => `
-              <a href="${r.url}" target="_blank" class="group bg-gradient-to-br ${r.color} text-white p-6 rounded-2xl hover:shadow-lg transition-all duration-300 hover:-translate-y-1 flex items-center gap-4">
-                <span class="text-4xl group-hover:scale-110 transition-transform">${r.icon}</span>
-                <div><h4 class="font-bold text-lg">${r.title}</h4><p class="text-sm opacity-90 mt-1">عرض وطباعة فورية</p></div>
-              </a>
-            `).join('')}
-          </div>
-        </div>`;
+    async function uploadPhoto(file) {
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onload = function(e) { resolve(e.target.result); };
+        reader.readAsDataURL(file);
+      });
     }
 
+      // ======== سجلات الطلاب ========
+    async function renderStudentRecords() {
+      const contentDiv = document.getElementById('main-content');
+      contentDiv.innerHTML = '<div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 md:p-8 mb-6">' +
+        '<h3 class="text-lg font-bold text-slate-800 mb-6 flex items-center gap-2">🔍 البحث في سجلات الطلاب</h3>' +
+        '<div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">' +
+        '<div><label class="block text-sm font-semibold text-slate-700 mb-2">نوع البحث</label>' +
+        '<select id="search-field" class="form-input mb-0">' +
+        '<option value="name">الاسم</option><option value="number">الرقم</option><option value="grade">الصف</option></select></div>' +
+        '<div class="md:col-span-2"><label class="block text-sm font-semibold text-slate-700 mb-2">ابحث عن...</label>' +
+        '<input type="text" id="search-query" class="form-input mb-0" placeholder="اكتب اسم الطالب أو رقمه أو صفه" onkeypress="if(event.key===\'Enter\') searchStudents()"></div>' +
+        '<div class="flex items-end"><button onclick="searchStudents()" class="btn-primary w-full py-3">🔍 بحث</button></div></div></div>' +
+        '<div id="student-results" class="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 md:p-8">' +
+        '<div class="text-center py-16"><div class="text-6xl mb-4">📋</div><div class="text-slate-400 font-semibold">استخدم البحث أعلاه لعرض سجلات الطلاب</div></div></div>';
+    }
+
+    async function searchStudents() {
+      const field = document.getElementById('search-field').value;
+      const query = document.getElementById('search-query').value;
+      const resultsDiv = document.getElementById('student-results');
+      if (!query) { resultsDiv.innerHTML = '<div class="text-center py-12 text-red-500 font-semibold">❌ الرجاء إدخال كلمة البحث</div>'; return; }
+      resultsDiv.innerHTML = '<div class="text-center py-12 text-slate-400">جاري البحث...</div>';
+      try {
+        const res = await fetch('/api/students/search?query=' + encodeURIComponent(query) + '&field=' + field);
+        const data = await res.json();
+        if (!data.success || data.data.length === 0) {
+          resultsDiv.innerHTML = '<div class="text-center py-16"><div class="text-6xl mb-4">🔍</div><div class="text-slate-400 font-semibold">لا توجد نتائج</div></div>';
+          return;
+        }
+        resultsDiv.innerHTML = '<h3 class="text-lg font-bold text-slate-800 mb-4">📋 نتائج البحث (' + data.count + ')</h3>' +
+          '<div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">' +
+          data.data.map(function(s) {
+            return '<div class="bg-gradient-to-br from-white to-slate-50 border-2 border-slate-200 rounded-2xl p-5 hover:shadow-xl hover:border-indigo-300 transition-all cursor-pointer" onclick="viewStudentDetails(' + s.id + ')">' +
+              '<div class="flex items-center gap-4 mb-4">' +
+              '<div class="w-16 h-16 bg-gradient-to-br from-indigo-100 to-blue-100 rounded-full flex items-center justify-center text-3xl overflow-hidden flex-shrink-0 border-2 border-white shadow-md">' +
+              (s.photo ? '<img src="' + s.photo + '" class="w-full h-full object-cover">' : '👤') + '</div>' +
+              '<div class="flex-1 min-w-0"><h4 class="font-bold text-lg text-slate-800 truncate">' + s.name + '</h4>' +
+              '<p class="text-sm text-slate-500">' + (s.student_number || 'لا يوجد رقم') + '</p></div></div>' +
+              '<div class="space-y-2 text-sm border-t border-slate-100 pt-3">' +
+              '<div class="flex justify-between"><span class="text-slate-500">الصف:</span><span class="font-semibold">' + (s.grade || '-') + '</span></div>' +
+              '<div class="flex justify-between"><span class="text-slate-500">الشعبة:</span><span class="font-semibold">' + (s.section || '-') + '</span></div></div>' +
+              '<button onclick="event.stopPropagation(); viewStudentDetails(' + s.id + ')" class="mt-4 w-full bg-gradient-to-r from-indigo-600 to-blue-600 text-white py-2.5 rounded-xl font-bold hover:shadow-lg transition">عرض السجل الكامل</button></div>';
+          }).join('') + '</div>';
+      } catch (err) { resultsDiv.innerHTML = '<div class="text-center py-12 text-red-500">❌ خطأ في الاتصال</div>'; }
+    }
+
+    async function viewStudentDetails(id) {
+      try {
+        const res = await fetch('/api/students/' + id);
+        const data = await res.json();
+        if (!data.success) { showToast('❌ خطأ في تحميل البيانات', 'error'); return; }
+        const student = data.data;
+        const parent = student.parent;
+        const fees = student.fees || [];
+        let totalFees = 0, paidFees = 0;
+        fees.forEach(function(f) { totalFees += Number(f.amount) || 0; if (f.status === 'paid') paidFees += Number(f.amount) || 0; });
+        const contentDiv = document.getElementById('student-results');
+        contentDiv.innerHTML = '<div class="bg-gradient-to-br from-indigo-50 via-white to-blue-50 rounded-3xl shadow-2xl border-2 border-indigo-200 p-6 md:p-10">' +
+          '<div class="flex justify-between items-start mb-8 flex-wrap gap-3">' +
+          '<div><h3 class="text-3xl font-extrabold text-slate-800 mb-2">📋 السجل الكامل للطالب</h3>' +
+          '<p class="text-sm text-slate-500">جميع المعلومات والبيانات المالية</p></div>' +
+          '<button onclick="renderStudentRecords()" class="bg-white hover:bg-slate-50 text-slate-700 px-6 py-3 rounded-xl font-bold transition border border-slate-200 shadow-sm flex items-center gap-2">' +
+          '<svg class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" /></svg> رجوع</button></div>' +
+          '<div class="bg-gradient-to-r from-indigo-600 to-blue-600 rounded-2xl p-8 mb-6 text-white shadow-xl">' +
+          '<div class="flex items-center gap-6 flex-wrap">' +
+          '<div class="w-32 h-32 bg-white/20 rounded-2xl flex items-center justify-center text-6xl overflow-hidden border-4 border-white/30 shadow-lg flex-shrink-0">' +
+          (student.photo ? '<img src="' + student.photo + '" class="w-full h-full object-cover">' : '👤') + '</div>' +
+          '<div class="flex-1 min-w-[200px]">' +
+          '<h4 class="text-3xl font-extrabold mb-3">' + student.name + '</h4>' +
+          '<div class="grid grid-cols-2 gap-3 text-sm">' +
+          '<div class="bg-white/10 backdrop-blur px-4 py-2 rounded-lg"><span class="opacity-80">رقم الطالب:</span> <span class="font-bold">' + (student.student_number || 'غير محدد') + '</span></div>' +
+          '<div class="bg-white/10 backdrop-blur px-4 py-2 rounded-lg"><span class="opacity-80">الصف:</span> <span class="font-bold">' + (student.grade || '-') + ' - ' + (student.section || '-') + '</span></div>' +
+          '<div class="bg-white/10 backdrop-blur px-4 py-2 rounded-lg"><span class="opacity-80">النوع:</span> <span class="font-bold">' + (student.gender || '-') + '</span></div>' +
+          '<div class="bg-white/10 backdrop-blur px-4 py-2 rounded-lg"><span class="opacity-80">تاريخ الميلاد:</span> <span class="font-bold">' + (student.birth_date || '-') + '</span></div>' +
+          '</div></div></div></div>' +
+          '<div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">' +
+          '<div class="bg-white rounded-2xl p-6 shadow-lg border border-slate-100">' +
+          '<h5 class="text-xl font-bold text-slate-800 mb-5 flex items-center gap-2 pb-3 border-b-2 border-indigo-100">📞 معلومات الاتصال</h5>' +
+          '<div class="space-y-4">' +
+          '<div class="flex items-start gap-3"><div class="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center text-xl flex-shrink-0">📱</div><div><div class="text-xs text-slate-500 font-semibold">رقم الهاتف</div><div class="font-bold text-slate-800">' + (student.phone || 'غير محدد') + '</div></div></div>' +
+          '<div class="flex items-start gap-3"><div class="w-10 h-10 bg-indigo-100 rounded-lg flex items-center justify-center text-xl flex-shrink-0">🏠</div><div><div class="text-xs text-slate-500 font-semibold">العنوان</div><div class="font-bold text-slate-800">' + (student.address || 'غير محدد') + '</div></div></div>' +
+          '</div></div>' +
+          (parent ? '<div class="bg-white rounded-2xl p-6 shadow-lg border border-slate-100">' +
+          '<h5 class="text-xl font-bold text-slate-800 mb-5 flex items-center gap-2 pb-3 border-b-2 border-indigo-100">👨‍👩‍👧 بيانات ولي الأمر</h5>' +
+          '<div class="space-y-4">' +
+          '<div class="flex items-start gap-3"><div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center text-xl flex-shrink-0">👤</div><div><div class="text-xs text-slate-500 font-semibold">الاسم</div><div class="font-bold text-slate-800">' + parent.name + '</div></div></div>' +
+          '<div class="flex items-start gap-3"><div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center text-xl flex-shrink-0">📞</div><div><div class="text-xs text-slate-500 font-semibold">الهاتف</div><div class="font-bold text-slate-800">' + (parent.phone || 'غير محدد') + '</div></div></div>' +
+          '<div class="flex items-start gap-3"><div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center text-xl flex-shrink-0">📧</div><div><div class="text-xs text-slate-500 font-semibold">البريد</div><div class="font-bold text-slate-800">' + (parent.email || 'غير محدد') + '</div></div></div>' +
+          '<div class="flex items-start gap-3"><div class="w-10 h-10 bg-purple-100 rounded-lg flex items-center justify-center text-xl flex-shrink-0">💼</div><div><div class="text-xs text-slate-500 font-semibold">الوظيفة</div><div class="font-bold text-slate-800">' + (parent.job || 'غير محدد') + '</div></div></div>' +
+          '</div></div>' : '') +
+          '</div>' +
+          '<div class="bg-white rounded-2xl p-6 shadow-lg border border-slate-100 mb-6">' +
+          '<h5 class="text-xl font-bold text-slate-800 mb-5 flex items-center gap-2 pb-3 border-b-2 border-indigo-100">💰 الرسوم الدراسية</h5>' +
+          '<div class="grid grid-cols-3 gap-4 mb-6">' +
+          '<div class="bg-gradient-to-br from-blue-500 to-blue-600 rounded-xl p-5 text-center text-white shadow-lg"><div class="text-xs opacity-90 font-semibold mb-1">الإجمالي</div><div class="text-3xl font-extrabold">' + totalFees + '</div><div class="text-xs opacity-90 mt-1">جنيه</div></div>' +
+          '<div class="bg-gradient-to-br from-green-500 to-green-600 rounded-xl p-5 text-center text-white shadow-lg"><div class="text-xs opacity-90 font-semibold mb-1">المدفوع</div><div class="text-3xl font-extrabold">' + paidFees + '</div><div class="text-xs opacity-90 mt-1">جنيه</div></div>' +
+          '<div class="bg-gradient-to-br from-red-500 to-red-600 rounded-xl p-5 text-center text-white shadow-lg"><div class="text-xs opacity-90 font-semibold mb-1">المتبقي</div><div class="text-3xl font-extrabold">' + (totalFees - paidFees) + '</div><div class="text-xs opacity-90 mt-1">جنيه</div></div></div>' +
+          (fees.length > 0 ? '<div class="overflow-x-auto"><table class="w-full text-sm"><thead class="bg-slate-50"><tr><th class="px-4 py-3 text-right font-bold text-slate-700 border-b-2 border-slate-200">النوع</th><th class="px-4 py-3 text-right font-bold text-slate-700 border-b-2 border-slate-200">المبلغ</th><th class="px-4 py-3 text-right font-bold text-slate-700 border-b-2 border-slate-200">الاستحقاق</th><th class="px-4 py-3 text-right font-bold text-slate-700 border-b-2 border-slate-200">الحالة</th></tr></thead><tbody>' +
+          fees.map(function(f) { return '<tr class="border-b border-slate-100 hover:bg-slate-50 transition"><td class="px-4 py-3 font-semibold">' + (f.type || '-') + '</td><td class="px-4 py-3 font-bold text-indigo-600">' + f.amount + ' جنيه</td><td class="px-4 py-3 text-slate-600">' + (f.due_date || '-') + '</td><td class="px-4 py-3">' + (f.status === 'paid' ? '<span class="status-badge status-active">مدفوع</span>' : '<span class="status-badge status-inactive">غير مدفوع</span>') + '</td></tr>'; }).join('') +
+          '</tbody></table></div>' : '<div class="text-center py-8"><div class="text-5xl mb-3">💳</div><p class="text-slate-400 font-semibold">لا توجد رسوم مسجلة</p></div>') +
+          '</div>' +
+          '<div class="flex flex-col sm:flex-row gap-3">' +
+          '<button onclick="window.open(\'/api/cards/print/student/' + student.id + '\', \'_blank\')" class="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 text-white py-4 rounded-xl font-bold hover:shadow-xl transition">🎫 طباعة بطاقة الطالب</button>' +
+          '<button onclick="window.open(\'/certificate/' + student.id + '\', \'_blank\')" class="flex-1 bg-gradient-to-r from-indigo-600 to-blue-600 text-white py-4 rounded-xl font-bold hover:shadow-xl transition">🎓 طباعة الشهادة</button>' +
+          '<button onclick="window.print()" class="flex-1 bg-white hover:bg-slate-50 text-slate-700 py-4 rounded-xl font-bold transition border-2 border-slate-200">🖨️ طباعة السجل</button>' +
+          '</div></div>';
+      } catch (err) { showToast('❌ خطأ في تحميل البيانات', 'error'); }
+    }
+
+    // ======== سجلات المعلمين ========
+    async function renderTeacherRecords() {
+      const contentDiv = document.getElementById('main-content');
+      contentDiv.innerHTML = '<div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 md:p-8 mb-6">' +
+        '<h3 class="text-lg font-bold text-slate-800 mb-6">🔍 البحث في سجلات المعلمين</h3>' +
+        '<div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">' +
+        '<div><label class="block text-sm font-semibold text-slate-700 mb-2">نوع البحث</label><select id="teacher-search-field" class="form-input mb-0"><option value="name">الاسم</option><option value="subject">المادة</option></select></div>' +
+        '<div class="md:col-span-2"><label class="block text-sm font-semibold text-slate-700 mb-2">ابحث عن...</label><input type="text" id="teacher-search-query" class="form-input mb-0" placeholder="اكتب اسم المعلم أو المادة" onkeypress="if(event.key===\'Enter\') searchTeachers()"></div>' +
+        '<div class="flex items-end"><button onclick="searchTeachers()" class="btn-primary w-full py-3">🔍 بحث</button></div></div></div>' +
+        '<div id="teacher-results" class="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 md:p-8"><div class="text-center py-16"><div class="text-6xl mb-4">👨‍🏫</div><div class="text-slate-400 font-semibold">استخدم البحث أعلاه</div></div></div>';
+    }
+
+    async function searchTeachers() {
+      const field = document.getElementById('teacher-search-field').value;
+      const query = document.getElementById('teacher-search-query').value;
+      const resultsDiv = document.getElementById('teacher-results');
+      if (!query) { resultsDiv.innerHTML = '<div class="text-center py-12 text-red-500 font-semibold">❌ الرجاء إدخال كلمة البحث</div>'; return; }
+      resultsDiv.innerHTML = '<div class="text-center py-12 text-slate-400">جاري البحث...</div>';
+      try {
+        const res = await fetch('/api/teachers/search?query=' + encodeURIComponent(query) + '&field=' + field);
+        const data = await res.json();
+        if (!data.success || data.data.length === 0) { resultsDiv.innerHTML = '<div class="text-center py-16"><div class="text-6xl mb-4">🔍</div><div class="text-slate-400 font-semibold">لا توجد نتائج</div></div>'; return; }
+        resultsDiv.innerHTML = '<h3 class="text-lg font-bold text-slate-800 mb-4">📋 نتائج البحث (' + data.count + ')</h3><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">' +
+          data.data.map(function(t) {
+            return '<div class="bg-gradient-to-br from-white to-slate-50 border-2 border-slate-200 rounded-2xl p-5 hover:shadow-xl hover:border-emerald-300 transition-all cursor-pointer" onclick="viewTeacherDetails(' + t.id + ')">' +
+              '<div class="flex items-center gap-4 mb-4"><div class="w-16 h-16 bg-gradient-to-br from-emerald-100 to-teal-100 rounded-full flex items-center justify-center text-3xl overflow-hidden flex-shrink-0 border-2 border-white shadow-md">' + (t.photo ? '<img src="' + t.photo + '" class="w-full h-full object-cover">' : '👨‍🏫') + '</div>' +
+              '<div class="flex-1 min-w-0"><h4 class="font-bold text-lg text-slate-800 truncate">' + t.name + '</h4><p class="text-sm text-slate-500">' + (t.subject || '-') + '</p></div></div>' +
+              '<div class="space-y-2 text-sm border-t border-slate-100 pt-3"><div class="flex justify-between"><span class="text-slate-500">الهاتف:</span><span class="font-semibold">' + (t.phone || '-') + '</span></div><div class="flex justify-between"><span class="text-slate-500">الراتب:</span><span class="font-semibold">' + (t.salary || 0) + ' ج</span></div></div>' +
+              '<button onclick="event.stopPropagation(); viewTeacherDetails(' + t.id + ')" class="mt-4 w-full bg-gradient-to-r from-emerald-600 to-teal-600 text-white py-2.5 rounded-xl font-bold hover:shadow-lg transition">عرض السجل الكامل</button></div>';
+          }).join('') + '</div>';
+      } catch (err) { resultsDiv.innerHTML = '<div class="text-center py-12 text-red-500">❌ خطأ</div>'; }
+    }
+
+    async function viewTeacherDetails(id) {
+      try {
+        const res = await fetch('/api/teachers/' + id);
+        const data = await res.json();
+        if (!data.success) { showToast('❌ خطأ', 'error'); return; }
+        const t = data.data;
+        document.getElementById('teacher-results').innerHTML = '<div class="bg-gradient-to-br from-emerald-50 via-white to-teal-50 rounded-3xl shadow-2xl border-2 border-emerald-200 p-6 md:p-10">' +
+          '<div class="flex justify-between items-start mb-8 flex-wrap gap-3"><div><h3 class="text-3xl font-extrabold text-slate-800 mb-2">📋 السجل الكامل للمعلم</h3><p class="text-sm text-slate-500">جميع المعلومات</p></div>' +
+          '<button onclick="renderTeacherRecords()" class="bg-white hover:bg-slate-50 text-slate-700 px-6 py-3 rounded-xl font-bold transition border border-slate-200 shadow-sm">← رجوع</button></div>' +
+          '<div class="bg-gradient-to-r from-emerald-600 to-teal-600 rounded-2xl p-8 mb-6 text-white shadow-xl"><div class="flex items-center gap-6 flex-wrap">' +
+          '<div class="w-32 h-32 bg-white/20 rounded-2xl flex items-center justify-center text-6xl overflow-hidden border-4 border-white/30 shadow-lg flex-shrink-0">' + (t.photo ? '<img src="' + t.photo + '" class="w-full h-full object-cover">' : '👨‍🏫') + '</div>' +
+          '<div class="flex-1 min-w-[200px]"><h4 class="text-3xl font-extrabold mb-4">' + t.name + '</h4><div class="grid grid-cols-2 gap-3 text-sm"><div class="bg-white/10 backdrop-blur px-4 py-2 rounded-lg"><span class="opacity-80">المادة:</span> <span class="font-bold">' + (t.subject || '-') + '</span></div><div class="bg-white/10 backdrop-blur px-4 py-2 rounded-lg"><span class="opacity-80">الراتب:</span> <span class="font-bold">' + (t.salary || 0) + ' ج</span></div></div></div></div></div>' +
+          '<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6"><div class="bg-white rounded-2xl p-6 shadow-lg border border-slate-100"><h5 class="text-xl font-bold text-slate-800 mb-5 pb-3 border-b-2 border-emerald-100">📞 معلومات الاتصال</h5><div class="space-y-4"><div class="flex items-start gap-3"><div class="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center text-xl">📱</div><div><div class="text-xs text-slate-500 font-semibold">الهاتف</div><div class="font-bold">' + (t.phone || '-') + '</div></div></div><div class="flex items-start gap-3"><div class="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center text-xl">📧</div><div><div class="text-xs text-slate-500 font-semibold">البريد</div><div class="font-bold">' + (t.email || '-') + '</div></div></div></div></div>' +
+          '<div class="bg-white rounded-2xl p-6 shadow-lg border border-slate-100"><h5 class="text-xl font-bold text-slate-800 mb-5 pb-3 border-b-2 border-emerald-100">📊 المعلومات المهنية</h5><div class="space-y-4"><div class="bg-gradient-to-br from-emerald-50 to-teal-50 rounded-xl p-5 border border-emerald-100"><div class="text-xs text-slate-500 font-semibold mb-1">المادة</div><div class="text-xl font-extrabold text-emerald-700">' + (t.subject || '-') + '</div></div><div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-5 border border-blue-100"><div class="text-xs text-slate-500 font-semibold mb-1">الراتب</div><div class="text-xl font-extrabold text-blue-700">' + (t.salary || 0) + ' جنيه</div></div></div></div></div>' +
+          '<div class="flex flex-col sm:flex-row gap-3"><button onclick="window.open(\'/api/cards/print/teacher/' + t.id + '\', \'_blank\')" class="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 text-white py-4 rounded-xl font-bold hover:shadow-xl transition">🎫 طباعة بطاقة المعلم</button><button onclick="window.print()" class="flex-1 bg-white hover:bg-slate-50 text-slate-700 py-4 rounded-xl font-bold transition border-2 border-slate-200">🖨️ طباعة السجل</button></div></div>';
+      } catch (err) { showToast('❌ خطأ', 'error'); }
+    }
+
+    // ======== سجلات الموظفين ========
+    async function renderEmployeeRecords() {
+      const contentDiv = document.getElementById('main-content');
+      contentDiv.innerHTML = '<div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 md:p-8 mb-6">' +
+        '<h3 class="text-lg font-bold text-slate-800 mb-6">🔍 البحث في سجلات الموظفين</h3>' +
+        '<div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">' +
+        '<div><label class="block text-sm font-semibold text-slate-700 mb-2">نوع البحث</label><select id="employee-search-field" class="form-input mb-0"><option value="name">الاسم</option><option value="role">الوظيفة</option></select></div>' +
+        '<div class="md:col-span-2"><label class="block text-sm font-semibold text-slate-700 mb-2">ابحث عن...</label><input type="text" id="employee-search-query" class="form-input mb-0" placeholder="اكتب اسم الموظف أو وظيفته" onkeypress="if(event.key===\'Enter\') searchEmployees()"></div>' +
+        '<div class="flex items-end"><button onclick="searchEmployees()" class="btn-primary w-full py-3">🔍 بحث</button></div></div></div>' +
+        '<div id="employee-results" class="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 md:p-8"><div class="text-center py-16"><div class="text-6xl mb-4">👔</div><div class="text-slate-400 font-semibold">استخدم البحث أعلاه</div></div></div>';
+    }
+
+    async function searchEmployees() {
+      const field = document.getElementById('employee-search-field').value;
+      const query = document.getElementById('employee-search-query').value;
+      const resultsDiv = document.getElementById('employee-results');
+      if (!query) { resultsDiv.innerHTML = '<div class="text-center py-12 text-red-500 font-semibold">❌ الرجاء إدخال كلمة البحث</div>'; return; }
+      resultsDiv.innerHTML = '<div class="text-center py-12 text-slate-400">جاري البحث...</div>';
+      try {
+        const res = await fetch('/api/employees/search?query=' + encodeURIComponent(query) + '&field=' + field);
+        const data = await res.json();
+        if (!data.success || data.data.length === 0) { resultsDiv.innerHTML = '<div class="text-center py-16"><div class="text-6xl mb-4">🔍</div><div class="text-slate-400 font-semibold">لا توجد نتائج</div></div>'; return; }
+        resultsDiv.innerHTML = '<h3 class="text-lg font-bold text-slate-800 mb-4">📋 نتائج البحث (' + data.count + ')</h3><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">' +
+          data.data.map(function(e) {
+            return '<div class="bg-gradient-to-br from-white to-slate-50 border-2 border-slate-200 rounded-2xl p-5 hover:shadow-xl hover:border-amber-300 transition-all cursor-pointer" onclick="viewEmployeeDetails(' + e.id + ')">' +
+              '<div class="flex items-center gap-4 mb-4"><div class="w-16 h-16 bg-gradient-to-br from-amber-100 to-orange-100 rounded-full flex items-center justify-center text-3xl overflow-hidden flex-shrink-0 border-2 border-white shadow-md">' + (e.photo ? '<img src="' + e.photo + '" class="w-full h-full object-cover">' : '👔') + '</div>' +
+              '<div class="flex-1 min-w-0"><h4 class="font-bold text-lg text-slate-800 truncate">' + e.name + '</h4><p class="text-sm text-slate-500">' + (e.role || '-') + '</p></div></div>' +
+              '<div class="space-y-2 text-sm border-t border-slate-100 pt-3"><div class="flex justify-between"><span class="text-slate-500">الهاتف:</span><span class="font-semibold">' + (e.phone || '-') + '</span></div><div class="flex justify-between"><span class="text-slate-500">الراتب:</span><span class="font-semibold">' + (e.salary || 0) + ' ج</span></div></div>' +
+              '<button onclick="event.stopPropagation(); viewEmployeeDetails(' + e.id + ')" class="mt-4 w-full bg-gradient-to-r from-amber-600 to-orange-600 text-white py-2.5 rounded-xl font-bold hover:shadow-lg transition">عرض السجل الكامل</button></div>';
+          }).join('') + '</div>';
+      } catch (err) { resultsDiv.innerHTML = '<div class="text-center py-12 text-red-500">❌ خطأ</div>'; }
+    }
+
+    async function viewEmployeeDetails(id) {
+      try {
+        const res = await fetch('/api/employees/' + id);
+        const data = await res.json();
+        if (!data.success) { showToast('❌ خطأ', 'error'); return; }
+        const e = data.data;
+        document.getElementById('employee-results').innerHTML = '<div class="bg-gradient-to-br from-amber-50 via-white to-orange-50 rounded-3xl shadow-2xl border-2 border-amber-200 p-6 md:p-10">' +
+          '<div class="flex justify-between items-start mb-8 flex-wrap gap-3"><div><h3 class="text-3xl font-extrabold text-slate-800 mb-2">📋 السجل الكامل للموظف</h3><p class="text-sm text-slate-500">جميع المعلومات</p></div>' +
+          '<button onclick="renderEmployeeRecords()" class="bg-white hover:bg-slate-50 text-slate-700 px-6 py-3 rounded-xl font-bold transition border border-slate-200 shadow-sm">← رجوع</button></div>' +
+          '<div class="bg-gradient-to-r from-amber-600 to-orange-600 rounded-2xl p-8 mb-6 text-white shadow-xl"><div class="flex items-center gap-6 flex-wrap">' +
+          '<div class="w-32 h-32 bg-white/20 rounded-2xl flex items-center justify-center text-6xl overflow-hidden border-4 border-white/30 shadow-lg flex-shrink-0">' + (e.photo ? '<img src="' + e.photo + '" class="w-full h-full object-cover">' : '👔') + '</div>' +
+          '<div class="flex-1 min-w-[200px]"><h4 class="text-3xl font-extrabold mb-4">' + e.name + '</h4><div class="grid grid-cols-2 gap-3 text-sm"><div class="bg-white/10 backdrop-blur px-4 py-2 rounded-lg"><span class="opacity-80">الوظيفة:</span> <span class="font-bold">' + (e.role || '-') + '</span></div><div class="bg-white/10 backdrop-blur px-4 py-2 rounded-lg"><span class="opacity-80">الراتب:</span> <span class="font-bold">' + (e.salary || 0) + ' ج</span></div></div></div></div></div>' +
+          '<div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6"><div class="bg-white rounded-2xl p-6 shadow-lg border border-slate-100"><h5 class="text-xl font-bold text-slate-800 mb-5 pb-3 border-b-2 border-amber-100">📞 معلومات الاتصال</h5><div class="space-y-4"><div class="flex items-start gap-3"><div class="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center text-xl">📱</div><div><div class="text-xs text-slate-500 font-semibold">الهاتف</div><div class="font-bold">' + (e.phone || '-') + '</div></div></div><div class="flex items-start gap-3"><div class="w-10 h-10 bg-amber-100 rounded-lg flex items-center justify-center text-xl">📧</div><div><div class="text-xs text-slate-500 font-semibold">البريد</div><div class="font-bold">' + (e.email || '-') + '</div></div></div></div></div>' +
+          '<div class="bg-white rounded-2xl p-6 shadow-lg border border-slate-100"><h5 class="text-xl font-bold text-slate-800 mb-5 pb-3 border-b-2 border-amber-100">📊 المعلومات المهنية</h5><div class="space-y-4"><div class="bg-gradient-to-br from-amber-50 to-orange-50 rounded-xl p-5 border border-amber-100"><div class="text-xs text-slate-500 font-semibold mb-1">الوظيفة</div><div class="text-xl font-extrabold text-amber-700">' + (e.role || '-') + '</div></div><div class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-xl p-5 border border-blue-100"><div class="text-xs text-slate-500 font-semibold mb-1">الراتب</div><div class="text-xl font-extrabold text-blue-700">' + (e.salary || 0) + ' جنيه</div></div></div></div></div>' +
+          '<div class="flex flex-col sm:flex-row gap-3"><button onclick="window.open(\'/api/cards/print/employee/' + e.id + '\', \'_blank\')" class="flex-1 bg-gradient-to-r from-purple-600 to-pink-600 text-white py-4 rounded-xl font-bold hover:shadow-xl transition">🎫 طباعة بطاقة الموظف</button><button onclick="window.print()" class="flex-1 bg-white hover:bg-slate-50 text-slate-700 py-4 rounded-xl font-bold transition border-2 border-slate-200">🖨️ طباعة السجل</button></div></div>';
+      } catch (err) { showToast('❌ خطأ', 'error'); }
+    }
+
+    // ======== البطاقات ========
+    async function renderCards() {
+      const contentDiv = document.getElementById('main-content');
+      contentDiv.innerHTML = '<div class="bg-gradient-to-br from-purple-50 via-pink-50 to-indigo-50 rounded-2xl shadow-sm border border-purple-100 p-4 md:p-8 mb-6">' +
+        '<h3 class="text-lg font-bold text-slate-800 mb-6">🎫 إنشاء بطاقة احترافية</h3>' +
+        '<div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">' +
+        '<div><label class="block text-sm font-semibold text-slate-700 mb-2">نوع البطاقة</label><select id="card-type" class="form-input mb-0" onchange="loadCardPersons()"><option value="student">👨‍🎓 طالب</option><option value="teacher">👨‍🏫 معلم</option><option value="employee">👔 موظف</option></select></div>' +
+        '<div><label class="block text-sm font-semibold text-slate-700 mb-2">البحث السريع</label><input type="text" id="card-search" class="form-input mb-0" placeholder="اكتب الاسم..." oninput="filterCardPersons()"></div>' +
+        '<div><label class="block text-sm font-semibold text-slate-700 mb-2">اختر الشخص</label><select id="card-person" class="form-input mb-0"><option value="">جاري التحميل...</option></select></div></div>' +
+        '<button onclick="generateCard()" class="btn-primary w-full py-3 text-base">🎫 إنشاء وطباعة البطاقة</button></div>';
+      await loadCardPersons();
+    }
+
+    async function loadCardPersons() {
+      const type = document.getElementById('card-type').value;
+      const select = document.getElementById('card-person');
+      select.innerHTML = '<option value="">جاري التحميل...</option>';
+      try {
+        const res = await fetch('/api/' + type + 's');
+        const data = await res.json();
+        if (data.success && data.data) {
+          select.innerHTML = '<option value="">اختر الشخص</option>';
+          data.data.forEach(function(p) {
+            const displayText = type === 'student' ? (p.name + ' (' + (p.student_number || p.grade || '-') + ')') : p.name;
+            select.innerHTML += '<option value="' + p.id + '" data-name="' + p.name + '">' + displayText + '</option>';
+          });
+        }
+      } catch (err) { console.error('خطأ:', err); }
+    }
+
+    function filterCardPersons() {
+      const query = document.getElementById('card-search').value.toLowerCase();
+      const select = document.getElementById('card-person');
+      Array.from(select.options).forEach(function(option) {
+        if (option.value === '') return;
+        const name = (option.getAttribute('data-name') || '').toLowerCase();
+        option.hidden = !(name.includes(query) || option.value.includes(query));
+      });
+    }
+
+    function generateCard() {
+      const type = document.getElementById('card-type').value;
+      const personId = document.getElementById('card-person').value;
+      if (!personId) { showToast('❌ الرجاء اختيار الشخص', 'error'); return; }
+      window.open('/api/cards/print/' + type + '/' + personId, '_blank');
+    }
+
+    // ======== إدارة الحصص ========
+    async function renderManageSchedules() {
+      const contentDiv = document.getElementById('main-content');
+      contentDiv.innerHTML = '<div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 md:p-8 mb-6"><h3 class="text-lg font-bold text-slate-800 mb-6">➕ إضافة حصة جديدة</h3>' +
+        '<form id="schedule-form" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">' +
+        '<div><label class="block text-sm font-semibold text-slate-700 mb-2">اليوم *</label><select id="sched-day" class="form-input mb-0" required><option value="">اختر</option><option value="الأحد">الأحد</option><option value="الاثنين">الاثنين</option><option value="الثلاثاء">الثلاثاء</option><option value="الأربعاء">الأربعاء</option><option value="الخميس">الخميس</option></select></div>' +
+        '<div><label class="block text-sm font-semibold text-slate-700 mb-2">رقم الحصة *</label><select id="sched-period" class="form-input mb-0" required><option value="">اختر</option><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option></select></div>' +
+        '<div><label class="block text-sm font-semibold text-slate-700 mb-2">الفصل *</label><select id="sched-section" class="form-input mb-0" required><option value="">تحميل...</option></select></div>' +
+        '<div><label class="block text-sm font-semibold text-slate-700 mb-2">المعلم *</label><select id="sched-teacher" class="form-input mb-0" required><option value="">تحميل...</option></select></div>' +
+        '<div><label class="block text-sm font-semibold text-slate-700 mb-2">المادة *</label><select id="sched-subject" class="form-input mb-0" required><option value="">تحميل...</option></select></div>' +
+        '<div><label class="block text-sm font-semibold text-slate-700 mb-2">القاعة *</label><input type="text" id="sched-room" class="form-input mb-0" placeholder="القاعة 101" required></div>' +
+        '<div class="md:col-span-2 lg:col-span-3 flex justify-end gap-3 mt-4"><button type="button" onclick="resetScheduleForm()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-6 py-3 rounded-xl font-bold transition">🔄 إعادة تعيين</button><button type="submit" class="btn-success flex items-center gap-2 px-8 py-3">✅ حفظ الحصة</button></div></form></div>' +
+        '<div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 md:p-8"><div class="flex justify-between items-center mb-6"><h3 class="text-lg font-bold text-slate-800">📋 الحصص المضافة</h3><button onclick="loadManageSchedulesList()" class="bg-slate-100 hover:bg-slate-200 text-slate-700 px-4 py-2 rounded-lg text-sm font-semibold transition">🔄 تحديث</button></div>' +
+        '<div class="overflow-x-auto -mx-4 md:mx-0"><table class="w-full text-sm min-w-[800px]"><thead class="bg-slate-50 border-b border-slate-100"><tr><th class="px-4 py-3 text-right font-semibold text-slate-600">اليوم</th><th class="px-4 py-3 text-right font-semibold text-slate-600">الحصة</th><th class="px-4 py-3 text-right font-semibold text-slate-600">المادة</th><th class="px-4 py-3 text-right font-semibold text-slate-600">المعلم</th><th class="px-4 py-3 text-right font-semibold text-slate-600">الفصل</th><th class="px-4 py-3 text-right font-semibold text-slate-600">القاعة</th><th class="px-4 py-3 text-right font-semibold text-slate-600">الإجراءات</th></tr></thead><tbody id="manage-schedules-body"><tr><td colspan="7" class="text-center py-12 text-slate-400">جاري التحميل...</td></tr></tbody></table></div></div>';
+      await loadScheduleOptions();
+      loadManageSchedulesList();
+      document.getElementById('schedule-form').addEventListener('submit', handleScheduleSubmit);
+    }
+
+    async function loadScheduleOptions() {
+      try {
+        const sR = await fetch('/api/sections-list'); const sD = await sR.json();
+        const sS = document.getElementById('sched-section');
+        if (sD.success && sD.data.length > 0) { sS.innerHTML = '<option value="">اختر الفصل</option>'; sD.data.forEach(function(s) { sS.innerHTML += '<option value="' + s + '">' + s + '</option>'; }); } else sS.innerHTML = '<option value="">لا توجد فصول</option>';
+        const tR = await fetch('/api/teachers-list'); const tD = await tR.json();
+        const tS = document.getElementById('sched-teacher');
+        if (tD.success && tD.data.length > 0) { tS.innerHTML = '<option value="">اختر المعلم</option>'; tD.data.forEach(function(t) { tS.innerHTML += '<option value="' + t.name + '" data-subject="' + t.subject + '">' + t.name + ' (' + t.subject + ')</option>'; }); } else tS.innerHTML = '<option value="">لا يوجد معلمون</option>';
+        const mR = await fetch('/api/subjects-list'); const mD = await mR.json();
+        const mS = document.getElementById('sched-subject');
+        if (mD.success && mD.data.length > 0) { mS.innerHTML = '<option value="">اختر المادة</option>'; mD.data.forEach(function(s) { mS.innerHTML += '<option value="' + s.name + '">' + s.name + '</option>'; }); } else mS.innerHTML = '<option value="">لا توجد مواد</option>';
+        tS.addEventListener('change', function() { const sub = this.options[this.selectedIndex].getAttribute('data-subject'); if (sub && mS) { for (let i = 0; i < mS.options.length; i++) { if (mS.options[i].value === sub) { mS.selectedIndex = i; break; } } } });
+      } catch (err) { console.error('خطأ:', err); }
+    }
+
+    async function handleScheduleSubmit(e) {
+      e.preventDefault();
+      const data = { day: document.getElementById('sched-day').value, period: document.getElementById('sched-period').value, section: document.getElementById('sched-section').value, teacher: document.getElementById('sched-teacher').value, subject: document.getElementById('sched-subject').value, room: document.getElementById('sched-room').value };
+      try {
+        const res = await fetch('/api/schedules', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
+        const result = await res.json();
+        if (result.success) { showToast('✅ تمت إضافة الحصة بنجاح'); resetScheduleForm(); loadManageSchedulesList(); } else showToast('❌ ' + result.message, 'error');
+      } catch (err) { showToast('❌ خطأ', 'error'); }
+    }
+
+    function resetScheduleForm() {
+      document.getElementById('schedule-form').reset();
+      ['sched-day','sched-period','sched-section','sched-teacher','sched-subject'].forEach(function(id) { document.getElementById(id).selectedIndex = 0; });
+      document.getElementById('sched-room').value = '';
+    }
+
+    async function loadManageSchedulesList() {
+      const tbody = document.getElementById('manage-schedules-body');
+      if (!tbody) return;
+      try {
+        const res = await fetch('/api/schedules'); const data = await res.json();
+        if (!data.success || !data.data || data.data.length === 0) { tbody.innerHTML = '<tr><td colspan="7" class="text-center py-12 text-slate-400">لا توجد حصص</td></tr>'; return; }
+        const daysOrder = ['الأحد','الاثنين','الثلاثاء','الأربعاء','الخميس'];
+        const sorted = data.data.sort(function(a, b) { const d = daysOrder.indexOf(a.day) - daysOrder.indexOf(b.day); return d !== 0 ? d : a.period - b.period; });
+        tbody.innerHTML = sorted.map(function(row) { return '<tr class="hover:bg-slate-50 transition"><td class="px-4 py-4 font-semibold">' + row.day + '</td><td class="px-4 py-4">الحصة ' + row.period + '</td><td class="px-4 py-4 text-indigo-700 font-semibold">' + row.subject + '</td><td class="px-4 py-4">' + row.teacher + '</td><td class="px-4 py-4">' + row.section + '</td><td class="px-4 py-4">' + row.room + '</td><td class="px-4 py-4"><button onclick="deleteScheduleItem(' + row.id + ',\'' + row.subject + '\')" class="btn-action btn-delete">🗑️</button></td></tr>'; }).join('');
+      } catch (err) { tbody.innerHTML = '<tr><td colspan="7" class="text-center py-12 text-red-500">❌ خطأ</td></tr>'; }
+    }
+
+    async function deleteScheduleItem(id, subject) {
+      if (!confirm('حذف حصة "' + subject + '"؟')) return;
+      try { const res = await fetch('/api/schedules/' + id, { method: 'DELETE' }); const r = await res.json(); if (r.success) { showToast('🗑️ تم الحذف'); loadManageSchedulesList(); } else showToast('❌ ' + r.message, 'error'); } catch (err) { showToast('❌ خطأ', 'error'); }
+    }
+
+    // ======== التقارير ========
+    function renderReports() {
+      document.getElementById('main-content').innerHTML = '<div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 md:p-8 mb-6"><h3 class="text-lg font-bold text-slate-800 mb-6">📄 إنشاء تقرير مخصص</h3><div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 mb-6"><div><label class="block text-sm font-semibold text-slate-700 mb-2">نوع التقرير</label><select id="report-type" class="form-input mb-0"><option value="attendance">📅 الحضور</option><option value="fees">💰 الرسوم</option><option value="students">👥 الطلاب</option><option value="teachers">👨‍🏫 المعلمين</option></select></div><div><label class="block text-sm font-semibold text-slate-700 mb-2">من تاريخ</label><input type="date" id="report-from" class="form-input mb-0"></div><div><label class="block text-sm font-semibold text-slate-700 mb-2">إلى تاريخ</label><input type="date" id="report-to" class="form-input mb-0"></div><div class="flex items-end"><button onclick="generateReport()" class="btn-primary w-full py-3">📄 إنشاء</button></div></div></div><div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 md:p-8"><h3 class="text-lg font-bold text-slate-800 mb-4">📋 تقارير جاهزة</h3><div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"><a href="/api/reports/students" target="_blank" class="bg-gradient-to-br from-indigo-500 to-blue-600 text-white p-5 rounded-xl hover:shadow-lg transition flex items-center gap-3"><span class="text-3xl">👥</span><div><h4 class="font-bold">تقرير الطلاب</h4><p class="text-xs opacity-90">عرض وطباعة</p></div></a><a href="/api/reports/teachers" target="_blank" class="bg-gradient-to-br from-emerald-500 to-teal-600 text-white p-5 rounded-xl hover:shadow-lg transition flex items-center gap-3"><span class="text-3xl">👨‍🏫</span><div><h4 class="font-bold">تقرير المعلمين</h4><p class="text-xs opacity-90">عرض وطباعة</p></div></a><a href="/api/reports/fees" target="_blank" class="bg-gradient-to-br from-amber-500 to-orange-600 text-white p-5 rounded-xl hover:shadow-lg transition flex items-center gap-3"><span class="text-3xl">💰</span><div><h4 class="font-bold">التقرير المالي</h4><p class="text-xs opacity-90">عرض وطباعة</p></div></a></div></div>';
+    }
+
+    function generateReport() {
+      const type = document.getElementById('report-type').value;
+      const f = document.getElementById('report-from').value;
+      const t = document.getElementById('report-to').value;
+      let url = '/api/reports/advanced?type=' + type;
+      if (f) url += '&date_from=' + f;
+      if (t) url += '&date_to=' + t;
+      window.open(url, '_blank');
+    }
+
+    // ======== جدول الحصص ========
+    async function renderSchedules() {
+      document.getElementById('main-content').innerHTML = '<div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 md:p-8"><h3 class="text-lg font-bold text-slate-800 mb-6">🕐 جدول الحصص</h3><div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6"><div><label class="block text-sm font-semibold text-slate-700 mb-2">الفصل</label><select id="schedule-section" class="form-input mb-0" onchange="loadSchedule()"><option value="">تحميل...</option></select></div><div><label class="block text-sm font-semibold text-slate-700 mb-2">نوع العرض</label><select id="schedule-view" class="form-input mb-0" onchange="toggleScheduleView()"><option value="weekly">📆 أسبوعي</option><option value="daily">📅 يومي</option></select></div><div id="daily-day-selector" style="display:none"><label class="block text-sm font-semibold text-slate-700 mb-2">اليوم</label><select id="schedule-day" class="form-input mb-0" onchange="loadSchedule()"><option value="الأحد">الأحد</option><option value="الاثنين">الاثنين</option><option value="الثلاثاء">الثلاثاء</option><option value="الأربعاء">الأربعاء</option><option value="الخميس">الخميس</option></select></div></div><div class="flex justify-end mb-4"><button onclick="printSchedule()" class="bg-indigo-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-indigo-700 transition">🖨️ طباعة الجدول</button></div><div id="schedule-container" class="overflow-x-auto"><div class="text-center py-12 text-slate-400">جاري التحميل...</div></div></div>';
+      await loadSections(); loadSchedule();
+    }
+
+    async function loadSections() {
+      try { const res = await fetch('/api/sections'); const data = await res.json(); const s = document.getElementById('schedule-section'); if (data.success && data.data) { s.innerHTML = '<option value="all">جميع الفصول</option>'; data.data.forEach(function(sec) { const o = document.createElement('option'); o.value = sec; o.textContent = sec; s.appendChild(o); }); } } catch (err) {}
+    }
+
+    function toggleScheduleView() { document.getElementById('daily-day-selector').style.display = document.getElementById('schedule-view').value === 'daily' ? 'block' : 'none'; loadSchedule(); }
+
+    async function loadSchedule() {
+      const section = document.getElementById('schedule-section').value;
+      const view = document.getElementById('schedule-view').value;
+      const c = document.getElementById('schedule-container');
+      c.innerHTML = '<div class="text-center py-12 text-slate-400">جاري التحميل...</div>';
+      try {
+        let url = '/api/schedules/weekly?section=' + encodeURIComponent(section) + '&view=' + view;
+        if (view === 'daily') url += '&day=' + encodeURIComponent(document.getElementById('schedule-day').value);
+        const res = await fetch(url); const data = await res.json();
+        if (!data.success) { c.innerHTML = '<div class="text-center py-12 text-red-500">❌ خطأ</div>'; return; }
+        if (view === 'daily') renderDailySchedule(data); else renderWeeklySchedule(data);
+      } catch (err) { c.innerHTML = '<div class="text-center py-12 text-red-500">❌ خطأ</div>'; }
+    }
+
+    function renderWeeklySchedule(data) {
+      const c = document.getElementById('schedule-container');
+      const sn = document.getElementById('schedule-section').value === 'all' ? 'جميع الفصول' : document.getElementById('schedule-section').value;
+      let h = '<h4 class="text-lg font-bold text-slate-800 mb-4">📆 الجدول الأسبوعي - ' + sn + '</h4><table class="w-full text-sm min-w-[800px] border-collapse"><thead><tr class="bg-slate-800 text-white"><th class="px-4 py-3 border border-slate-600">الحصة</th>';
+      data.days.forEach(function(d) { h += '<th class="px-4 py-3 border border-slate-600">' + d + '</th>'; });
+      h += '</tr></thead><tbody>';
+      data.periods.forEach(function(p) {
+        h += '<tr class="' + (p % 2 === 0 ? 'bg-slate-50' : 'bg-white') + '"><td class="px-4 py-3 border border-slate-200 font-bold text-center">الحصة ' + p + '</td>';
+        data.days.forEach(function(d) { const item = data.data[d][p]; if (item) h += '<td class="px-4 py-3 border border-slate-200 text-center"><div class="font-semibold text-indigo-700">' + item.subject + '</div><div class="text-xs text-slate-500">' + item.teacher + '</div><div class="text-xs text-slate-400">' + item.room + '</div></td>'; else h += '<td class="px-4 py-3 border border-slate-200 text-center text-slate-300">-</td>'; });
+        h += '</tr>';
+      });
+      h += '</tbody></table>'; c.innerHTML = h;
+    }
+
+    function renderDailySchedule(data) {
+      const c = document.getElementById('schedule-container');
+      const sn = document.getElementById('schedule-section').value === 'all' ? 'جميع الفصول' : document.getElementById('schedule-section').value;
+      let h = '<h4 class="text-lg font-bold text-slate-800 mb-4">📅 جدول يوم ' + data.day + ' - ' + sn + '</h4><table class="w-full text-sm border-collapse"><thead><tr class="bg-slate-800 text-white"><th class="px-4 py-3 border border-slate-600">الحصة</th><th class="px-4 py-3 border border-slate-600">المادة</th><th class="px-4 py-3 border border-slate-600">المعلم</th><th class="px-4 py-3 border border-slate-600">القاعة</th></tr></thead><tbody>';
+      if (data.data.length === 0) h += '<tr><td colspan="4" class="px-4 py-8 text-center text-slate-400">لا توجد حصص</td></tr>';
+      else data.data.forEach(function(item) { h += '<tr class="hover:bg-slate-50"><td class="px-4 py-3 border border-slate-200 text-center font-bold">الحصة ' + item.period + '</td><td class="px-4 py-3 border border-slate-200 font-semibold text-indigo-700">' + item.subject + '</td><td class="px-4 py-3 border border-slate-200">' + item.teacher + '</td><td class="px-4 py-3 border border-slate-200">' + item.room + '</td></tr>'; });
+      h += '</tbody></table>'; c.innerHTML = h;
+    }
+
+    function printSchedule() {
+      const s = document.getElementById('schedule-section').value;
+      const v = document.getElementById('schedule-view').value;
+      let url = '/api/reports/schedule-print?section=' + encodeURIComponent(s) + '&view=' + v;
+      if (v === 'daily') url += '&day=' + encodeURIComponent(document.getElementById('schedule-day').value);
+      window.open(url, '_blank');
+    }
+
+    // ======== الشهادات ========
     async function renderCertificates() {
       try {
-        const res = await fetch('/api/students');
-        const data = await res.json();
-        if (!data.success) {
-          document.getElementById('main-content').innerHTML = '<div class="bg-red-50 border border-red-100 p-6 rounded-2xl text-red-600 font-semibold">⛔ ' + data.message + '</div>';
-          return;
-        }
-        document.getElementById('main-content').innerHTML = `
-          <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-8">
-            <h3 class="text-xl font-bold text-slate-800 mb-6">🎓 شهادات الطلاب</h3>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-              ${data.data.length ? data.data.map(s => `
-                <a href="/certificate/${s.id}" target="_blank" class="group bg-gradient-to-br from-slate-800 to-slate-900 text-white p-6 rounded-2xl hover:shadow-xl transition-all duration-300 hover:-translate-y-1">
-                  <div class="flex items-center gap-4 mb-4">
-                    <div class="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center text-2xl">🎓</div>
-                    <div><h4 class="font-bold text-lg">${s.name}</h4><p class="text-sm text-slate-300">${s.grade} - ${s.section}</p></div>
-                  </div>
-                  <div class="mt-4 bg-white text-slate-900 px-4 py-2.5 rounded-xl text-sm font-bold text-center group-hover:bg-indigo-50 transition-colors">عرض وطباعة الشهادة</div>
-                </a>
-              `).join('') : '<p class="text-slate-400 col-span-3 text-center py-12">لا يوجد طلاب لعرض شهاداتهم</p>'}
-            </div>
-          </div>`;
-      } catch(e) {
-        document.getElementById('main-content').innerHTML = '<div class="bg-red-50 border border-red-100 p-6 rounded-2xl text-red-600 font-semibold">❌ خطأ في الاتصال</div>';
-      }
+        const res = await fetch('/api/students'); const data = await res.json();
+        if (!data.success) { document.getElementById('main-content').innerHTML = '<div class="bg-red-50 p-6 rounded-2xl text-red-600 font-semibold">⛔ ' + data.message + '</div>'; return; }
+        document.getElementById('main-content').innerHTML = '<div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 md:p-8"><h3 class="text-lg font-bold text-slate-800 mb-6">🎓 شهادات الطلاب</h3><div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">' + (data.data.length ? data.data.map(function(s) { return '<a href="/certificate/' + s.id + '" target="_blank" class="group bg-gradient-to-br from-slate-800 to-slate-900 text-white p-5 rounded-2xl hover:shadow-xl transition-all hover:-translate-y-1"><div class="flex items-center gap-4 mb-4"><div class="w-12 h-12 bg-white/10 rounded-full flex items-center justify-center text-2xl">🎓</div><div class="overflow-hidden"><h4 class="font-bold truncate">' + s.name + '</h4><p class="text-xs text-slate-300">' + s.grade + ' - ' + s.section + '</p></div></div><div class="bg-white text-slate-900 px-4 py-2.5 rounded-xl text-sm font-bold text-center group-hover:bg-indigo-50 transition">عرض الشهادة</div></a>'; }).join('') : '<p class="text-slate-400 col-span-3 text-center py-12">لا يوجد طلاب</p>') + '</div></div>';
+      } catch(e) { document.getElementById('main-content').innerHTML = '<div class="bg-red-50 p-6 rounded-2xl text-red-600 font-semibold">❌ خطأ</div>'; }
     }
 
-    async function loadData(table) {
+    // ======== إدارة المستخدمين ========
+    async function renderUsers() {
+      document.getElementById('main-content').innerHTML = '<div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-4 md:p-6"><div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-6 gap-4"><h3 class="text-lg font-bold text-slate-800">👥 إدارة المستخدمين</h3><button onclick="openUserModal()" class="btn-primary flex items-center gap-2 text-sm w-full sm:w-auto">➕ إضافة مستخدم</button></div><div class="overflow-x-auto -mx-4 md:mx-0"><table class="w-full text-sm min-w-[800px]"><thead class="bg-slate-50 border-b border-slate-100"><tr><th class="px-4 py-3 text-right font-semibold text-slate-600">الاسم</th><th class="px-4 py-3 text-right font-semibold text-slate-600">البريد</th><th class="px-4 py-3 text-right font-semibold text-slate-600">الدور</th><th class="px-4 py-3 text-right font-semibold text-slate-600">الهاتف</th><th class="px-4 py-3 text-right font-semibold text-slate-600">الحالة</th><th class="px-4 py-3 text-right font-semibold text-slate-600">الإجراءات</th></tr></thead><tbody id="users-table-body"><tr><td colspan="6" class="text-center py-12 text-slate-400">جاري التحميل...</td></tr></tbody></table></div></div>';
+      loadUsers();
+    }
+
+    async function loadUsers() {
       try {
-        const res = await fetch(`/api/${table}`);
-        const data = await res.json();
-        const tbody = document.getElementById('dynamic-table-body');
-        if (!tbody) return;
-        
-        if (!data.success) {
-          tbody.innerHTML = `<tr><td colspan="100" class="text-center py-12 text-red-500 font-semibold">⛔ ${data.message}</td></tr>`;
-          return;
-        }
-
-        const config = tableConfigs[currentTable];
-        if (!data.data || data.data.length === 0) {
-          tbody.innerHTML = `<tr><td colspan="100" class="text-center py-12 text-slate-400">لا توجد بيانات لعرضها حالياً</td></tr>`;
-          return;
-        }
-
-        tbody.innerHTML = data.data.map(row => `
-          <tr class="hover:bg-slate-50/80 transition-colors group">
-            ${config.columns.map(c => {
-              let val = row[c.key] || '-';
-              if (c.key === 'status') {
-                if (val === 'نشط' || val === 'paid' || val === 'present') val = `<span class="status-badge status-active">${val === 'نشط' ? 'نشط' : (val === 'paid' ? 'مدفوع' : 'حاضر')}</span>`;
-                else if (val === 'متوقف' || val === 'unpaid' || val === 'absent') val = `<span class="status-badge status-inactive">${val === 'متوقف' ? 'متوقف' : (val === 'unpaid' ? 'غير مدفوع' : 'غائب')}</span>`;
-                else if (val === 'late') val = `<span class="status-badge" style="background:#fff7ed;color:#ea580c">متأخر</span>`;
-              }
-              return `<td class="px-6 py-4 text-slate-700 font-medium">${val}</td>`;
-            }).join('')}
-            <td class="px-6 py-4">
-              ${!config.noAdd ? `
-                <button onclick="editItem('${table}', ${row.id})" class="btn-action btn-edit" title="تعديل">✏️</button>
-                <button onclick="deleteItem('${table}', ${row.id}, '${(row.name || row.student_name || row.book_title || row.bus_name || row.source || row.category || 'هذا السجل').replace(/'/g, "\\'")}')" class="btn-action btn-delete" title="حذف">🗑️</button>
-              ` : '<span class="text-slate-400 text-xs">سجل نظام</span>'}
-            </td>
-          </tr>
-        `).join('');
-      } catch (err) {
-        const tbody = document.getElementById('dynamic-table-body');
-        if (tbody) tbody.innerHTML = `<tr><td colspan="100" class="text-center py-12 text-red-500 font-semibold">❌ خطأ في الاتصال بالخادم</td></tr>`;
-      }
+        const res = await fetch('/api/users'); const data = await res.json(); const tbody = document.getElementById('users-table-body');
+        if (!data.success || !data.data || data.data.length === 0) { tbody.innerHTML = '<tr><td colspan="6" class="text-center py-12 text-slate-400">لا يوجد مستخدمين</td></tr>'; return; }
+        tbody.innerHTML = data.data.map(function(u) {
+          const rc = { 'مدير': 'bg-purple-100 text-purple-700', 'تسجيل الطلاب': 'bg-blue-100 text-blue-700', 'التقارير': 'bg-green-100 text-green-700', 'الشؤون المالية': 'bg-amber-100 text-amber-700', 'مخصص': 'bg-slate-100 text-slate-700' };
+          return '<tr class="hover:bg-slate-50 transition"><td class="px-4 py-4 font-semibold">' + u.name + '</td><td class="px-4 py-4 text-slate-600">' + u.email + '</td><td class="px-4 py-4"><span class="px-3 py-1 rounded-full text-xs font-bold ' + (rc[u.role] || 'bg-slate-100 text-slate-700') + '">' + u.role + '</span></td><td class="px-4 py-4 text-slate-600">' + (u.phone || '-') + '</td><td class="px-4 py-4">' + (u.status === 'active' ? '<span class="status-badge status-active">نشط</span>' : '<span class="status-badge status-inactive">موقوف</span>') + '</td><td class="px-4 py-4"><button onclick="openUserModal(' + u.id + ')" class="btn-action btn-edit">✏️</button>' + (u.id !== currentUser.id ? '<button onclick="deleteUser(' + u.id + ',\'' + u.name + '\')" class="btn-action btn-delete">🗑️</button>' : '') + '</td></tr>';
+        }).join('');
+      } catch (err) { document.getElementById('users-table-body').innerHTML = '<tr><td colspan="6" class="text-center py-12 text-red-500">❌ خطأ</td></tr>'; }
     }
 
-    function openModal(editData = null) {
-      const config = tableConfigs[currentTable];
-      document.getElementById('modal-title').textContent = editData ? `تعديل بيانات: ${config.title}` : `إضافة جديد إلى: ${config.title}`;
-      currentEditId = editData ? editData.id : null;
-      
-      document.getElementById('modal-form').innerHTML = config.form.map(f => {
-        const val = editData ? (editData[f.name] || '') : '';
-        if (f.type === 'select') {
-          return `<label class="block text-sm font-semibold text-slate-700 mb-1.5">${f.label}</label>
-                  <select name="${f.name}" class="form-input">${f.options.map(o => `<option value="${o}" ${val===o?'selected':''}>${o}</option>`).join('')}</select>`;
-        }
-        return `<label class="block text-sm font-semibold text-slate-700 mb-1.5">${f.label}</label>
-                <input type="${f.type}" name="${f.name}" value="${val}" class="form-input" placeholder="أدخل ${f.label}">`;
-      }).join('') + `<div class="flex gap-3 mt-8">
-        <button type="submit" class="flex-1 btn-primary py-3 text-base">💾 حفظ البيانات</button>
-        <button type="button" onclick="closeModal()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-3 rounded-xl font-bold transition-colors">إلغاء</button>
-      </div>`;
-      
+    function openUserModal(userId) {
+      currentEditId = userId || null;
+      document.getElementById('modal-title').textContent = userId ? 'تعديل مستخدم' : 'إضافة مستخدم جديد';
+      let user = { name: '', email: '', password: '', role: 'مخصص', phone: '', allowed_menus: [] };
+      if (userId) { fetch('/api/users').then(function(r) { return r.json(); }).then(function(data) { if (data.success) { user = data.data.find(function(u) { return u.id === userId; }) || user; let am = user.allowed_menus || []; if (typeof am === 'string') { try { am = JSON.parse(am); } catch (e) { am = []; } } user.allowed_menus = am; renderUserForm(user); } }); } else renderUserForm(user);
+    }
+
+    function renderUserForm(user) {
+      const roles = ['مدير','تسجيل الطلاب','التقارير','الشؤون المالية','مخصص'];
+      document.getElementById('modal-form').innerHTML = '<div class="space-y-4"><div><label class="block text-sm font-semibold text-slate-700 mb-1.5">الاسم *</label><input type="text" name="name" value="' + user.name + '" class="form-input" required></div><div><label class="block text-sm font-semibold text-slate-700 mb-1.5">البريد *</label><input type="email" name="email" value="' + user.email + '" class="form-input" required></div><div><label class="block text-sm font-semibold text-slate-700 mb-1.5">' + (currentEditId ? 'كلمة مرور جديدة' : 'كلمة المرور *') + '</label><input type="password" name="password" class="form-input" ' + (!currentEditId ? 'required' : '') + '></div><div><label class="block text-sm font-semibold text-slate-700 mb-1.5">الهاتف</label><input type="text" name="phone" value="' + (user.phone || '') + '" class="form-input"></div><div><label class="block text-sm font-semibold text-slate-700 mb-1.5">الدور *</label><select name="role" id="user-role-select" class="form-input" onchange="toggleCustomMenus()">' + roles.map(function(r) { return '<option value="' + r + '" ' + (user.role === r ? 'selected' : '') + '>' + r + '</option>'; }).join('') + '</select></div><div id="custom-menus-section" style="display:' + (user.role === 'مخصص' ? 'block' : 'none') + '"><label class="block text-sm font-semibold text-slate-700 mb-2">القوائم المسموح بها</label><div class="grid grid-cols-2 gap-2 max-h-60 overflow-y-auto border border-slate-200 rounded-lg p-3">' + allMenus.filter(function(m) { return m.id !== 'users'; }).map(function(m) { return '<label class="flex items-center gap-2 cursor-pointer hover:bg-slate-50 p-2 rounded"><input type="checkbox" name="allowed_menus" value="' + m.id + '" ' + (user.allowed_menus.includes(m.id) ? 'checked' : '') + ' class="rounded"><span class="text-sm">' + m.icon + ' ' + m.label + '</span></label>'; }).join('') + '</div></div>' + (currentEditId ? '<div><label class="block text-sm font-semibold text-slate-700 mb-1.5">الحالة</label><select name="status" class="form-input"><option value="active" ' + (user.status === 'active' ? 'selected' : '') + '>نشط</option><option value="inactive" ' + (user.status === 'inactive' ? 'selected' : '') + '>موقوف</option></select></div>' : '') + '</div><div class="flex flex-col sm:flex-row gap-3 mt-6"><button type="submit" class="btn-primary py-3 text-base flex-1">💾 ' + (currentEditId ? 'تعديل' : 'إضافة') + '</button><button type="button" onclick="closeModal()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-3 rounded-xl font-bold transition">إلغاء</button></div>';
       document.getElementById('modal').classList.add('show');
     }
 
-    async function editItem(table, id) {
-      try {
-        const actualTable = tableConfigs[table].table || table;
-        const res = await fetch(`/api/${actualTable}`);
-        const data = await res.json();
-        const item = data.data.find(r => r.id === id);
-        if (item) openModal(item);
-      } catch(e) { showToast('❌ خطأ في تحميل البيانات', 'error'); }
-    }
+    function toggleCustomMenus() { document.getElementById('custom-menus-section').style.display = document.getElementById('user-role-select').value === 'مخصص' ? 'block' : 'none'; }
 
-    function closeModal() { document.getElementById('modal').classList.remove('show'); }
-
-    document.getElementById('modal-form').addEventListener('submit', async (e) => {
+    document.getElementById('modal-form').addEventListener('submit', async function(e) {
       e.preventDefault();
-      const formData = new FormData(e.target);
-      const data = {}; formData.forEach((v, k) => data[k] = v);
-      
-      const actualTable = tableConfigs[currentTable].table || currentTable;
+      const fd = new FormData(e.target);
+      const data = { name: fd.get('name'), email: fd.get('email'), phone: fd.get('phone'), role: fd.get('role'), status: fd.get('status') || 'active' };
+      const pw = fd.get('password'); if (pw) data.password = pw;
+      data.allowed_menus = Array.from(document.querySelectorAll('input[name="allowed_menus"]:checked')).map(function(cb) { return cb.value; });
       const method = currentEditId ? 'PUT' : 'POST';
-      const url = currentEditId ? `/api/${actualTable}/${currentEditId}` : `/api/${actualTable}`;
-      
-      try {
-        const res = await fetch(url, { method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) });
-        const result = await res.json();
-        if (result.success) {
-          showToast(currentEditId ? '✅ تم تعديل البيانات بنجاح' : '✅ تمت إضافة البيانات بنجاح');
-          closeModal();
-          loadData(actualTable);
-        } else {
-          showToast('❌ ' + result.message, 'error');
-        }
-      } catch (err) { showToast('❌ خطأ في الاتصال بالخادم', 'error'); }
+      const url = currentEditId ? '/api/users/' + currentEditId : '/api/users';
+      try { const res = await fetch(url, { method: method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) }); const r = await res.json(); if (r.success) { showToast(currentEditId ? '✅ تم التعديل' : '✅ تمت الإضافة'); closeModal(); loadUsers(); } else showToast('❌ ' + r.message, 'error'); } catch (err) { showToast('❌ خطأ', 'error'); }
     });
 
-    async function deleteItem(table, id, name) {
-      if (!confirm(`هل أنت متأكد من حذف "${name}"؟\nلا يمكن التراجع عن هذا الإجراء.`)) return;
-      const actualTable = tableConfigs[table].table || table;
+    async function deleteUser(id, name) { if (!confirm('حذف "' + name + '"؟')) return; try { const res = await fetch('/api/users/' + id, { method: 'DELETE' }); const r = await res.json(); if (r.success) { showToast('🗑️ تم الحذف'); loadUsers(); } else showToast('❌ ' + r.message, 'error'); } catch (err) { showToast('❌ خطأ', 'error'); } }
+
+    async function loadData(table) {
       try {
-        const res = await fetch(`/api/${actualTable}/${id}`, { method: 'DELETE' });
-        const result = await res.json();
-        if (result.success) { 
-          showToast('🗑️ تم الحذف بنجاح'); 
-          loadData(actualTable); 
-        } else {
-          showToast('❌ ' + result.message, 'error');
-        }
-      } catch (err) { showToast('❌ خطأ في عملية الحذف', 'error'); }
+        const res = await fetch('/api/' + table); const data = await res.json(); const tbody = document.getElementById('dynamic-table-body');
+        if (!tbody) return;
+        if (!data.success) { tbody.innerHTML = '<tr><td colspan="100" class="text-center py-12 text-red-500">⛔ ' + data.message + '</td></tr>'; return; }
+        const config = tableConfigs[currentTable];
+        if (!data.data || data.data.length === 0) { tbody.innerHTML = '<tr><td colspan="100" class="text-center py-12 text-slate-400">لا توجد بيانات</td></tr>'; return; }
+        tbody.innerHTML = data.data.map(function(row) {
+          return '<tr class="hover:bg-slate-50 transition">' + config.columns.map(function(c) {
+            let val = row[c.key] || '-';
+            if (c.key === 'status') { if (val === 'نشط' || val === 'paid' || val === 'present') val = '<span class="status-badge status-active">' + (val === 'نشط' ? 'نشط' : val === 'paid' ? 'مدفوع' : 'حاضر') + '</span>'; else if (val === 'متوقف' || val === 'unpaid' || val === 'absent') val = '<span class="status-badge status-inactive">' + (val === 'متوقف' ? 'متوقف' : val === 'unpaid' ? 'غير مدفوع' : 'غائب') + '</span>'; }
+            return '<td class="px-4 py-4 text-slate-700 font-medium whitespace-nowrap">' + val + '</td>';
+          }).join('') + '<td class="px-4 py-4 whitespace-nowrap">' + (!config.noAdd ? '<button onclick="editItem(\'' + table + '\',' + row.id + ')" class="btn-action btn-edit">✏️</button><button onclick="deleteItem(\'' + table + '\',' + row.id + ',\'' + (row.name || row.student_name || 'سجل').replace(/'/g, "\\'") + '\')" class="btn-action btn-delete">🗑️</button>' : '<span class="text-slate-400 text-xs">سجل</span>') + '</td></tr>';
+        }).join('');
+      } catch (err) { const tbody = document.getElementById('dynamic-table-body'); if (tbody) tbody.innerHTML = '<tr><td colspan="100" class="text-center py-12 text-red-500">❌ خطأ</td></tr>'; }
     }
 
-    function showToast(msg, type = 'success') {
-      const t = document.getElementById('toast');
-      t.textContent = msg; 
-      t.className = `toast show ${type === 'error' ? 'error' : ''}`;
-      setTimeout(() => t.classList.remove('show'), 3000);
+    async function openModal(editData) {
+      const config = tableConfigs[currentTable];
+      currentPhotoUrl = editData ? (editData.photo || null) : null;
+      document.getElementById('modal-title').textContent = editData ? 'تعديل: ' + config.title : 'إضافة: ' + config.title;
+      currentEditId = editData ? editData.id : null;
+      let formHtml = '';
+      for (const f of config.form) {
+        const val = editData ? (editData[f.name] || '') : '';
+        if (f.type === 'select') formHtml += '<label class="block text-sm font-semibold text-slate-700 mb-1.5">' + f.label + '</label><select name="' + f.name + '" class="form-input">' + f.options.map(function(o) { return '<option value="' + o + '" ' + (val === o ? 'selected' : '') + '>' + o + '</option>'; }).join('') + '</select>';
+        else if (f.type === 'file') formHtml += '<label class="block text-sm font-semibold text-slate-700 mb-1.5">' + f.label + '</label><div id="photo-preview-container" class="mb-2">' + (currentPhotoUrl ? '<img src="' + currentPhotoUrl + '" class="photo-preview">' : '') + '</div><div class="photo-upload-area" onclick="document.getElementById(\'photo-file-input\').click()"><div class="text-3xl mb-2">📷</div><div class="text-sm text-slate-600 font-semibold">اضغط لاختيار صورة</div></div><input type="file" id="photo-file-input" accept="image/*" style="display:none" onchange="previewPhoto(this)"><input type="hidden" name="' + f.name + '" id="photo-url-input" value="' + (currentPhotoUrl || '') + '">';
+        else formHtml += '<label class="block text-sm font-semibold text-slate-700 mb-1.5">' + f.label + '</label><input type="' + f.type + '" name="' + f.name + '" value="' + val + '" class="form-input" placeholder="أدخل ' + f.label + '">';
+      }
+      formHtml += '<div class="flex flex-col sm:flex-row gap-3 mt-6"><button type="submit" class="btn-primary py-3 text-base flex-1">💾 حفظ</button><button type="button" onclick="closeModal()" class="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-3 rounded-xl font-bold transition">إلغاء</button></div>';
+      document.getElementById('modal-form').innerHTML = formHtml;
+      document.getElementById('modal').classList.add('show');
     }
 
-    function logout() { 
-      if(confirm('هل تريد تسجيل الخروج من النظام؟')) {
-        localStorage.removeItem('user'); 
-        window.location.href = '/login'; 
+    function previewPhoto(input) {
+      if (input.files && input.files[0]) {
+        if (input.files[0].size > 5 * 1024 * 1024) { showToast('❌ حجم الصورة كبير', 'error'); input.value = ''; return; }
+        const reader = new FileReader();
+        reader.onload = function(e) { document.getElementById('photo-preview-container').innerHTML = '<img src="' + e.target.result + '" class="photo-preview">'; document.getElementById('photo-url-input').value = e.target.result; };
+        reader.readAsDataURL(input.files[0]);
       }
     }
+
+    document.getElementById('modal-form').addEventListener('submit', async function(e) {
+      e.preventDefault();
+      const fd = new FormData(e.target); const data = {};
+      fd.forEach(function(v, k) { if (k !== 'photo') data[k] = v; });
+      const pu = document.getElementById('photo-url-input'); if (pu && pu.value) data.photo = pu.value;
+      const at = tableConfigs[currentTable]?.table || currentTable;
+      const method = currentEditId ? 'PUT' : 'POST';
+      const url = currentEditId ? '/api/' + at + '/' + currentEditId : '/api/' + at;
+      try { const res = await fetch(url, { method: method, headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(data) }); const r = await res.json(); if (r.success) { showToast(currentEditId ? '✅ تم التعديل' : '✅ تمت الإضافة'); closeModal(); loadData(at); } else showToast('❌ ' + r.message, 'error'); } catch (err) { showToast('❌ خطأ', 'error'); }
+    });
+
+    async function editItem(table, id) { try { const at = tableConfigs[table].table || table; const res = await fetch('/api/' + at); const data = await res.json(); const item = data.data.find(function(r) { return r.id === id; }); if (item) openModal(item); } catch(e) { showToast('❌ خطأ', 'error'); } }
+
+    function closeModal() { document.getElementById('modal').classList.remove('show'); currentPhotoUrl = null; }
+
+    async function deleteItem(table, id, name) { if (!confirm('حذف "' + name + '"؟')) return; const at = tableConfigs[table].table || table; try { const res = await fetch('/api/' + at + '/' + id, { method: 'DELETE' }); const r = await res.json(); if (r.success) { showToast('🗑️ تم الحذف'); loadData(at); } else showToast('❌ ' + r.message, 'error'); } catch (err) { showToast('❌ خطأ', 'error'); } }
+
+    function showToast(msg, type) { const t = document.getElementById('toast'); t.textContent = msg; t.className = 'toast show ' + (type === 'error' ? 'error' : ''); setTimeout(function() { t.classList.remove('show'); }, 3000); }
+
+    function logout() { if (confirm('هل تريد تسجيل الخروج؟')) { localStorage.removeItem('user'); window.location.href = '/login'; } }
 
     buildSidebar();
     showPage('dashboard');
   </script>
 </body>
 </html>
+    
