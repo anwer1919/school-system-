@@ -4,8 +4,24 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
   <title>لوحة التحكم | مدرسة النور</title>
+    <script>
+    // التحقق من الجلسة قبل تحميل أي شيء
+    (function() {
+      try {
+        const user = JSON.parse(localStorage.getItem('user') || 'null');
+        if (!user || !user.role) {
+          // إعادة التوجيه الفوري لصفحة تسجيل الدخول
+          window.location.replace('/login');
+        }
+      } catch(e) {
+        localStorage.removeItem('user');
+        window.location.replace('/login');
+      }
+    })();
+  </script>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+  <style>
   <style>
     :root {
       --primary: #6366f1;
